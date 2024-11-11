@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PackageId>MarvinMarjan.Latte</PackageId>
+        <Version>0.0.1</Version>
+        <Title>An immediate mode GUI for SFML.Net</Title>
+        <PackageTags>imgui gui ui sfml graphics rendering interface</PackageTags>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SFML.Net" Version="2.6.0" />
+    </ItemGroup>
+
+</Project>
