@@ -99,7 +99,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     public virtual Vector2f GetAlignmentPosition(AlignmentType alignment)
     {
-        FloatRect defaultBounds = MainWindow.Current!.View.ViewToRect();
+        FloatRect defaultBounds = App.MainWindow!.View.ViewToRect();
         return AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), Parent?.GetBounds() ?? defaultBounds, alignment);
     }
 

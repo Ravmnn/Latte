@@ -43,7 +43,7 @@ public class ButtonElement : RectangleElement, IClickable
 
     public override void Update()
     {
-        IsMouseHover = IsPointOver(MainWindow.Current!.WorldMousePosition);
+        IsMouseHover = IsPointOver(App.MainWindow!.WorldMousePosition);
         IsMouseDown = IsMouseHover && Mouse.IsButtonPressed(Mouse.Button.Left);
     
         if (IsMouseDown)
