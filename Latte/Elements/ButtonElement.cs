@@ -4,6 +4,7 @@ using SFML.System;
 using SFML.Window;
 using SFML.Graphics;
 
+using Latte.Application;
 using Latte.Elements.Shapes;
 
 
@@ -36,6 +37,9 @@ public class ButtonElement : RectangleElement, IClickable
             Alignment = AlignmentType.Center,
             Text = { FillColor = Color.Black }
         };
+        
+        BorderColor = new(100, 100, 100);
+        BorderSize = 3f;
         
         SetColorVariants(Color);
     }

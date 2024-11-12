@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Latte.Elements;
 
 
-namespace Latte;
+namespace Latte.Application;
 
 
 public static class App
@@ -11,6 +11,7 @@ public static class App
     public static Window? MainWindow { get; set; }
 
     public static List<Element> Elements { get; set; } = [];
+    
     
 
     public static void Update()

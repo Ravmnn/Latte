@@ -1,4 +1,7 @@
+using Latte.Application;
 using SFML.Graphics;
+using SFML.Graphics.Glsl;
+using SFML.System;
 
 
 namespace Latte.Elements.Shapes;
@@ -9,7 +12,7 @@ public abstract class ShapeElement : Element
     public override Transformable Transformable => SfmlShape;
     
     public Shape SfmlShape { get; protected set; }
-    
+
     public float BorderSize { get; set; }
 
     public Color Color { get; set; }
@@ -29,7 +32,10 @@ public abstract class ShapeElement : Element
         if (!Visible)
             return;
         
-        target.Draw(SfmlShape);
+        BufferTexture.Draw(SfmlShape);
+        UpdateClipShaderParameters();
+        
+        target.Draw(new Sprite(BufferTexture.Texture), new() { Shader = Loaded.ClipShader });
         
         base.Draw(target);
     }

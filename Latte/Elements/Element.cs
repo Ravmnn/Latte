@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 using SFML.System;
 using SFML.Graphics;
+using SFML.Graphics.Glsl;
+
+using Latte.Application;
 
 
 namespace Latte.Elements;
@@ -14,6 +17,11 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public List<Element> Children { get; }
     
     public abstract Transformable Transformable { get; }
+    
+    protected RenderTexture BufferTexture { get; set; }
+    
+    public bool Visible { get; set; }
+    public bool ShouldDrawElementBoundaries { get; set; }
     
     public Vector2f Position { get; set; }
     public Vector2f AbsolutePosition
@@ -35,9 +43,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public AlignmentType? Alignment { get; set; }
     public Vector2f AlignmentMargin { get; set; }
 
-    public bool Visible { get; set; }
-    public bool DrawElementBoundaries { get; set; }
-
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;
 
@@ -55,6 +60,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     public virtual void Update()
     {
+        Vector2f size = ParentOrWindowBounds().Size;
+        BufferTexture = new((uint)size.X, (uint)size.Y);
+        
         if (!Visible)
             return;
         
@@ -68,6 +76,23 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         foreach (Element child in Children)
             child.Update();
     }
+    
+    
+    protected void UpdateClipShaderParameters()
+    {
+        FloatRect bounds = ParentOrWindowBounds();
+        
+        Loaded.ClipShader.SetUniform("texture", BufferTexture.Texture);
+        Loaded.ClipShader.SetUniform("clipArea", new Vec4(bounds.Left, bounds.Top, bounds.Width, bounds.Height));
+    }
+    
+    
+    protected virtual void UpdateSfmlProperties()
+    {
+        Transformable.Position = AbsolutePosition;
+        Transformable.Origin = Origin;
+        Transformable.Rotation = Rotation;
+    }
 
     
     public virtual void Draw(RenderTarget target)
@@ -75,17 +100,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         if (!Visible)
             return;
         
-        if (DrawElementBoundaries)
-        {
-            FloatRect bounds = GetBounds();
-            target.Draw(new RectangleShape(bounds.Size)
-            {
-                Position = bounds.Position,
-                FillColor = Color.Transparent,
-                OutlineColor = Color.Red,
-                OutlineThickness = 1f
-            });
-        }
+        if (ShouldDrawElementBoundaries)
+            DrawElementBoundaries(target);
         
         DrawEvent?.Invoke(this, EventArgs.Empty);
         
@@ -94,22 +110,27 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     }
 
 
+    protected void DrawElementBoundaries(RenderTarget target)
+    {
+        FloatRect bounds = GetBounds();
+        target.Draw(new RectangleShape(bounds.Size)
+        {
+            Position = bounds.Position,
+            FillColor = Color.Transparent,
+            OutlineColor = Color.Red,
+            OutlineThickness = 1f
+        });
+    }
+
+
     public abstract FloatRect GetBounds();
+    
+    public FloatRect ParentOrWindowBounds()
+        => Parent?.GetBounds() ?? new(new(0, 0), (Vector2f)App.MainWindow!.Size);
 
 
     public virtual Vector2f GetAlignmentPosition(AlignmentType alignment)
-    {
-        FloatRect defaultBounds = App.MainWindow!.View.ViewToRect();
-        return AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), Parent?.GetBounds() ?? defaultBounds, alignment);
-    }
-
-
-    protected virtual void UpdateSfmlProperties()
-    {
-        Transformable.Position = AbsolutePosition;
-        Transformable.Origin = Origin;
-        Transformable.Rotation = Rotation;
-    }
+        => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), ParentOrWindowBounds(), alignment);
     
     
     public void Show()
