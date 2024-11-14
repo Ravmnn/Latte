@@ -19,6 +19,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public abstract Transformable Transformable { get; }
     
     protected RenderTexture BufferTexture { get; set; }
+    private FloatRect _oldBounds;
     
     public bool Visible { get; set; }
     public bool ShouldDrawElementBoundaries { get; set; }
@@ -55,21 +56,25 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Visible = true;
         
         Parent?.Children.Add(this);
+
+        _oldBounds = new();
     }
 
 
     public virtual void Update()
     {
-        Vector2f size = ParentOrWindowBounds().Size;
-        BufferTexture = new((uint)size.X, (uint)size.Y);
-        
         if (!Visible)
             return;
+        
+        if (_oldBounds != GetBounds())
+            ResizeBufferTextureToBounds();
         
         if (Alignment is not null)
             AbsolutePosition = GetAlignmentPosition(Alignment.Value) + AlignmentMargin;
      
         UpdateSfmlProperties();
+        
+        _oldBounds = GetBounds();
         
         UpdateEvent?.Invoke(this, EventArgs.Empty);
         
@@ -81,9 +86,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     protected void UpdateClipShaderParameters()
     {
         FloatRect bounds = ParentOrWindowBounds();
+        Vector2f resolution = (Vector2f)App.MainWindow!.Size;
         
-        Loaded.ClipShader.SetUniform("texture", BufferTexture.Texture);
+        // TODO: not working with window resizing
+        
+        Loaded.ClipShader.SetUniform("tex", BufferTexture.Texture);
         Loaded.ClipShader.SetUniform("clipArea", new Vec4(bounds.Left, bounds.Top, bounds.Width, bounds.Height));
+        Loaded.ClipShader.SetUniform("resolution", new Vec2(resolution));
     }
     
     
@@ -108,6 +117,30 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         foreach (Element child in Children)
             child.Draw(target);
     }
+    
+    
+    protected void Draw<T>(RenderTarget target, T @object) where T : Transformable, Drawable
+    {
+        DrawToBufferTexture(@object);
+        UpdateClipShaderParameters();
+        
+        target.Draw(CreateSpriteFromBufferTexture(), new(Loaded.ClipShader));
+    }
+
+
+    protected virtual void DrawToBufferTexture<T>(T element) where T : Transformable, Drawable 
+    {
+        element.Position = new();
+        element.Origin = new();
+        element.Rotation = 0f;
+        
+        BufferTexture.Clear();
+        BufferTexture.Draw(element);
+        BufferTexture.Display();
+        
+        // restore old properties
+        UpdateSfmlProperties();
+    }
 
 
     protected void DrawElementBoundaries(RenderTarget target)
@@ -121,11 +154,27 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
             OutlineThickness = 1f
         });
     }
+    
+    
+    protected void ResizeBufferTextureToBounds()
+    {
+        Vector2f size = GetBounds().Size;
+        BufferTexture = new((uint)size.X, (uint)size.Y);
+    }
 
 
+    protected Sprite CreateSpriteFromBufferTexture()
+        => new(BufferTexture.Texture)
+        {
+            Position = AbsolutePosition,
+            Origin = Origin,
+            Rotation = Rotation
+        };
+    
+    
     public abstract FloatRect GetBounds();
     
-    public FloatRect ParentOrWindowBounds()
+    protected FloatRect ParentOrWindowBounds()
         => Parent?.GetBounds() ?? new(new(0, 0), (Vector2f)App.MainWindow!.Size);
 
 

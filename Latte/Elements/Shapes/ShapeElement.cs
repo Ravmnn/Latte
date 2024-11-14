@@ -1,7 +1,4 @@
-using Latte.Application;
 using SFML.Graphics;
-using SFML.Graphics.Glsl;
-using SFML.System;
 
 
 namespace Latte.Elements.Shapes;
@@ -32,10 +29,7 @@ public abstract class ShapeElement : Element
         if (!Visible)
             return;
         
-        BufferTexture.Draw(SfmlShape);
-        UpdateClipShaderParameters();
-        
-        target.Draw(new Sprite(BufferTexture.Texture), new() { Shader = Loaded.ClipShader });
+        Draw(target, SfmlShape);
         
         base.Draw(target);
     }

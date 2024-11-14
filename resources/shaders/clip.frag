@@ -1,16 +1,17 @@
 #version 330 core
 
 
-uniform sampler2D texture;
+uniform sampler2D tex;
 uniform vec4 clipArea;
+uniform vec2 resolution;
 
 
 void main()
 {
-    vec2 pos = gl_FragCoord.xy;
+    vec2 normPos = gl_FragCoord.xy / resolution.xy;
     
-    if (pos.x >= clipArea.x && pos.x <= clipArea.x + clipArea.z && pos.y >= clipArea.y && pos.y <= clipArea.y + clipArea.w)
-        gl_FragColor = texture2D(texture, gl_TexCoord[0].xy);
+    if (gl_FragCoord.x >= clipArea.x && gl_FragCoord.x <= clipArea.x + clipArea.z && gl_FragCoord.y >= clipArea.y && gl_FragCoord.y <= clipArea.y + clipArea.w)
+        gl_FragColor = texture(tex, normPos.xy);
     else
-        discard; // Descarte pixels fora da área de recorte
+        discard;
 }

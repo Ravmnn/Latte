@@ -1,7 +1,8 @@
 using System;
-
+using System.Net.Mime;
 using SFML.System;
 using SFML.Graphics;
+
 
 namespace Latte.Elements;
 
@@ -24,6 +25,7 @@ public class TextElement : Element
     {
         Text = new(text, font ?? DefaultTextFont)
         {
+            FillColor = Color.White,
             CharacterSize = size
         };
         
@@ -33,14 +35,25 @@ public class TextElement : Element
 
     public override void Draw(RenderTarget target)
     {
-        target.Draw(Text);
+        if (!Visible)
+            return;
+        
+        Draw(target, Text);
         
         base.Draw(target);
     }
-    
-    
+
+
     public override FloatRect GetBounds()
-        => Text.GetGlobalBounds();
+    {
+        FloatRect bounds = Text.GetGlobalBounds();
+        FloatRect localBounds = Text.GetLocalBounds();
+        
+        bounds.Left -= localBounds.Left;
+        bounds.Top -= localBounds.Top;
+        
+        return bounds;
+    }
 
 
     public override Vector2f GetAlignmentPosition(AlignmentType alignment)

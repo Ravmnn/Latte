@@ -18,15 +18,25 @@ class Program
         
         App.Elements.Add(new RectangleElement(null, new(), new(600, 600))
         {
-            Alignment = AlignmentType.Center
+            Color = Color.Green,
+            
+            Alignment = AlignmentType.Center,
+            ShouldDrawElementBoundaries = true
         });
         
-        App.Elements.Add(new RectangleElement(App.Elements[0], new(), new(300, 300))
+        _ = new ButtonElement(App.Elements[0], new(), new(200, 90), "Press me!!")
         {
-            Color = Color.Blue,
-            
             Alignment = AlignmentType.BottomRight,
-            AlignmentMargin = new(200, 200),
+            AlignmentMargin = new(30, 20),
+            ShouldDrawElementBoundaries = true,
+            BorderColor = Color.Magenta,
+            BorderSize = 4f
+        };
+
+        App.Elements.Add(new TextElement(null, new(), 50, "this is a large text.")
+        {
+            Alignment = AlignmentType.TopLeft,
+            AlignmentMargin = new(40, 40),
             ShouldDrawElementBoundaries = true
         });
         
