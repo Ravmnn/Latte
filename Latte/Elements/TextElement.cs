@@ -1,5 +1,5 @@
 using System;
-using System.Net.Mime;
+
 using SFML.System;
 using SFML.Graphics;
 
@@ -38,22 +38,14 @@ public class TextElement : Element
         if (!Visible)
             return;
         
-        Draw(target, Text);
+        target.Draw(Text);
         
         base.Draw(target);
     }
 
 
     public override FloatRect GetBounds()
-    {
-        FloatRect bounds = Text.GetGlobalBounds();
-        FloatRect localBounds = Text.GetLocalBounds();
-        
-        bounds.Left -= localBounds.Left;
-        bounds.Top -= localBounds.Top;
-        
-        return bounds;
-    }
+        => Text.GetGlobalBounds();
 
 
     public override Vector2f GetAlignmentPosition(AlignmentType alignment)

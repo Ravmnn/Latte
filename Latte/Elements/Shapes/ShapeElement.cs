@@ -1,5 +1,7 @@
 using SFML.Graphics;
 
+using OpenTK.Graphics.OpenGL;
+
 
 namespace Latte.Elements.Shapes;
 
@@ -29,7 +31,9 @@ public abstract class ShapeElement : Element
         if (!Visible)
             return;
         
-        Draw(target, SfmlShape);
+        BeginDraw();
+        target.Draw(SfmlShape);
+        EndDraw();
         
         base.Draw(target);
     }
