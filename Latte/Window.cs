@@ -23,6 +23,7 @@ public class Window : RenderWindow
     public Vector2f WorldMousePosition => MapPixelToCoords(MousePosition);
     
     public View View { get; set; }
+    public IntRect RectSize => new(new(0, 0), (Vector2i)Size);
 
     public event EventHandler? ClosedEvent;
     

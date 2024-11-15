@@ -1,3 +1,4 @@
+using Latte.Application;
 using SFML.Graphics;
 
 using OpenTK.Graphics.OpenGL;
@@ -39,6 +40,18 @@ public abstract class ShapeElement : Element
     }
 
 
+    protected override IntRect GetThisClipArea()
+    {
+        FloatRect bounds = GetBounds();
+        bounds.Top += BorderSize;
+        bounds.Left += BorderSize;
+        bounds.Width -= BorderSize * 2;
+        bounds.Height -= BorderSize * 2;
+
+        return (IntRect)bounds;
+    }
+    
+    
     public override FloatRect GetBounds()
         => SfmlShape.GetGlobalBounds();
 

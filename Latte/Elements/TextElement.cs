@@ -38,12 +38,14 @@ public class TextElement : Element
         if (!Visible)
             return;
         
+        BeginDraw();
         target.Draw(Text);
+        EndDraw();
         
         base.Draw(target);
     }
-
-
+    
+    
     public override FloatRect GetBounds()
         => Text.GetGlobalBounds();
 

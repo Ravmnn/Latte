@@ -21,6 +21,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public bool Visible { get; set; }
     public bool ShouldDrawElementBoundaries { get; set; }
+    public bool ShouldDrawClipArea { get; set; }
     
     public Vector2f Position { get; set; }
     public Vector2f AbsolutePosition
@@ -84,11 +85,14 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public virtual void Draw(RenderTarget target)
     {
+        if (ShouldDrawElementBoundaries)
+            Debug.DrawLineRect(target, GetBounds(), Color.Red);
+        
+        if (ShouldDrawClipArea)
+            Debug.DrawLineRect(target, (FloatRect)GetClipAreaOrWindow(), Color.Magenta);
+        
         if (!Visible)
             return;
-        
-        if (ShouldDrawElementBoundaries)
-            DrawElementBoundaries(target);
         
         DrawEvent?.Invoke(this, EventArgs.Empty);
         
@@ -98,10 +102,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     protected virtual void BeginDraw()
     {
-        IntRect area = GetClipArea();
+        IntRect area = GetFinalClipArea();
+        Vector2u windowSize = App.MainWindow!.Size;
         
         GL.Enable(EnableCap.ScissorTest);
-        GL.Scissor(area.Left, area.Top, area.Width, area.Height);
+        
+        // the Y parameter needs to be converted to OpenGL coordinate system
+        GL.Scissor(area.Left, (int)windowSize.Y - area.Height - area.Top, area.Width, area.Height);
     }
 
     protected virtual void EndDraw()
@@ -109,27 +116,40 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         GL.Disable(EnableCap.ScissorTest);
     }
 
-    protected virtual IntRect GetClipArea()
-        =>  (IntRect)ParentOrWindowBounds();
+
+    protected IntRect GetFinalClipArea()
+    {
+        Element? element = this;
+        IntRect? area = null;
+        
+        do
+        {
+            IntRect newArea = element.GetClipAreaOrWindow();
+
+            if (area is null)
+                area = newArea;
+            
+            else if (area.Value.Intersects(newArea, out IntRect overlap))
+                area = overlap;
+                
+            element = element.Parent;
+        }
+        while (element is not null);
+
+        return area.Value;
+    }
 
     
-    protected void DrawElementBoundaries(RenderTarget target)
-    {
-        FloatRect bounds = GetBounds();
-        target.Draw(new RectangleShape(bounds.Size)
-        {
-            Position = bounds.Position,
-            FillColor = Color.Transparent,
-            OutlineColor = Color.Red,
-            OutlineThickness = 1f
-        });
-    }
+    protected IntRect GetClipAreaOrWindow()
+        => Parent?.GetThisClipArea() ?? App.MainWindow!.RectSize;
+
+    protected virtual IntRect GetThisClipArea() => (IntRect)GetBounds();
     
     
     public abstract FloatRect GetBounds();
     
     protected FloatRect ParentOrWindowBounds()
-        => Parent?.GetBounds() ?? new(new(0, 0), (Vector2f)App.MainWindow!.Size);
+        => Parent?.GetBounds() ?? (FloatRect)App.MainWindow!.RectSize;
 
 
     public virtual Vector2f GetAlignmentPosition(AlignmentType alignment)
