@@ -102,13 +102,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     protected virtual void BeginDraw()
     {
-        IntRect area = GetFinalClipArea();
+        IntRect clipArea = GetFinalClipArea();
         Vector2u windowSize = App.MainWindow!.Size;
         
         GL.Enable(EnableCap.ScissorTest);
         
         // the Y parameter needs to be converted to OpenGL coordinate system
-        GL.Scissor(area.Left, (int)windowSize.Y - area.Height - area.Top, area.Width, area.Height);
+        GL.Scissor(clipArea.Left, (int)windowSize.Y - clipArea.Height - clipArea.Top, clipArea.Width, clipArea.Height);
     }
 
     protected virtual void EndDraw()
@@ -147,6 +147,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     
     public abstract FloatRect GetBounds();
+    
     
     protected FloatRect ParentOrWindowBounds()
         => Parent?.GetBounds() ?? (FloatRect)App.MainWindow!.RectSize;

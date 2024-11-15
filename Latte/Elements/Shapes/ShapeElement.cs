@@ -1,7 +1,4 @@
-using Latte.Application;
 using SFML.Graphics;
-
-using OpenTK.Graphics.OpenGL;
 
 
 namespace Latte.Elements.Shapes;
@@ -42,6 +39,8 @@ public abstract class ShapeElement : Element
 
     protected override IntRect GetThisClipArea()
     {
+        // ignore border when clipping elements
+        
         FloatRect bounds = GetBounds();
         bounds.Top += BorderSize;
         bounds.Left += BorderSize;
