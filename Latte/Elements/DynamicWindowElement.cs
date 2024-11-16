@@ -21,6 +21,9 @@ public class DynamicWindowElement : WindowElement, IDraggable
     protected bool WasMouseHover { get; set; }
     protected bool IsMouseDown { get; set; }
     protected bool WasMouseDown { get; set; }
+    private bool _isMouseButtonDown;
+    
+    private bool _enteredWithMouseDown;
     
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
@@ -28,29 +31,35 @@ public class DynamicWindowElement : WindowElement, IDraggable
     public event EventHandler? MouseUpEvent;
     
     
-    // BUG: dragging goes wrong when moving it too fast
-    
     public DynamicWindowElement(string title, Vector2f position, Vector2f size) : base(title, position, size)
     {}
     
     
     public override void Update()
     {
+        _isMouseButtonDown = Mouse.IsButtonPressed(Mouse.Button.Left);
+        
         WasMouseHover = IsMouseHover;
         WasMouseDown = IsMouseDown;
         IsMouseHover = IsPointOver(App.MainWindow.WorldMousePosition);
-        IsMouseDown = IsMouseHover && Mouse.IsButtonPressed(Mouse.Button.Left);
-    
-        if (IsMouseDown)
+        IsMouseDown = IsMouseHover && _isMouseButtonDown;
+
+        bool entered = IsMouseHover && !WasMouseHover;
+        bool leaved = !IsMouseHover && WasMouseHover;
+        
+        if (!_enteredWithMouseDown)
+            _enteredWithMouseDown = entered && IsMouseDown;
+        
+        if (IsMouseDown && !_enteredWithMouseDown)
             OnMouseDown();
         
         else if (WasMouseDown)
             OnMouseUp();
         
-        if (IsMouseHover && !WasMouseHover)
+        if (entered)
             OnMouseEnter();
         
-        else if (!IsMouseHover && WasMouseHover)
+        else if (leaved)
             OnMouseLeave();
         
         LastDraggerPosition = DraggerPosition;
@@ -74,7 +83,12 @@ public class DynamicWindowElement : WindowElement, IDraggable
     
     protected virtual void OnMouseUp()
     {
-        Dragging = false;
+        if (_enteredWithMouseDown && !IsMouseDown)
+            _enteredWithMouseDown = false;
+        
+        if (!_isMouseButtonDown)
+            Dragging = false;
+        
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
 

@@ -20,6 +20,8 @@ public class ButtonElement : RectangleElement, IClickable
     protected bool IsMouseDown { get; set; }
     protected bool WasMouseDown { get; set; }
 
+    private bool _enteredWithMouseDown;
+    
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
     public event EventHandler? MouseDownEvent;
@@ -51,17 +53,23 @@ public class ButtonElement : RectangleElement, IClickable
         WasMouseDown = IsMouseDown;
         IsMouseHover = IsPointOver(App.MainWindow.WorldMousePosition);
         IsMouseDown = IsMouseHover && Mouse.IsButtonPressed(Mouse.Button.Left);
-    
-        if (IsMouseDown)
+
+        bool entered = IsMouseHover && !WasMouseHover;
+        bool leaved = !IsMouseHover && WasMouseHover;
+
+        if (!_enteredWithMouseDown)
+            _enteredWithMouseDown = entered && IsMouseDown;
+        
+        if (IsMouseDown && !_enteredWithMouseDown)
             OnMouseDown();
         
         else if (WasMouseDown)
             OnMouseUp();
         
-        if (IsMouseHover && !WasMouseHover)
+        if (entered)
             OnMouseEnter();
         
-        else if (!IsMouseHover && WasMouseHover)
+        else if (leaved)
             OnMouseLeave();
         
         base.Update();
@@ -88,6 +96,9 @@ public class ButtonElement : RectangleElement, IClickable
     
     protected virtual void OnMouseUp()
     {
+        if (_enteredWithMouseDown && !IsMouseDown)
+            _enteredWithMouseDown = false;
+        
         Color = IsMouseHover ? HoverColor : NormalColor;
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
