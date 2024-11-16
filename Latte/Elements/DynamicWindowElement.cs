@@ -28,6 +28,8 @@ public class DynamicWindowElement : WindowElement, IDraggable
     public event EventHandler? MouseUpEvent;
     
     
+    // BUG: dragging goes wrong when moving it too fast
+    
     public DynamicWindowElement(string title, Vector2f position, Vector2f size) : base(title, position, size)
     {}
     

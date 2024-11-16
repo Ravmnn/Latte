@@ -13,7 +13,7 @@ class Program
 {
     static void Main()
     {
-        App.Init(new(VideoMode.DesktopMode, "Latte Test"), new("../../../resources/Itim-Regular.ttf"));
+        App.Init(VideoMode.DesktopMode, "Latte Test", new("../../../resources/Itim-Regular.ttf"));
 
         App.Elements.Add(new RectangleElement(null, new(), new(700, 700))
         {
@@ -45,11 +45,16 @@ class Program
             ShouldDrawElementBoundaries = false,
             ShouldDrawClipArea = false
         };
+
         
         while (App.MainWindow.IsOpen)
         {
+            App.MainWindow.Clear();
+            
             App.Update();
             App.Draw();
+            
+            App.MainWindow.Display();
         }
     }
 }
