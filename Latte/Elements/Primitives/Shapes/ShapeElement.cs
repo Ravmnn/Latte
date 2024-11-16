@@ -1,7 +1,7 @@
 using SFML.Graphics;
 
 
-namespace Latte.Elements.Shapes;
+namespace Latte.Elements.Primitives.Shapes;
 
 
 public abstract class ShapeElement : Element

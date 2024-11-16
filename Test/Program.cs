@@ -4,9 +4,8 @@ using SFML.Graphics;
 using OpenTK.Windowing.Desktop;
 
 using Latte.Application;
-using Latte.Elements;
-using Latte.Elements.Shapes;
-using SFML.System;
+using Latte.Elements.Primitives;
+using Latte.Elements.Primitives.Shapes;
 
 
 namespace Latte.Test;

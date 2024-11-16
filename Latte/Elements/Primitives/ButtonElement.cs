@@ -1,14 +1,14 @@
 using System;
 
+using Latte.Application;
+using Latte.Elements.Primitives.Shapes;
+
 using SFML.System;
 using SFML.Window;
 using SFML.Graphics;
 
-using Latte.Application;
-using Latte.Elements.Shapes;
 
-
-namespace Latte.Elements;
+namespace Latte.Elements.Primitives;
 
 
 public class ButtonElement : RectangleElement, IClickable

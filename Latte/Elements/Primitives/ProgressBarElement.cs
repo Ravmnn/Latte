@@ -3,10 +3,10 @@ using System;
 using SFML.System;
 using SFML.Graphics;
 
-using Latte.Elements.Shapes;
+using Latte.Elements.Primitives.Shapes;
 
 
-namespace Latte.Elements;
+namespace Latte.Elements.Primitives;
 
 
 public class ProgressBarElement : Element

@@ -1,6 +1,7 @@
 using System;
 
-using Latte.Elements.Shapes;
+using Latte.Elements.Primitives;
+using Latte.Elements.Primitives.Shapes;
 
 
 namespace Latte.Elements;

@@ -4,7 +4,7 @@ using SFML.System;
 using SFML.Graphics;
 
 
-namespace Latte.Elements;
+namespace Latte.Elements.Primitives;
 
 
 public class TextElement : Element

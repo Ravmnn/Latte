@@ -8,13 +8,11 @@ using SFML.Graphics;
 namespace Latte;
 
 
-// TODO: add element clipping (OpenGL).
 // TODO: add windows to UI
 // TODO: add checkbox
 // TODO: add text inputs
 // TODO: add layouts (horizontal, vertical, grid...)
-
-// TODO: work on the game only after finishing all these stuff... good luck :)
+// TODO: add animations
 
 
 public class Window : RenderWindow
@@ -58,5 +56,6 @@ public class Window : RenderWindow
     private void ResizeViewToFitScreenSize(Vector2u newSize)
     {
         View.Size = (Vector2f)newSize;
+        View.Center = (Vector2f)Size / 2;
     }
 }

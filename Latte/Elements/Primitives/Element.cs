@@ -9,7 +9,7 @@ using OpenTK.Graphics.OpenGL;
 using Latte.Application;
 
 
-namespace Latte.Elements;
+namespace Latte.Elements.Primitives;
 
 
 public abstract class Element : IUpdateable, IDrawable, IAlignable

@@ -2,7 +2,7 @@ using SFML.System;
 using SFML.Graphics;
 
 
-namespace Latte.Elements.Shapes;
+namespace Latte.Elements.Primitives.Shapes;
 
 
 public class RectangleElement : ShapeElement
