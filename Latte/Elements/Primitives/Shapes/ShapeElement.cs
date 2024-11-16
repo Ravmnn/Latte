@@ -47,7 +47,7 @@ public abstract class ShapeElement : Element
         bounds.Width -= BorderSize * 2;
         bounds.Height -= BorderSize * 2;
 
-        return (IntRect)bounds;
+        return WorldFloatRectToClipArea(bounds);
     }
     
     

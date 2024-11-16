@@ -4,15 +4,17 @@ using Latte.Elements.Primitives;
 namespace Latte.Elements;
 
 
-public class ProgressBarPopup : PopupElement
+public class ProgressBarPopup : WindowElement
 {
     public ProgressBarElement ProgressBar { get; }
     
     public bool CloseOnComplete { get; set; }
     
     
-    public ProgressBarPopup(string title) : base(title)
+    public ProgressBarPopup(string title) : base(title, new(), new(300, 200))
     {
+        Alignment = AlignmentType.Center;
+        
         CloseOnComplete = true;
         
         ProgressBar = new(this, new(), new(Size.X - 30, 20))

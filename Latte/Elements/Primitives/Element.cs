@@ -103,7 +103,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     protected virtual void BeginDraw()
     {
         IntRect clipArea = GetFinalClipArea();
-        Vector2u windowSize = App.MainWindow!.Size;
+        Vector2u windowSize = App.MainWindow.Size;
         
         GL.Enable(EnableCap.ScissorTest);
         
@@ -140,17 +140,26 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     }
 
     
-    protected IntRect GetClipAreaOrWindow()
-        => Parent?.GetThisClipArea() ?? App.MainWindow!.RectSize;
+    protected IntRect GetClipAreaOrWindow() 
+        => Parent?.GetThisClipArea() ?? App.MainWindow.RectSize;
 
-    protected virtual IntRect GetThisClipArea() => (IntRect)GetBounds();
-    
-    
+    protected virtual IntRect GetThisClipArea() => WorldFloatRectToClipArea(GetBounds());
+
+
+    protected static IntRect WorldFloatRectToClipArea(FloatRect rect)
+    {
+        Vector2i transformedPosition = App.MainWindow.MapCoordsToPixel(rect.Position);
+        Vector2i transformedSize = App.MainWindow.MapCoordsToPixel(rect.Position + rect.Size) - transformedPosition;
+        
+        return new(transformedPosition, transformedSize);
+    }
+
+
     public abstract FloatRect GetBounds();
     
     
     protected FloatRect ParentOrWindowBounds()
-        => Parent?.GetBounds() ?? (FloatRect)App.MainWindow!.RectSize;
+        => Parent?.GetBounds() ?? (FloatRect)App.MainWindow.RectSize;
 
 
     public virtual Vector2f GetAlignmentPosition(AlignmentType alignment)

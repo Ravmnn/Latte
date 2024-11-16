@@ -1,8 +1,6 @@
 ﻿using SFML.Window;
 using SFML.Graphics;
 
-using OpenTK.Windowing.Desktop;
-
 using Latte.Application;
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
@@ -15,11 +13,8 @@ class Program
 {
     static void Main()
     {
-        _ = new GameWindow(new(), new() { StartVisible = false });
-        
-        App.MainWindow = new(VideoMode.DesktopMode, "Latte Test");
-        TextElement.DefaultTextFont = new("../../../resources/Itim-Regular.ttf");
-        
+        App.Init(new(VideoMode.DesktopMode, "Latte Test"), new("../../../resources/Itim-Regular.ttf"));
+
         App.Elements.Add(new RectangleElement(null, new(), new(700, 700))
         {
             Color = Color.Green,

@@ -1,11 +1,11 @@
 using System;
 
-using Latte.Application;
-using Latte.Elements.Primitives.Shapes;
-
 using SFML.System;
 using SFML.Window;
 using SFML.Graphics;
+
+using Latte.Application;
+using Latte.Elements.Primitives.Shapes;
 
 
 namespace Latte.Elements.Primitives;
@@ -47,7 +47,9 @@ public class ButtonElement : RectangleElement, IClickable
 
     public override void Update()
     {
-        IsMouseHover = IsPointOver(App.MainWindow!.WorldMousePosition);
+        WasMouseHover = IsMouseHover;
+        WasMouseDown = IsMouseDown;
+        IsMouseHover = IsPointOver(App.MainWindow.WorldMousePosition);
         IsMouseDown = IsMouseHover && Mouse.IsButtonPressed(Mouse.Button.Left);
     
         if (IsMouseDown)
@@ -61,9 +63,6 @@ public class ButtonElement : RectangleElement, IClickable
         
         else if (!IsMouseHover && WasMouseHover)
             OnMouseLeave();
-            
-        WasMouseHover = IsMouseHover;
-        WasMouseDown = IsMouseDown;
         
         base.Update();
     }

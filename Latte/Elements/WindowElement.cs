@@ -1,5 +1,7 @@
 using System;
 
+using SFML.System;
+
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
 
@@ -7,7 +9,7 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements;
 
 
-public abstract class PopupElement : RectangleElement
+public abstract class WindowElement : RectangleElement
 {
     public TextElement Title { get; protected set; }
     
@@ -16,20 +18,15 @@ public abstract class PopupElement : RectangleElement
     public event EventHandler? ClosedEvent;
     
     
-    public PopupElement(string title) : base(null, new(), new())
+    public WindowElement(string title, Vector2f position, Vector2f size) : base(null, position, size)
     {
-        Size = new(300, 200);
-        Color = new(50, 50, 50, 200);
-        Alignment = AlignmentType.Center;
+        Color = new(50, 50, 50, 220);
 
         Title = new(this, new(), 20, title)
         {
             Alignment = AlignmentType.HorizontalCenter | AlignmentType.Top,
             AlignmentMargin = new(0, 10)
         };
-        
-        // not visible by default
-        Hide();
     }
 
 

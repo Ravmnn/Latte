@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Generic;
 
+using SFML.Graphics;
+
+using OpenTK.Windowing.Desktop;
 
 using Latte.Elements.Primitives;
 
@@ -9,15 +13,35 @@ namespace Latte.Application;
 
 public static class App
 {
-    public static Window? MainWindow { get; set; }
-
-    public static List<Element> Elements { get; set; } = [];
+    private static Window? _mainWindow;
+    public static Window MainWindow
+    {
+        get => _mainWindow ?? throw new NullReferenceException("Main window not defined. Did you forget to call \"App.Init()\"?");    
+        private set => _mainWindow = value;
+    }
     
+    private static bool _initialized;
+    
+    public static List<Element> Elements { get; set; } = [];
+
+
+    public static void Init(Window mainWindow, Font defaultFont)
+    {
+        if (_initialized)
+            return;
+            
+        _ = new GameWindow(new(), new() { StartVisible = false });
+        
+        MainWindow = mainWindow;
+        TextElement.DefaultTextFont = defaultFont;
+        
+        _initialized = true;
+    }
     
 
     public static void Update()
     {
-        MainWindow?.ProcessEvents();
+        MainWindow.ProcessEvents();
         
         foreach (Element element in Elements)
             element.Update();
@@ -26,14 +50,7 @@ public static class App
 
     public static void Draw()
     {
-        if (MainWindow is null)
-            return;
-        
-        MainWindow.Clear();
-        
         foreach (Element element in Elements)
             element.Draw(MainWindow);
-        
-        MainWindow.Display();
     }
 }
