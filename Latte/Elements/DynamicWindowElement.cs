@@ -18,12 +18,13 @@ public class DynamicWindowElement : WindowElement, IDraggable
     protected Vector2f DraggerPositionDelta => DraggerPosition - LastDraggerPosition;
     
     protected bool IsMouseHover { get; set; }
-    protected bool WasMouseHover { get; set; }
     protected bool IsMouseDown { get; set; }
-    protected bool WasMouseDown { get; set; }
-    private bool _isMouseButtonDown;
+    protected bool IsPressed { get; set; }
+    protected bool IsTruePressed { get; set; }
     
-    private bool _enteredWithMouseDown;
+    protected bool WasMouseHover { get; set; }
+    protected bool WasMouseDown { get; set; }
+    protected bool WasTruePressed { get; set; }
     
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
@@ -37,23 +38,27 @@ public class DynamicWindowElement : WindowElement, IDraggable
     
     public override void Update()
     {
-        _isMouseButtonDown = Mouse.IsButtonPressed(Mouse.Button.Left);
-        
         WasMouseHover = IsMouseHover;
         WasMouseDown = IsMouseDown;
+        WasTruePressed = IsTruePressed;
+        
         IsMouseHover = IsPointOver(App.MainWindow.WorldMousePosition);
-        IsMouseDown = IsMouseHover && _isMouseButtonDown;
-
+        IsMouseDown = Mouse.IsButtonPressed(Mouse.Button.Left);
+        IsPressed = IsMouseHover && IsMouseDown;
+        
+        if (!IsTruePressed)
+            IsTruePressed = IsPressed && !WasMouseDown;
+        
+        if (IsTruePressed && !IsMouseDown)
+            IsTruePressed = false;
+        
         bool entered = IsMouseHover && !WasMouseHover;
         bool leaved = !IsMouseHover && WasMouseHover;
         
-        if (!_enteredWithMouseDown)
-            _enteredWithMouseDown = entered && IsMouseDown;
-        
-        if (IsMouseDown && !_enteredWithMouseDown)
+        if (IsTruePressed)
             OnMouseDown();
         
-        else if (WasMouseDown)
+        else if (WasTruePressed)
             OnMouseUp();
         
         if (entered)
@@ -83,12 +88,7 @@ public class DynamicWindowElement : WindowElement, IDraggable
     
     protected virtual void OnMouseUp()
     {
-        if (_enteredWithMouseDown && !IsMouseDown)
-            _enteredWithMouseDown = false;
-        
-        if (!_isMouseButtonDown)
-            Dragging = false;
-        
+        Dragging = false;
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
 

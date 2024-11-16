@@ -16,11 +16,14 @@ public class ButtonElement : RectangleElement, IClickable
     public TextElement Text { get; protected set; }
 
     protected bool IsMouseHover { get; set; }
-    protected bool WasMouseHover { get; set; }
     protected bool IsMouseDown { get; set; }
+    protected bool IsPressed { get; set; }
+    protected bool IsTruePressed { get; set; }
+    
+    protected bool WasMouseHover { get; set; }
     protected bool WasMouseDown { get; set; }
-
-    private bool _enteredWithMouseDown;
+    protected bool WasTruePressed { get; set; }
+    
     
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
@@ -51,19 +54,25 @@ public class ButtonElement : RectangleElement, IClickable
     {
         WasMouseHover = IsMouseHover;
         WasMouseDown = IsMouseDown;
+        WasTruePressed = IsTruePressed;
+        
         IsMouseHover = IsPointOver(App.MainWindow.WorldMousePosition);
-        IsMouseDown = IsMouseHover && Mouse.IsButtonPressed(Mouse.Button.Left);
-
+        IsMouseDown = Mouse.IsButtonPressed(Mouse.Button.Left);
+        IsPressed = IsMouseHover && IsMouseDown;
+        
+        if (!IsTruePressed)
+            IsTruePressed = IsPressed && !WasMouseDown;
+        
+        if (IsTruePressed && !IsPressed)
+            IsTruePressed = false;
+        
         bool entered = IsMouseHover && !WasMouseHover;
         bool leaved = !IsMouseHover && WasMouseHover;
-
-        if (!_enteredWithMouseDown)
-            _enteredWithMouseDown = entered && IsMouseDown;
         
-        if (IsMouseDown && !_enteredWithMouseDown)
+        if (IsTruePressed)
             OnMouseDown();
         
-        else if (WasMouseDown)
+        else if (WasTruePressed)
             OnMouseUp();
         
         if (entered)
@@ -96,9 +105,6 @@ public class ButtonElement : RectangleElement, IClickable
     
     protected virtual void OnMouseUp()
     {
-        if (_enteredWithMouseDown && !IsMouseDown)
-            _enteredWithMouseDown = false;
-        
         Color = IsMouseHover ? HoverColor : NormalColor;
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
