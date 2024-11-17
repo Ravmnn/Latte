@@ -8,7 +8,6 @@ using SFML.Graphics;
 namespace Latte.Core;
 
 
-// TODO: add windows to UI
 // TODO: add checkbox
 // TODO: add text inputs
 // TODO: add layouts (horizontal, vertical, grid...)

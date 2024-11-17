@@ -11,20 +11,20 @@ public static class Math
 {
     public static bool IsPointOverRoundedRect(Vector2f point, Vector2f position, Vector2f size, float radius)
     {
-        Vector2f ltcenter = new(position.X + radius, position.Y + radius);
-        Vector2f rtcenter = new(position.X + size.X - radius, position.Y + radius);
-        Vector2f lbcenter = new(position.X + radius, position.Y + size.Y - radius);
-        Vector2f rbcenter = new(position.X + size.X - radius, position.Y + size.Y - radius);
+        Vector2f leftTopCenter = new(position.X + radius, position.Y + radius);
+        Vector2f rightTopCenter = new(position.X + size.X - radius, position.Y + radius);
+        Vector2f leftBottomCenter = new(position.X + radius, position.Y + size.Y - radius);
+        Vector2f rightBottomCenter = new(position.X + size.X - radius, position.Y + size.Y - radius);
 
-        FloatRect hrect = new(new(position.X, position.Y + radius), new(size.X, size.Y - radius * 2));
-        FloatRect vrect = new(new(position.X + radius, position.Y), new(size.X - radius * 2, size.Y));
+        FloatRect horizontalRect = new(new(position.X, position.Y + radius), new(size.X, size.Y - radius * 2));
+        FloatRect verticalRect = new(new(position.X + radius, position.Y), new(size.X - radius * 2, size.Y));
 
-        bool overCorners = IsPointOverCircle(point, ltcenter, radius) ||
-                           IsPointOverCircle(point, rtcenter, radius) ||
-                           IsPointOverCircle(point, lbcenter, radius) ||
-                           IsPointOverCircle(point, rbcenter, radius);
+        bool overCorners = IsPointOverCircle(point, leftTopCenter, radius) ||
+                           IsPointOverCircle(point, rightTopCenter, radius) ||
+                           IsPointOverCircle(point, leftBottomCenter, radius) ||
+                           IsPointOverCircle(point, rightBottomCenter, radius);
         
-        bool overRects = hrect.Contains(point) || vrect.Contains(point);
+        bool overRects = horizontalRect.Contains(point) || verticalRect.Contains(point);
         
         return overCorners || overRects;
     }

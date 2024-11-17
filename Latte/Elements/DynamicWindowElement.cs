@@ -13,6 +13,8 @@ namespace Latte.Elements;
 
 public class DynamicWindowElement : WindowElement, IDraggable
 {
+    // TODO: add a close and minimize button
+    
     public bool Dragging { get; protected set; }
 
     protected Vector2f DraggerPosition { get; set; }

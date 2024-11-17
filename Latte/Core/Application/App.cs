@@ -44,7 +44,10 @@ public static class App
     public static void Init(VideoMode mode, string title, Font defaultFont, Styles styles = Styles.Default, ContextSettings settings = new())
     {
         if (_initialized)
+        {
+            Console.WriteLine("App has already been initialized.");
             return;
+        }
         
         // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
         // this should be ALWAYS initialized before MainWindow
@@ -66,7 +69,6 @@ public static class App
     {
         MainWindow.ProcessEvents();
         
-        // use a separated view to draw UI elements
         MainWindow.SetView(UIView);
         
         foreach (Element element in Elements)
@@ -78,6 +80,7 @@ public static class App
 
     public static void Draw()
     {
+        // use a separated view to draw UI elements
         MainWindow.SetView(UIView);
         
         foreach (Element element in Elements)

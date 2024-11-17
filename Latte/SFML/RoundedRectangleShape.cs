@@ -1,6 +1,8 @@
 using System;
-using SFML.Graphics;
+
 using SFML.System;
+using SFML.Graphics;
+
 
 namespace Latte.SFML;
 
@@ -71,6 +73,7 @@ public class RoundedRectangleShape : Shape
     {
         const float pi = 3.141592654f;
 
+        // this GetPoint will not work properly if Radius is 0
         if (Radius == 0f)
             return RectangleGetPoint(index);
         
