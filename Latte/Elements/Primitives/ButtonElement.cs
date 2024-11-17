@@ -1,29 +1,24 @@
 using System;
 
 using SFML.System;
-using SFML.Window;
 using SFML.Graphics;
 
-using Latte.Application;
+using Latte.Core;
 using Latte.Elements.Primitives.Shapes;
+
+
+using Math = Latte.Core.Math;
 
 
 namespace Latte.Elements.Primitives;
 
 
-public class ButtonElement : RectangleElement, IClickable
+public class ButtonElement : RectangleElement, IDefaultClickable
 {
     public TextElement Text { get; protected set; }
 
-    protected bool IsMouseHover { get; set; }
-    protected bool IsMouseDown { get; set; }
-    protected bool IsPressed { get; set; }
-    protected bool IsTruePressed { get; set; }
-    
-    protected bool WasMouseHover { get; set; }
-    protected bool WasMouseDown { get; set; }
-    protected bool WasTruePressed { get; set; }
-    
+    public MouseClickState MouseClickState { get; }
+    public bool Continuous { get; protected set; }
     
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
@@ -45,6 +40,9 @@ public class ButtonElement : RectangleElement, IClickable
         
         BorderColor = new(100, 100, 100);
         BorderSize = 3f;
+
+        MouseClickState = new();
+        Continuous = false;
         
         SetColorVariants(Color);
     }
@@ -52,67 +50,41 @@ public class ButtonElement : RectangleElement, IClickable
 
     public override void Update()
     {
-        WasMouseHover = IsMouseHover;
-        WasMouseDown = IsMouseDown;
-        WasTruePressed = IsTruePressed;
-        
-        IsMouseHover = IsPointOver(App.MainWindow.WorldMousePosition);
-        IsMouseDown = Mouse.IsButtonPressed(Mouse.Button.Left);
-        IsPressed = IsMouseHover && IsMouseDown;
-        
-        if (!IsTruePressed)
-            IsTruePressed = IsPressed && !WasMouseDown;
-        
-        if (IsTruePressed && !IsPressed)
-            IsTruePressed = false;
-        
-        bool entered = IsMouseHover && !WasMouseHover;
-        bool leaved = !IsMouseHover && WasMouseHover;
-        
-        if (IsTruePressed)
-            OnMouseDown();
-        
-        else if (WasTruePressed)
-            OnMouseUp();
-        
-        if (entered)
-            OnMouseEnter();
-        
-        else if (leaved)
-            OnMouseLeave();
+        (this as IDefaultClickable).UpdateClickStateProperties();
+        (this as IDefaultClickable).ProcessMouseEvents();
         
         base.Update();
     }
     
     
-    protected virtual void OnMouseEnter()
+    public virtual void OnMouseEnter()
     {
         Color = HoverColor;
         MouseEnterEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    protected virtual void OnMouseLeave()
+    public virtual void OnMouseLeave()
     {
         Color = NormalColor;
         MouseLeaveEvent?.Invoke(this, EventArgs.Empty);
     }
     
-    protected virtual void OnMouseDown()
+    public virtual void OnMouseDown()
     {
         Color = DownColor;
         MouseDownEvent?.Invoke(this, EventArgs.Empty);
     }
     
-    protected virtual void OnMouseUp()
+    public virtual void OnMouseUp()
     {
-        Color = IsMouseHover ? HoverColor : NormalColor;
+        Color = MouseClickState.IsMouseHover ? HoverColor : NormalColor;
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
 
 
 
     public virtual bool IsPointOver(Vector2f point)
-        => GetBounds().Contains(point);
+        => Math.IsPointOverRoundedRect(point, AbsolutePosition, Size, Radius);
 
 
     public void SetColorVariants(Color color)

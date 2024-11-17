@@ -5,7 +5,7 @@ using SFML.Window;
 using SFML.Graphics;
 
 
-namespace Latte;
+namespace Latte.Core;
 
 
 // TODO: add windows to UI
@@ -28,8 +28,6 @@ public class Window : RenderWindow
     public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings settings = new()) : base(mode, title, style, settings)
     {
         Closed += (_, _) => Close();
-        
-        SetVerticalSyncEnabled(true);
     }
 
 

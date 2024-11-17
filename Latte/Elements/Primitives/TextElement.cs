@@ -3,6 +3,8 @@ using System;
 using SFML.System;
 using SFML.Graphics;
 
+using Latte.Core;
+
 
 namespace Latte.Elements.Primitives;
 

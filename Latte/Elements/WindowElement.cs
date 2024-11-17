@@ -2,6 +2,7 @@ using System;
 
 using SFML.System;
 
+using Latte.Core;
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
 

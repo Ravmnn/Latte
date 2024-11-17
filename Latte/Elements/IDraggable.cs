@@ -1,7 +1,7 @@
 namespace Latte.Elements;
 
 
-public interface IDraggable : IClickable
+public interface IDraggable : IDefaultClickable
 {
     bool Dragging { get; }
 }

@@ -10,7 +10,7 @@ using OpenTK.Windowing.Desktop;
 using Latte.Elements.Primitives;
 
 
-namespace Latte.Application;
+namespace Latte.Core.Application;
 
 
 public static class App
@@ -84,6 +84,16 @@ public static class App
             element.Draw(MainWindow);
         
         MainWindow.SetView(MainView);
+    }
+
+
+    public static bool IsMouseOverAnyElementBound()
+    {
+        foreach (Element element in Elements)
+            if (element.Visible && element.GetBounds().Contains(MainWindow.WorldMousePosition))
+                return true;
+
+        return false;
     }
 
 

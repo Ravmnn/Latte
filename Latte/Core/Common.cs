@@ -1,7 +1,7 @@
 using SFML.Graphics;
 
 
-namespace Latte;
+namespace Latte.Core;
 
 
 public interface IUpdateable

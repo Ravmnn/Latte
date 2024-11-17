@@ -1,7 +1,7 @@
 using SFML.Graphics;
 
 
-namespace Latte.Application;
+namespace Latte.Core;
 
 
 public static class Debug

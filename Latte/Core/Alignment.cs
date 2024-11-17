@@ -1,9 +1,10 @@
 using System;
-using SFML.Graphics;
+
 using SFML.System;
+using SFML.Graphics;
 
 
-namespace Latte;
+namespace Latte.Core;
 
 
 [Flags]

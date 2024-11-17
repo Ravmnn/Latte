@@ -6,7 +6,8 @@ using SFML.Graphics;
 
 using OpenTK.Graphics.OpenGL;
 
-using Latte.Application;
+using Latte.Core;
+using Latte.Core.Application;
 
 
 namespace Latte.Elements.Primitives;

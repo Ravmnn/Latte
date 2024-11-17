@@ -2,7 +2,7 @@ using SFML.System;
 using SFML.Graphics;
 
 
-namespace Latte;
+namespace Latte.SFML;
 
 
 public static class ViewExtensions
