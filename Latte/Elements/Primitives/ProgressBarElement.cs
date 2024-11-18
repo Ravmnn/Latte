@@ -48,17 +48,13 @@ public class ProgressBarElement : Element
         
         Progress = minValue;
         
-        Position = position;
+        Position.Set(position);
 
-        Background = new(this, new(), size)
-        {
-            Color = Color.Black
-        };
-        
-        Foreground = new(this, new(), size)
-        {
-            Color = Color.White
-        };
+        Background = new(this, new(), size);
+        Background.Color.Set(Color.Black);
+
+        Foreground = new(this, new(), size);
+        Foreground.Color.Set(Color.White);
     }
 
 
@@ -71,7 +67,7 @@ public class ProgressBarElement : Element
             CompletedEvent?.Invoke(this, EventArgs.Empty);
         
         float normalizedProgress = (Progress - MinValue) / (MaxValue - MinValue); 
-        Foreground.Size = new(Background.Size.X * normalizedProgress, Background.Size.Y);
+        Foreground.Size.Set(new(Background.Size.Value.X * normalizedProgress, Background.Size.Value.Y));
         
         _wasCompleted = Completed;
         

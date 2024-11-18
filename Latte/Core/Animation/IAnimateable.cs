@@ -12,5 +12,5 @@ public interface IAnimateable<T>
     /// Convert a float[] to this type.
     /// </summary>
     /// <param name="values"> The float[]. </param>
-    T ConvertAnimationValues(float[] values);
+    T AnimationValuesToThis(float[] values);
 }

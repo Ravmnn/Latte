@@ -4,6 +4,8 @@ using SFML.System;
 using SFML.Window;
 using SFML.Graphics;
 
+using Latte.Core.Type;
+
 
 namespace Latte.Core;
 
@@ -16,8 +18,8 @@ namespace Latte.Core;
 
 public class Window : RenderWindow
 {
-    public Vector2i MousePosition => Mouse.GetPosition(this);
-    public Vector2f WorldMousePosition => MapPixelToCoords(MousePosition);
+    public Vec2i MousePosition => Mouse.GetPosition(this);
+    public Vec2f WorldMousePosition => MapPixelToCoords(MousePosition);
     
     public IntRect RectSize => new(new(0, 0), (Vector2i)Size);
 

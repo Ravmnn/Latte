@@ -1,5 +1,7 @@
 using SFML.Graphics;
 
+using Latte.Core.Type;
+
 
 namespace Latte.Elements.Primitives.Shapes;
 
@@ -10,17 +12,20 @@ public abstract class ShapeElement : Element
     
     public Shape SfmlShape { get; protected set; }
 
-    public float BorderSize { get; set; }
+    public Property<Float> BorderSize { get; }
 
-    public Color Color { get; set; }
-    public Color BorderColor { get; set; }
+    public Property<ColorRGBA> Color { get; }
+    public Property<ColorRGBA> BorderColor { get; }
     
     
     protected ShapeElement(Element? parent, Shape shape) : base(parent)
     {
         SfmlShape = shape;
+
+        BorderSize = new(this, 0f);
         
-        Color = Color.White;
+        Color = new(this, SFML.Graphics.Color.White);
+        BorderColor = new(this, SFML.Graphics.Color.White);
     }
     
 
@@ -42,10 +47,10 @@ public abstract class ShapeElement : Element
         // ignore border when clipping elements
         
         FloatRect bounds = GetBounds();
-        bounds.Top += BorderSize;
-        bounds.Left += BorderSize;
-        bounds.Width -= BorderSize * 2;
-        bounds.Height -= BorderSize * 2;
+        bounds.Top += BorderSize.Value;
+        bounds.Left += BorderSize.Value;
+        bounds.Width -= BorderSize.Value * 2;
+        bounds.Height -= BorderSize.Value * 2;
 
         return WorldFloatRectToClipArea(bounds);
     }
@@ -59,8 +64,8 @@ public abstract class ShapeElement : Element
     {
         base.UpdateSfmlProperties();
 
-        SfmlShape.OutlineThickness = BorderSize;
-        SfmlShape.FillColor = Color;
-        SfmlShape.OutlineColor = BorderColor;
+        SfmlShape.OutlineThickness = BorderSize.Value;
+        SfmlShape.FillColor = Color.Value;
+        SfmlShape.OutlineColor = BorderColor.Value;
     }
 }

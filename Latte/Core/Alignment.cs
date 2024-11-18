@@ -3,6 +3,8 @@ using System;
 using SFML.System;
 using SFML.Graphics;
 
+using Latte.Core.Type;
+
 
 namespace Latte.Core;
 
@@ -29,15 +31,15 @@ public enum AlignmentType
 
 public interface IAlignable
 {
-    Vector2f GetAlignmentPosition(AlignmentType alignment);
+    Vec2f GetAlignmentPosition(AlignmentType alignment);
 }
 
 
 public static class AlignmentCalculator
 {
-    public static Vector2f GetAlignedPositionOfChild(FloatRect child, FloatRect parent, AlignmentType alignment)
+    public static Vec2f GetAlignedPositionOfChild(FloatRect child, FloatRect parent, AlignmentType alignment)
     {
-        Vector2f position = new();
+        Vec2f position = new();
 
         if (alignment.HasFlag(AlignmentType.Top))
             position.Y = parent.Top;

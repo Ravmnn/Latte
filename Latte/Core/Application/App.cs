@@ -8,6 +8,7 @@ using SFML.Graphics;
 
 using OpenTK.Windowing.Desktop;
 
+using Latte.Core.Type;
 using Latte.Elements.Primitives;
 
 
@@ -106,18 +107,18 @@ public static class App
     public static bool IsMouseOverAnyElementBound()
     {
         foreach (Element element in Elements)
-            if (element.Visible && element.GetBounds().Contains(MainWindow.WorldMousePosition))
+            if (element.Visible && element.GetBounds().Contains((Vector2f)MainWindow.WorldMousePosition))
                 return true;
 
         return false;
     }
 
 
-    private static void OnWindowResized(Vector2u newSize)
+    private static void OnWindowResized(Vec2u newSize)
     {
-        MainView.Size = (Vector2f)newSize;
+        MainView.Size = newSize;
         
-        UIView.Size = (Vector2f)newSize;
+        UIView.Size = newSize;
         UIView.Center = (Vector2f)newSize / 2f;
     }
     

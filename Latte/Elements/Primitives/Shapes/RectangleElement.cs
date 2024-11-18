@@ -1,6 +1,5 @@
-using SFML.System;
-
-using Latte.SFML;
+using Latte.Sfml;
+using Latte.Core.Type;
 
 
 namespace Latte.Elements.Primitives.Shapes;
@@ -10,20 +9,20 @@ public class RectangleElement : ShapeElement
 {
     public new RoundedRectangleShape SfmlShape => (base.SfmlShape as RoundedRectangleShape)!;
 
-    public Vector2f Size { get; set; }
+    public Property<Vec2f> Size { get; }
     
-    public float Radius { get; set; }
+    public Property<Float> Radius { get; }
     
     protected const uint DefaultPointCount = 16;
     
 
-    public RectangleElement(Element? parent, Vector2f position, Vector2f size, float radius = 0f)
+    public RectangleElement(Element? parent, Vec2f position, Vec2f size, float radius = 0f)
         : base(parent, new RoundedRectangleShape(size, radius, DefaultPointCount))
     {
-        Position = position;
-        Size = size;
+        Position.Set(position);
         
-        Radius = radius;
+        Size = new(this, size);
+        Radius = new(this, radius);
     }
 
 
@@ -31,7 +30,7 @@ public class RectangleElement : ShapeElement
     {
         base.UpdateSfmlProperties();
         
-        SfmlShape.Size = Size;
-        SfmlShape.Radius = Radius;
+        SfmlShape.Size = Size.Value;
+        SfmlShape.Radius = Radius.Value;
     }
 }

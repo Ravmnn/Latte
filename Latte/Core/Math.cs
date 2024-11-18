@@ -3,18 +3,20 @@ using System;
 using SFML.System;
 using SFML.Graphics;
 
+using Latte.Core.Type;
+
 
 namespace Latte.Core;
 
 
 public static class Math
 {
-    public static bool IsPointOverRoundedRect(Vector2f point, Vector2f position, Vector2f size, float radius)
+    public static bool IsPointOverRoundedRect(Vec2f point, Vec2f position, Vec2f size, float radius)
     {
-        Vector2f leftTopCenter = new(position.X + radius, position.Y + radius);
-        Vector2f rightTopCenter = new(position.X + size.X - radius, position.Y + radius);
-        Vector2f leftBottomCenter = new(position.X + radius, position.Y + size.Y - radius);
-        Vector2f rightBottomCenter = new(position.X + size.X - radius, position.Y + size.Y - radius);
+        Vec2f leftTopCenter = new(position.X + radius, position.Y + radius);
+        Vec2f rightTopCenter = new(position.X + size.X - radius, position.Y + radius);
+        Vec2f leftBottomCenter = new(position.X + radius, position.Y + size.Y - radius);
+        Vec2f rightBottomCenter = new(position.X + size.X - radius, position.Y + size.Y - radius);
 
         FloatRect horizontalRect = new(new(position.X, position.Y + radius), new(size.X, size.Y - radius * 2));
         FloatRect verticalRect = new(new(position.X + radius, position.Y), new(size.X - radius * 2, size.Y));
@@ -24,7 +26,7 @@ public static class Math
                            IsPointOverCircle(point, leftBottomCenter, radius) ||
                            IsPointOverCircle(point, rightBottomCenter, radius);
         
-        bool overRects = horizontalRect.Contains(point) || verticalRect.Contains(point);
+        bool overRects = horizontalRect.Contains((Vector2f)point) || verticalRect.Contains((Vector2f)point);
         
         return overCorners || overRects;
     }

@@ -21,13 +21,11 @@ public abstract class WindowElement : RectangleElement
     
     public WindowElement(string title, Vector2f position, Vector2f size) : base(null, position, size)
     {
-        Color = new(50, 50, 50, 220);
+        Color.Set(new(50, 50, 50, 220));
 
-        Title = new(this, new(), 20, title)
-        {
-            Alignment = AlignmentType.HorizontalCenter | AlignmentType.Top,
-            AlignmentMargin = new(0, 10)
-        };
+        Title = new(this, new(), 20, title);
+        Title.Alignment = AlignmentType.HorizontalCenter | AlignmentType.Top;
+        Title.AlignmentMargin.Set(new(0, 10));
     }
 
 

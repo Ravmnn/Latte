@@ -73,5 +73,5 @@ public class DynamicWindowElement : WindowElement, IDraggable
 
     
     public bool IsPointOver(Vector2f point)
-        => Math.IsPointOverRoundedRect(point, AbsolutePosition, Size, Radius);
+        => Math.IsPointOverRoundedRect(point, AbsolutePosition, Size, Radius.Value);
 }

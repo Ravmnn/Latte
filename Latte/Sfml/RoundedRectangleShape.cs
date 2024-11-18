@@ -4,7 +4,7 @@ using SFML.System;
 using SFML.Graphics;
 
 
-namespace Latte.SFML;
+namespace Latte.Sfml;
 
 
 // this class original implementation was taken from

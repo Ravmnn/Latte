@@ -32,14 +32,14 @@ public class AnimationUpdatedEventArgs(float[] currentValues) : EventArgs
 /// <param name="time"> The time the animation will take to finish. </param>
 public class AnimationState(float[] startValues, float[] endValues, float time, EasingType easingType = EasingType.Linear) : IUpdateable
 {
-    public float[] StartValues { get; init; } = startValues;
-    public float[] EndValues { get; init; } = endValues;
+    public float[] StartValues { get; } = startValues;
+    public float[] EndValues { get; } = endValues;
     public float[] CurrentValues { get; private set; } = new float[startValues.Length];
 
-    public double Time { get; init; } = time;
+    public double Time { get; } = time;
     public double ElapsedTime { get; private set; }
 
-    public EasingType EasingType { get; init; } = easingType;
+    public EasingType EasingType { get; } = easingType;
 
     /// <summary>
     /// How much the animation has progressed from 0 to 1.

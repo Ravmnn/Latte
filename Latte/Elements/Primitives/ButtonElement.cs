@@ -35,16 +35,16 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         Text = new(this, new(), 32, text)
         {
             Alignment = AlignmentType.Center,
-            Text = { FillColor = Color.Black }
+            Text = { FillColor = SFML.Graphics.Color.Black }
         };
         
-        BorderColor = new(100, 100, 100);
-        BorderSize = 3f;
+        BorderColor.Set(new(100, 100, 100));
+        BorderSize.Set(3f);
 
         MouseClickState = new();
         Continuous = false;
         
-        SetColorVariants(Color);
+        SetColorVariants(Color.Value);
     }
 
 
@@ -59,32 +59,32 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     
     public virtual void OnMouseEnter()
     {
-        Color = HoverColor;
+        Color.Set(HoverColor);
         MouseEnterEvent?.Invoke(this, EventArgs.Empty);
     }
 
     public virtual void OnMouseLeave()
     {
-        Color = NormalColor;
+        Color.Set(NormalColor);
         MouseLeaveEvent?.Invoke(this, EventArgs.Empty);
     }
     
     public virtual void OnMouseDown()
     {
-        Color = DownColor;
+        Color.Set(DownColor);
         MouseDownEvent?.Invoke(this, EventArgs.Empty);
     }
     
     public virtual void OnMouseUp()
     {
-        Color = MouseClickState.IsMouseHover ? HoverColor : NormalColor;
+        Color.Set(MouseClickState.IsMouseHover ? HoverColor : NormalColor);
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
 
 
 
     public virtual bool IsPointOver(Vector2f point)
-        => Math.IsPointOverRoundedRect(point, AbsolutePosition, Size, Radius);
+        => Math.IsPointOverRoundedRect(point, AbsolutePosition, Size, Radius.Value);
 
 
     public void SetColorVariants(Color color)

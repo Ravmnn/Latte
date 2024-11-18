@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 
+using OpenTK.Graphics.OpenGL;
+
 using SFML.System;
 using SFML.Graphics;
 
-using OpenTK.Graphics.OpenGL;
-
 using Latte.Core;
+using Latte.Core.Type;
+using Latte.Core.Animation;
 using Latte.Core.Application;
 
 
@@ -18,31 +20,27 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public Element? Parent { get; set; }
     public List<Element> Children { get; }
     
+    protected List<AnimationState> PropertyAnimations { get; }
+    
     public abstract Transformable Transformable { get; }
     
     public bool Visible { get; set; }
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
     
-    public Vector2f Position { get; set; }
-    public Vector2f AbsolutePosition
+    public Property<Vec2f> Position { get; }
+    public Vec2f AbsolutePosition
     {
         get => Parent is not null ? Position + Parent.AbsolutePosition : Position;
-        set
-        {
-            if (Parent is not null)
-                Position = value - Parent.AbsolutePosition;
-            else
-                Position = value;
-        }
+        set => Position.Set(Parent is not null ? value - Parent.AbsolutePosition : value);
     }
     
-    public Vector2f Origin { get; set; }
+    public Property<Vec2f> Origin { get; }
 
-    public float Rotation { get; set; }
+    public Property<Float> Rotation { get; }
     
     public AlignmentType? Alignment { get; set; }
-    public Vector2f AlignmentMargin { get; set; }
+    public Property<Vec2f> AlignmentMargin { get; }
 
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;
@@ -52,8 +50,15 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     {
         Parent = parent;
         Children = [];
+
+        PropertyAnimations = [];
      
         Visible = true;
+        
+        Position = new(this, new());
+        Origin = new(this, new());
+        Rotation = new(this, 0f);
+        AlignmentMargin = new(this, new());
         
         Parent?.Children.Add(this);
     }
@@ -68,6 +73,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
             AbsolutePosition = GetAlignmentPosition(Alignment.Value) + AlignmentMargin;
      
         UpdateSfmlProperties();
+
+        foreach (AnimationState animation in PropertyAnimations)
+            animation.Update();
         
         UpdateEvent?.Invoke(this, EventArgs.Empty);
         
@@ -79,8 +87,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     protected virtual void UpdateSfmlProperties()
     {
         Transformable.Position = AbsolutePosition;
-        Transformable.Origin = Origin;
-        Transformable.Rotation = Rotation;
+        Transformable.Origin = Origin.Value;
+        Transformable.Rotation = Rotation.Value;
     }
 
     
@@ -118,6 +126,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     }
 
 
+    // TODO: clean-up
     protected IntRect GetFinalClipArea()
     {
         Element? element = this;
@@ -163,13 +172,17 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         => Parent?.GetBounds() ?? (FloatRect)App.MainWindow.RectSize;
 
 
-    public virtual Vector2f GetAlignmentPosition(AlignmentType alignment)
+    public virtual Vec2f GetAlignmentPosition(AlignmentType alignment)
         => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), ParentOrWindowBounds(), alignment);
     
     
-    public void Show()
-        => Visible = true;
-    
-    public void Hide()
-        => Visible = false;
+    public void Show() => Visible = true;
+    public void Hide() => Visible = false;
+
+
+    public void AddPropertyAnimation(AnimationState animation)
+    {
+        if (!PropertyAnimations.Contains(animation))
+            PropertyAnimations.Add(animation);
+    }
 }

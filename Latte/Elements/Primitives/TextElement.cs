@@ -4,6 +4,7 @@ using SFML.System;
 using SFML.Graphics;
 
 using Latte.Core;
+using Latte.Core.Type;
 
 
 namespace Latte.Elements.Primitives;
@@ -31,7 +32,7 @@ public class TextElement : Element
             CharacterSize = size
         };
         
-        Position = position;
+        Position.Set(position);
     }
     
 
@@ -52,14 +53,14 @@ public class TextElement : Element
         => Text.GetGlobalBounds();
 
 
-    public override Vector2f GetAlignmentPosition(AlignmentType alignment)
+    public override Vec2f GetAlignmentPosition(AlignmentType alignment)
     {
         // text local bounds work quite different
         // https://learnsfml.com/basics/graphics/how-to-center-text/#set-a-string
         
         FloatRect localBounds = Text.GetLocalBounds();
         
-        Vector2f position = base.GetAlignmentPosition(alignment);
+        Vec2f position = base.GetAlignmentPosition(alignment);
         position -= localBounds.Position;
         
         return position;
@@ -72,6 +73,6 @@ public class TextElement : Element
 
         // round to avoid blurry text
         Transformable.Position = new(MathF.Round(AbsolutePosition.X), MathF.Round(AbsolutePosition.Y));
-        Transformable.Origin = new(MathF.Round(Origin.X), MathF.Round(Origin.Y));
+        Transformable.Origin = new(MathF.Round(Origin.Value.X), MathF.Round(Origin.Value.Y));
     }
 }

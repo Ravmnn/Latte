@@ -17,12 +17,10 @@ public class ProgressBarPopup : WindowElement
         Alignment = AlignmentType.Center;
         
         CloseOnComplete = true;
-        
-        ProgressBar = new(this, new(), new(Size.X - 30, 20))
-        {
-            Alignment = AlignmentType.HorizontalCenter | AlignmentType.Bottom,
-            AlignmentMargin = new(0, -10)
-        };
+
+        ProgressBar = new(this, new(), new(Size.Value.X - 30, 20));
+        ProgressBar.Alignment = AlignmentType.HorizontalCenter | AlignmentType.Bottom;
+        ProgressBar.AlignmentMargin.Set(new(0, -10));
     }
 
 

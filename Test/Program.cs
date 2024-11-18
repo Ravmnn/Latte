@@ -1,8 +1,9 @@
 ﻿using SFML.Window;
 using SFML.Graphics;
 
-using Latte.SFML;
+using Latte.Sfml;
 using Latte.Core;
+using Latte.Core.Animation;
 using Latte.Core.Application;
 using Latte.Elements;
 using Latte.Elements.Primitives;
@@ -23,27 +24,26 @@ class Program
         
         App.Elements.Add(new RectangleElement(null, new(), new(700, 700))
         {
-            Color = Color.Green,
+            Color = { Value = Color.Green },
             Alignment = AlignmentType.Center,
-            BorderSize = 4f,
-            BorderColor = Color.White,
-            ShouldDrawElementBoundaries = false,
-            ShouldDrawClipArea = false
+            BorderSize = { Value = 4f },
+            BorderColor = { Value = Color.White }
         });
+
+        DynamicWindowElement window = new("Test Window", new(), new(400, 400));
+        window.BorderSize.Value = 2f;
+        window.BorderColor.Value = Color.White;
+        window.Radius.Value = 15f;
         
-        App.Elements.Add(new DynamicWindowElement("Test Window", new(), new(400, 400))
-        {
-            BorderSize = 2f,
-            BorderColor = Color.White,
-            
-            Radius = 15f
-        });
+        window.Position.Animate(new(1000, 200), 1f, EasingType.EaseOutQuint);
+        
+        App.Elements.Add(window);
 
         RectangleElement rect = new(App.Elements[0], new(), new(200, 200))
         {
             Alignment = AlignmentType.Center,
             
-            Color = new(80, 80, 255)
+            Color = { Value = new(80, 80, 255) }
         };
 
         _ = new TextElement(rect, new(), 30, "this is a large text!!!")
@@ -54,17 +54,17 @@ class Program
         _ = new ButtonElement(App.Elements[0], new(), new(200, 90), "Press me!!")
         {
             Alignment = AlignmentType.BottomRight,
-            AlignmentMargin = new(30, 40),
+            AlignmentMargin = { Value = new(30, 40) },
             
-            Radius = 3f
+            Radius = { Value = 3f }
         };
         
         _ = new ButtonElement(App.Elements[0], new(), new(300, 130), "Press me!!")
         {
             Alignment = AlignmentType.HorizontalCenter | AlignmentType.Top,
-            AlignmentMargin = new(0, 10),
+            AlignmentMargin = { Value = new(0, 10) },
 
-            Radius = 10f
+            Radius = { Value = 10f }
         };
 
         RoundedRectangleShape rrect = new(new(300, 300), 10f, 16)
