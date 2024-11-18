@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using SFML.System;
 using SFML.Window;
@@ -39,7 +40,13 @@ public static class App
     private static bool _initialized;
     
     public static List<Element> Elements { get; set; } = [];
+    
+    public static TimeSpan DeltaTime { get; private set; }
+    public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
+    public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
 
+    private static Stopwatch _deltaTimeStopwatch = new();
+    
 
     public static void Init(VideoMode mode, string title, Font defaultFont, Styles styles = Styles.Default, ContextSettings settings = new())
     {
@@ -62,13 +69,19 @@ public static class App
         TextElement.DefaultTextFont = defaultFont;
         
         _initialized = true;
+
+        DeltaTime = TimeSpan.Zero;
+        _deltaTimeStopwatch = new();
+        _deltaTimeStopwatch.Start();
     }
     
 
     public static void Update()
     {
-        MainWindow.ProcessEvents();
+        DeltaTime = _deltaTimeStopwatch.Elapsed;
+        _deltaTimeStopwatch.Restart();
         
+        MainWindow.ProcessEvents();
         MainWindow.SetView(UIView);
         
         foreach (Element element in Elements)
