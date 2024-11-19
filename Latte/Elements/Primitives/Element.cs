@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 
-using OpenTK.Graphics.OpenGL;
-
-using SFML.System;
 using SFML.Graphics;
 
 using Latte.Core;
@@ -98,7 +95,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
             Debug.DrawLineRect(target, GetBounds(), Color.Red);
         
         if (ShouldDrawClipArea)
-            Debug.DrawLineRect(target, (FloatRect)GetClipAreaOrWindow(), Color.Magenta);
+            Debug.DrawLineRect(target, (FloatRect)GetClipArea(), Color.Magenta);
         
         if (!Visible)
             return;
@@ -111,69 +108,26 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     protected virtual void BeginDraw()
     {
-        IntRect clipArea = GetFinalClipArea();
-        Vector2u windowSize = App.MainWindow.Size;
-        
-        GL.Enable(EnableCap.ScissorTest);
-        
-        // the Y parameter needs to be converted to OpenGL coordinate system
-        GL.Scissor(clipArea.Left, (int)windowSize.Y - clipArea.Height - clipArea.Top, clipArea.Width, clipArea.Height);
+        ClipArea.BeginClip(GetFinalClipArea());
     }
 
     protected virtual void EndDraw()
     {
-        GL.Disable(EnableCap.ScissorTest);
-    }
-
-
-    // TODO: clean-up
-    protected IntRect GetFinalClipArea()
-    {
-        Element? element = this;
-        IntRect? area = null;
-        
-        do
-        {
-            IntRect newArea = element.GetClipAreaOrWindow();
-
-            if (area is null)
-                area = newArea;
-            
-            else if (area.Value.Intersects(newArea, out IntRect overlap))
-                area = overlap;
-                
-            element = element.Parent;
-        }
-        while (element is not null);
-
-        return area.Value;
+        ClipArea.EndClip();
     }
 
     
-    protected IntRect GetClipAreaOrWindow() 
-        => Parent?.GetThisClipArea() ?? App.MainWindow.RectSize;
-
-    protected virtual IntRect GetThisClipArea() => WorldFloatRectToClipArea(GetBounds());
-
-
-    protected static IntRect WorldFloatRectToClipArea(FloatRect rect)
-    {
-        Vector2i transformedPosition = App.MainWindow.MapCoordsToPixel(rect.Position);
-        Vector2i transformedSize = App.MainWindow.MapCoordsToPixel(rect.Position + rect.Size) - transformedPosition;
-        
-        return new(transformedPosition, transformedSize);
-    }
+    public IntRect GetFinalClipArea() => ClipArea.OverlapElementsClipArea(this);
+    public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.MainWindow.RectSize;
+    public virtual IntRect GetThisClipArea() => ClipArea.WorldFloatRectToClipArea(GetBounds());
 
 
     public abstract FloatRect GetBounds();
-    
-    
-    protected FloatRect ParentOrWindowBounds()
-        => Parent?.GetBounds() ?? (FloatRect)App.MainWindow.RectSize;
+    public FloatRect ParentBounds() => Parent?.GetBounds() ?? (FloatRect)App.MainWindow.RectSize;
 
 
     public virtual Vec2f GetAlignmentPosition(AlignmentType alignment)
-        => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), ParentOrWindowBounds(), alignment);
+        => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), ParentBounds(), alignment);
     
     
     public void Show() => Visible = true;

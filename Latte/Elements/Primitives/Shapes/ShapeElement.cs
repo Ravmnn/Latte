@@ -42,7 +42,7 @@ public abstract class ShapeElement : Element
     }
 
 
-    protected override IntRect GetThisClipArea()
+    public override IntRect GetThisClipArea()
     {
         // ignore border when clipping elements
         
@@ -52,7 +52,7 @@ public abstract class ShapeElement : Element
         bounds.Width -= BorderSize.Value * 2;
         bounds.Height -= BorderSize.Value * 2;
 
-        return WorldFloatRectToClipArea(bounds);
+        return ClipArea.WorldFloatRectToClipArea(bounds);
     }
     
     
