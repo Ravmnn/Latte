@@ -4,7 +4,7 @@ namespace Latte.Core.Animation;
 /// <summary>
 /// Describes an object that can be animated.
 /// </summary>
-public interface IAnimateable<T>
+public interface IAnimatable<T>
 {
     AnimationState AnimateThis(T to, float time, EasingType easingType = EasingType.Linear);
 

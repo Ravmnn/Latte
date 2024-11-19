@@ -12,10 +12,10 @@ public abstract class ShapeElement : Element
     
     public Shape SfmlShape { get; protected set; }
 
-    public Property<Float> BorderSize { get; }
+    public AnimatableProperty<Float> BorderSize { get; }
 
-    public Property<ColorRGBA> Color { get; }
-    public Property<ColorRGBA> BorderColor { get; }
+    public AnimatableProperty<ColorRGBA> Color { get; }
+    public AnimatableProperty<ColorRGBA> BorderColor { get; }
     
     
     protected ShapeElement(Element? parent, Shape shape) : base(parent)

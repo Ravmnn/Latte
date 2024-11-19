@@ -9,9 +9,9 @@ public class RectangleElement : ShapeElement
 {
     public new RoundedRectangleShape SfmlShape => (base.SfmlShape as RoundedRectangleShape)!;
 
-    public Property<Vec2f> Size { get; }
+    public AnimatableProperty<Vec2f> Size { get; }
     
-    public Property<Float> Radius { get; }
+    public AnimatableProperty<Float> Radius { get; }
     
     protected const uint DefaultPointCount = 16;
     

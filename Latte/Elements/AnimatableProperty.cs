@@ -1,18 +1,17 @@
 using Latte.Core.Animation;
 using Latte.Elements.Primitives;
-using OpenTK.Graphics.GL;
 
 
 namespace Latte.Elements;
 
 
-public class Property<T> where T : IAnimateable<T>
+public class AnimatableProperty<T> where T : IAnimatable<T>
 {
     public Element Owner { get; }
     public T Value { get; set; }
 
 
-    public Property(Element owner, T value)
+    public AnimatableProperty(Element owner, T value)
     {
         Owner = owner;
         Value = value;
@@ -31,5 +30,5 @@ public class Property<T> where T : IAnimateable<T>
     }
 
 
-    public static implicit operator T(Property<T> property) => property.Value;
+    public static implicit operator T(AnimatableProperty<T> animatableProperty) => animatableProperty.Value;
 }

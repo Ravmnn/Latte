@@ -4,7 +4,7 @@ using Latte.Core.Animation;
 namespace Latte.Core.Type;
 
 
-public struct Float(float value) : IAnimateable<Float>
+public struct Float(float value) : IAnimatable<Float>
 {
     public float Value { get; set; } = value;
 

@@ -9,7 +9,7 @@ namespace Latte.Core.Type;
 /// <summary>
 /// Represents the four channels of color: red, green, blue and alpha (transparency)
 /// </summary>
-public struct ColorRGBA : IAnimateable<ColorRGBA>
+public struct ColorRGBA : IAnimatable<ColorRGBA>
 {
     private byte _r;
 

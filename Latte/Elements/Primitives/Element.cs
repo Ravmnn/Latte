@@ -25,19 +25,19 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
     
-    public Property<Vec2f> Position { get; }
+    public AnimatableProperty<Vec2f> Position { get; }
     public Vec2f AbsolutePosition
     {
         get => Parent is not null ? Position + Parent.AbsolutePosition : Position;
         set => Position.Set(Parent is not null ? value - Parent.AbsolutePosition : value);
     }
     
-    public Property<Vec2f> Origin { get; }
+    public AnimatableProperty<Vec2f> Origin { get; }
 
-    public Property<Float> Rotation { get; }
+    public AnimatableProperty<Float> Rotation { get; }
     
     public AlignmentType? Alignment { get; set; }
-    public Property<Vec2f> AlignmentMargin { get; }
+    public AnimatableProperty<Vec2f> AlignmentMargin { get; }
 
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;

@@ -56,7 +56,7 @@ public class Vec2<T>(T x, T y) where T :
 }
 
 
-public class Vec2f(float x = default, float y = default) : Vec2<float>(x, y), IAnimateable<Vec2f>
+public class Vec2f(float x = default, float y = default) : Vec2<float>(x, y), IAnimatable<Vec2f>
 {
     public static implicit operator Vec2f(Vector2f vec2) => new(vec2.X, vec2.Y);
     
@@ -69,7 +69,7 @@ public class Vec2f(float x = default, float y = default) : Vec2<float>(x, y), IA
 }
 
 
-public class Vec2i(int x = default, int y = default) : Vec2<int>(x, y), IAnimateable<Vec2i>
+public class Vec2i(int x = default, int y = default) : Vec2<int>(x, y), IAnimatable<Vec2i>
 {
     public static implicit operator Vec2i(Vector2i vec2) => new(vec2.X, vec2.Y);
     
@@ -82,7 +82,7 @@ public class Vec2i(int x = default, int y = default) : Vec2<int>(x, y), IAnimate
 }
 
 
-public class Vec2u(uint x = default, uint y = default) : Vec2<uint>(x, y), IAnimateable<Vec2u>
+public class Vec2u(uint x = default, uint y = default) : Vec2<uint>(x, y), IAnimatable<Vec2u>
 {
     public static implicit operator Vec2u(Vector2u vec2) => new(vec2.X, vec2.Y);
     
