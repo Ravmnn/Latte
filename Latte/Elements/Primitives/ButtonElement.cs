@@ -18,7 +18,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     public TextElement Text { get; protected set; }
 
     public MouseClickState MouseClickState { get; }
-    public bool Continuous { get; protected set; }
+    public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
     
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
@@ -39,10 +39,10 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         };
         
         BorderColor.Set(new(100, 100, 100));
-        BorderSize.Set(3f);
+        BorderSize.Set(1f);
 
         MouseClickState = new();
-        Continuous = false;
+        DisableTruePressOnlyWhenMouseIsUp = false;
         
         SetColorVariants(Color.Value);
     }

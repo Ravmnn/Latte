@@ -30,10 +30,10 @@ class Program
             BorderColor = { Value = Color.White }
         });
 
-        DynamicWindowElement window = new("Test Window", new(), new(400, 400));
+        WindowElement window = new("Test Window", new(), new(400, 400));
         window.BorderSize.Value = 2f;
         window.BorderColor.Value = Color.White;
-        window.Radius.Value = 15f;
+        window.Radius.Value = 5f;
         
         window.Position.Animate(new(1000, 200), 1f, EasingType.EaseOutQuint);
         

@@ -25,7 +25,7 @@ public class MouseClickState
 public interface IClickable
 {
     MouseClickState MouseClickState { get; }
-    bool Continuous { get; }
+    bool DisableTruePressOnlyWhenMouseIsUp { get; }
     
     event EventHandler? MouseEnterEvent;
     event EventHandler? MouseLeaveEvent;
@@ -58,7 +58,7 @@ public interface IDefaultClickable : IClickable
         if (!MouseClickState.IsTruePressed)
             MouseClickState.IsTruePressed = MouseClickState.IsPressed && !MouseClickState.WasMouseDown;
         
-        if (MouseClickState.IsTruePressed && !(Continuous ? MouseClickState.IsMouseDown : MouseClickState.IsPressed))
+        if (MouseClickState.IsTruePressed && !(DisableTruePressOnlyWhenMouseIsUp ? MouseClickState.IsMouseDown : MouseClickState.IsPressed))
             MouseClickState.IsTruePressed = false;
     }
 
