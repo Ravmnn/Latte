@@ -15,6 +15,7 @@ public class Vec2<T>(T x, T y) where T :
     IMultiplyOperators<T, T, T>,
     IDivisionOperators<T, T, T>,
     IEqualityOperators<T, T, bool>,
+    IComparisonOperators<T, T, bool>,
     IConvertible
 {
     public T X { get; set; } = x;

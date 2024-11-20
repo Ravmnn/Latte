@@ -8,8 +8,7 @@ using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using Cursor = SFML.Window.Cursor;
+using OpenTK.Graphics.OpenGL4;
 using Math = Latte.Core.Math;
 
 
@@ -56,6 +55,9 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public MouseCornerState ResizeCorner { get; }
     public FloatRect Rect => new(Position.Value, Size.Value);
     public float CornerSize { get; protected set; }
+    
+    public Vec2f MinSize { get; set; }
+    public Vec2f MaxSize { get; set; }
 
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
@@ -96,12 +98,13 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
         Style = style;
 
+        ClickState = new();
+        DisableTruePressOnlyWhenMouseIsUp = true;
+        
         ResizeCorner = new();
         CornerSize = 10f;
-        
-        ClickState = new();
-        
-        DisableTruePressOnlyWhenMouseIsUp = true;
+
+        MinSize = new(50, 50);
     }
     
     
@@ -144,23 +147,40 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public void ProcessResizing()
     {
         if (ResizeCorner.Top)
-        {
-            Position.Value.Y += DraggerPositionDelta.Y;
-            Size.Value.Y -= DraggerPositionDelta.Y;
-        }
+            ResizeCornerByDraggingDeltaFactor(topFactor: 1, bottomFactor: -1);
         
         else if (ResizeCorner.Bottom)
-            Size.Value.Y += DraggerPositionDelta.Y;
-
+            ResizeCornerByDraggingDeltaFactor(bottomFactor: 1);
 
         if (ResizeCorner.Left)
-        {
-            Position.Value.X += DraggerPositionDelta.X;
-            Size.Value.X -= DraggerPositionDelta.X;
-        }
+            ResizeCornerByDraggingDeltaFactor(leftFactor: 1, rightFactor: -1);
         
         else if (ResizeCorner.Right)
-            Size.Value.X += DraggerPositionDelta.X;
+            ResizeCornerByDraggingDeltaFactor(rightFactor: 1);
+    }
+
+
+    private void ResizeCornerByDraggingDeltaFactor(int leftFactor = 0, int topFactor = 0, int rightFactor = 0, int bottomFactor = 0)
+    {
+        Position.Value.X += DraggerPositionDelta.X * leftFactor;
+        Position.Value.Y += DraggerPositionDelta.Y * topFactor;
+        Size.Value.X += DraggerPositionDelta.X * rightFactor;
+        Size.Value.Y += DraggerPositionDelta.Y * bottomFactor;
+        
+        CheckCornerMinSize(leftFactor != 0, topFactor != 0, rightFactor != 0, bottomFactor != 0);
+    }
+    
+    private void CheckCornerMinSize(bool left = false, bool top = false, bool right = false, bool bottom = false)
+    {
+        if ((right && Size.Value.X >= MinSize.X) || (bottom && Size.Value.Y >= MinSize.Y))
+            return;
+        
+        Vec2f difference = MinSize - Size.Value;
+                
+        if (left) Position.Value.X -= difference.X;
+        if (top) Position.Value.Y -= difference.Y;
+        if (right) Size.Value.X += difference.X;
+        if (bottom) Size.Value.Y += difference.Y;
     }
     
     

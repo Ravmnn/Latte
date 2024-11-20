@@ -32,6 +32,9 @@ public interface IResizable
     FloatRect Rect { get; }
     float CornerSize { get; }
     
+    Vec2f? MinSize { get; }
+    Vec2f? MaxSize { get; }
+    
     MouseCornerState ResizeCorner { get; }
     
     bool Resizing { get; }
