@@ -186,5 +186,5 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
 
     public Keyframe ToKeyframe()
-        => new(Keyframe.PropertiesToKeyframeProperties(GetNonVectorProperties()));
+        => new(GetNonVectorProperties());
 }

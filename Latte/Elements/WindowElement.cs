@@ -29,7 +29,7 @@ public class WindowElement : RectangleElement, IDraggable
 {
     public TextElement Title { get; protected set; }
     
-    protected ButtonElement CloseButton { get; }
+    protected ButtonElement CloseButton { get; } // TODO: improve appearance
     
     public WindowElementStyle Style { get; set; }
     
@@ -90,7 +90,7 @@ public class WindowElement : RectangleElement, IDraggable
         DraggerPosition = App.MainWindow.WorldMousePosition;
         
         if (Style.HasFlag(WindowElementStyle.Moveable) && Dragging)
-            AbsolutePosition += DraggerPositionDelta;
+            AbsolutePosition += DraggerPositionDelta; // TODO: add dragging event
         
         CloseButton.Visible = Style.HasFlag(WindowElementStyle.Closeable);
         

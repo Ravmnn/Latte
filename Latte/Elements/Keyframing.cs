@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -9,12 +10,32 @@ using Latte.Elements.Primitives;
 namespace Latte.Elements;
 
 
-public readonly struct Keyframe(Dictionary<string, IAnimatable> properties)
+public class Keyframe() : IEnumerable
 {
-    public Dictionary<string, IAnimatable> Properties { get; } = properties;
+    public Dictionary<string, IAnimatable> Properties { get; } = [];
 
 
-    public static Dictionary<string, IAnimatable> PropertiesToKeyframeProperties(Property[] properties)
+    public Keyframe(Property[] properties) : this()
+    {
+        Properties = ElementPropertiesToKeyframeProperties(properties);
+    }
+        
+    
+    public void Add(string name, IAnimatable value)
+        => Properties[name] = value;
+    
+    public bool Remove(string name)
+        => Properties.Remove(name);
+    
+    public bool Exists(string name)
+        => Properties.ContainsKey(name);
+    
+    
+    public IEnumerator GetEnumerator()
+        => Properties.GetEnumerator();
+
+
+    public static Dictionary<string, IAnimatable> ElementPropertiesToKeyframeProperties(Property[] properties)
         => (from property in properties
             where property is AnimatableProperty
             let animatableProperty = property as AnimatableProperty
@@ -34,7 +55,7 @@ public class ElementKeyframeAnimator(Element element, double time, EasingType ea
     public void Animate(Keyframe to)
     {
         if (DefaultProperties is not null)
-            Animate(Element, DefaultProperties.Value, Time, EasingType);
+            Animate(Element, DefaultProperties, Time, EasingType);
         
         Animate(Element, to, Time, EasingType);
     }

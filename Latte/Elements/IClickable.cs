@@ -67,10 +67,10 @@ public interface IDefaultClickable : IClickable
         bool entered = MouseClickState.IsMouseHover && !MouseClickState.WasMouseHover;
         bool leaved = !MouseClickState.IsMouseHover && MouseClickState.WasMouseHover;
         
-        if (MouseClickState.IsTruePressed)
+        if (MouseClickState.IsTruePressed && !MouseClickState.WasTruePressed)
             OnMouseDown();
         
-        else if (MouseClickState.WasTruePressed)
+        else if (!MouseClickState.IsTruePressed && MouseClickState.WasTruePressed)
             OnMouseUp();
         
         if (entered)

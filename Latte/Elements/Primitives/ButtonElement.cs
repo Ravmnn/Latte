@@ -43,20 +43,20 @@ public class ButtonElement : RectangleElement, IDefaultClickable
 
         MouseClickState = new();
 
-        Normal = new(new()
+        Normal = new()
         {
             { "Color", new ColorRGBA(255, 255, 255) }
-        });
+        };
         
-        Hover = new(new()
+        Hover = new()
         {
             { "Color", new ColorRGBA(220, 220, 220) }
-        });
+        };
         
-        Down = new(new()
+        Down = new()
         {
             { "Color", new ColorRGBA(180, 180, 180) }
-        });
+        };
     }
 
 
@@ -83,9 +83,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     
     public virtual void OnMouseDown()
     {
-        if (!MouseClickState.WasTruePressed)
-            Animator.Animate(Down);
-        
+        Animator.Animate(Down);
         MouseDownEvent?.Invoke(this, EventArgs.Empty);
     }
     
