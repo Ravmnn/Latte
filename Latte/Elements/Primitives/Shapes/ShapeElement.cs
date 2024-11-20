@@ -1,6 +1,6 @@
-using System.Linq;
 using SFML.Graphics;
 
+using Latte.Sfml;
 using Latte.Core.Type;
 
 
@@ -11,7 +11,7 @@ public abstract class ShapeElement : Element
 {
     public override Transformable Transformable => SfmlShape;
     
-    public Shape SfmlShape { get; protected set; }
+    public Shape SfmlShape { get; }
 
     public AnimatableProperty<Float> BorderSize { get; }
 
@@ -53,7 +53,7 @@ public abstract class ShapeElement : Element
         bounds.Width -= BorderSize.Value * 2;
         bounds.Height -= BorderSize.Value * 2;
 
-        return ClipArea.WorldFloatRectToClipArea(bounds);
+        return bounds.ToWindowCoordinates();
     }
     
     

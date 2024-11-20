@@ -11,6 +11,13 @@ namespace Latte.Core;
 
 public static class Math
 {
+    public static bool IsPointOverRect(Vec2f point, Vec2f position, Vec2f size)
+        => new FloatRect(position, size).Contains((Vector2f)point);
+    
+    public static bool IsPointOverRect(Vec2f point, FloatRect rect)
+        => IsPointOverRect(point, rect.Position, rect.Size);
+    
+    
     public static bool IsPointOverRoundedRect(Vec2f point, Vec2f position, Vec2f size, float radius)
     {
         Vec2f leftTopCenter = new(position.X + radius, position.Y + radius);
@@ -31,14 +38,17 @@ public static class Math
         return overCorners || overRects;
     }
     
+    public static bool IsPointOverRoundedRect(Vec2f point, FloatRect rect, float radius)
+        => IsPointOverRoundedRect(point, rect.Position, rect.Size, radius);
     
-    public static bool IsPointOverCircle(Vector2f point, Vector2f circleCenter, float radius)
+    
+    public static bool IsPointOverCircle(Vec2f point, Vec2f circleCenter, float radius)
         => Distance(point, circleCenter) <= radius;
 
 
     public static float Distance(float x1, float y1, float x2, float y2)
         => MathF.Sqrt(MathF.Pow(x2 - x1, 2f) + MathF.Pow(y2 - y1, 2f));
     
-    public static float Distance(Vector2f p1, Vector2f p2)
+    public static float Distance(Vec2f p1, Vec2f p2)
         => Distance(p1.X, p1.Y, p2.X, p2.Y);
 }

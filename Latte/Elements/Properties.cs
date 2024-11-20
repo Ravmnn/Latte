@@ -13,6 +13,8 @@ public abstract class Property
     public object Value { get; set; }
     
  
+    // TODO: add events
+    
     public Property(Element owner, string name, object value)
     {
         Owner = owner;
@@ -57,6 +59,8 @@ public abstract class AnimatableProperty(Element owner, string name, object valu
     }
     
     public AnimationState? AnimationState { get; protected set; }
+    
+    public bool ShouldAnimatorIgnore { get; set; }
     
     
     public void Animate(object to, double time, EasingType easingType = EasingType.Linear)

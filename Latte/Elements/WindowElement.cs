@@ -30,7 +30,7 @@ public class WindowElement : RectangleElement, IDraggable
 {
     public TextElement Title { get; protected set; }
     
-    protected ButtonElement CloseButton { get; } // TODO: improve appearance
+    protected ButtonElement CloseButton { get; }
     
     public WindowElementStyle Style { get; set; }
     

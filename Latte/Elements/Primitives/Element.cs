@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using SFML.Graphics;
 
+using Latte.Sfml;
 using Latte.Core;
 using Latte.Core.Type;
 using Latte.Core.Application;
@@ -40,6 +41,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     public AnimatableProperty<Float> Rotation { get; }
     
+    public AnimatableProperty<Vec2f> Scale { get; }
+    
     public Property<AlignmentType> Alignment { get; set; }
     public AnimatableProperty<Vec2f> AlignmentMargin { get; }
 
@@ -61,11 +64,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
         _initialized = false;
         
-        Position = new(this, nameof(Position), new());
-        Origin = new(this, nameof(Origin), new());
+        Position = new(this, nameof(Position), new()) { ShouldAnimatorIgnore = true };
+        Origin = new(this, nameof(Origin), new()) { ShouldAnimatorIgnore = true }; 
         Rotation = new(this, nameof(Rotation), 0f);
+        Scale = new(this, nameof(Scale), new(1f, 1f));
+        
         Alignment = new(this, nameof(Alignment), AlignmentType.None);
-        AlignmentMargin = new(this, nameof(AlignmentMargin), new());
+        AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { ShouldAnimatorIgnore = true };
         
         Parent?.Children.Add(this);
     }
@@ -74,7 +79,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     protected virtual void Setup()
     {
         Animator.DefaultProperties = ToKeyframe();
-        
+
         _initialized = true;
         
         SetupEvent?.Invoke(this, EventArgs.Empty);
@@ -107,6 +112,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Transformable.Position = AbsolutePosition;
         Transformable.Origin = Origin.Value;
         Transformable.Rotation = Rotation.Value;
+        Transformable.Scale = Scale.Value;
     }
 
 
@@ -148,7 +154,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public IntRect GetFinalClipArea() => ClipArea.OverlapElementsClipArea(this);
     public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.MainWindow.RectSize;
-    public virtual IntRect GetThisClipArea() => ClipArea.WorldFloatRectToClipArea(GetBounds());
+    public virtual IntRect GetThisClipArea() => GetBounds().ToWindowCoordinates();
 
 
     public abstract FloatRect GetBounds();
@@ -161,14 +167,12 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public void Show() => Visible = true;
     public void Hide() => Visible = false;
-
-
-    protected Property[] GetNonVectorProperties()
-        => (from property in Properties
-            where property.Value is not Vec2f
-            select property).ToArray();
+    
+    
+    public AnimatableProperty[] GetAnimatableProperties()
+        => (from property in Properties where property is AnimatableProperty select property as AnimatableProperty).ToArray();
 
 
     public Keyframe ToKeyframe()
-        => new(GetNonVectorProperties());
+        => new(GetAnimatableProperties());
 }

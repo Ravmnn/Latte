@@ -15,7 +15,7 @@ public class Keyframe() : IEnumerable
     public Dictionary<string, IAnimatable> Properties { get; } = [];
 
 
-    public Keyframe(Property[] properties) : this()
+    public Keyframe(AnimatableProperty[] properties) : this()
     {
         Properties = ElementPropertiesToKeyframeProperties(properties);
     }
@@ -37,11 +37,8 @@ public class Keyframe() : IEnumerable
     }
 
 
-    public static Dictionary<string, IAnimatable> ElementPropertiesToKeyframeProperties(Property[] properties)
-        => (from property in properties
-            where property is AnimatableProperty
-            let animatableProperty = property as AnimatableProperty
-            select new KeyValuePair<string, IAnimatable>(animatableProperty.Name, animatableProperty.Value)).ToDictionary();
+    public static Dictionary<string, IAnimatable> ElementPropertiesToKeyframeProperties(AnimatableProperty[] properties)
+        => (from property in properties select new KeyValuePair<string, IAnimatable>(property.Name, property.Value)).ToDictionary();
 }
 
 
@@ -52,7 +49,7 @@ public class ElementKeyframeAnimator(Element element, double time, EasingType ea
 
     public double Time { get; set; } = time;
     public EasingType EasingType { get; set; } = easingType;
-    
+
 
     public void Animate(Keyframe to)
     {
@@ -69,11 +66,12 @@ public class ElementKeyframeAnimator(Element element, double time, EasingType ea
         {
             if (!to.Properties.TryGetValue(property.Name, out IAnimatable? targetValue))
                 continue;
-
+            
             if (property is not AnimatableProperty animatableProperty)
                 throw new InvalidOperationException($"Property \"{property.Name}\" is not an AnimatableProperty.");
-                
-            animatableProperty.Animate(targetValue, time, easingType);
+         
+            if (!animatableProperty.ShouldAnimatorIgnore)
+                animatableProperty.Animate(targetValue, time, easingType);
         }
     }
 }

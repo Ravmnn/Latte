@@ -1,5 +1,6 @@
 using System;
 
+using Latte.Sfml;
 using Latte.Core;
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
@@ -33,7 +34,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         Text = new(this, new(), 32, text)
         {
             Alignment = { Value = AlignmentType.Center },
-            Text = { FillColor = SFML.Graphics.Color.Black }
+            Color = { Value = SFML.Graphics.Color.Black }
         };
         
         BorderColor.Set(new(100, 100, 100));
@@ -45,7 +46,20 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         Hover = new();
         Down = new();
         
-        KeyframesFromColor(Color);
+        // TODO: make that a default behavior
+        /*
+        Hover =
+        {
+           { "Radius", new Float(10f) }  
+        },
+           
+        Down =
+        {
+            { "Radius", new Float(15f) }
+        } 
+        */
+        
+        SetKeyframeColoring(Color);
     }
 
 
@@ -82,14 +96,18 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    
+
     public virtual bool IsPointOver(Vec2f point)
+        => IsPointOverClipArea(point) && IsPointOverThis(point);
+    
+    protected bool IsPointOverClipArea(Vec2f point)
+        => Math.IsPointOverRect(point, GetFinalClipArea().ToWorldCoordinates());
+    
+    protected bool IsPointOverThis(Vec2f point)
         => Math.IsPointOverRoundedRect(point, AbsolutePosition, Size, Radius.Value);
     
-    // BUG: clicking is working even if the button is clipped
 
-
-    public void KeyframesFromColor(ColorRGBA color)
+    public void SetKeyframeColoring(ColorRGBA color)
     {
         const byte decreaseAmount = 30;
         

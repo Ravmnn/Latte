@@ -59,16 +59,23 @@ class Program
             Radius = { Value = 3f }
         };
         
-        ButtonElement btn = new(App.Elements[0], new(), new(300, 130), "Press me!!")
+        _ = new ButtonElement(App.Elements[0], new(), new(300, 130), "Press me!!")
         {
             Alignment = { Value = AlignmentType.HorizontalCenter | AlignmentType.Top },
             AlignmentMargin = { Value = new(0, 10) },
 
-            Radius = { Value = 5f }
+            Radius = { Value = 5f },
+            
+            Hover =
+            {
+                { "Radius", new Float(10f) }  
+            },
+           
+            Down =
+            {
+                { "Radius", new Float(15f) }
+            } 
         };
-
-        btn.Down.Properties["Size"] = new Vec2f(290, 130);
-        btn.Down.Properties["Radius"] = new Float(20f);
         
         RoundedRectangleShape rrect = new(new(300, 300), 10f, 16)
         {

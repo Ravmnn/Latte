@@ -15,25 +15,14 @@ public class ProgressBarElement : Element
 
     public RectangleElement Foreground { get; }
     public RectangleElement Background { get; }
-
-    private float _progress; // TODO: update to use AnimatableProperty
-    public float Progress
-    {
-        get => _progress;
-        set
-        {
-            if (value >= MinValue && value <= MaxValue)
-                _progress = value;
-            else
-                throw new ArgumentOutOfRangeException(nameof(value), "Progress must be between MinValue and MaxValue.");
-        }
-    }
-
-    public float MinValue { get; set; }
-    public float MaxValue { get; set; }
     
-    public bool IsAtMax => Progress >= MaxValue;
-    public bool IsAtMin => Progress <= MinValue;
+    public AnimatableProperty<Float> Progress { get; }
+
+    public Property<Float> MinValue { get; set; }
+    public Property<Float> MaxValue { get; set; }
+    
+    public bool IsAtMax => Progress.Value >= MaxValue.Value;
+    public bool IsAtMin => Progress.Value <= MinValue.Value;
 
     public bool Completed => IsAtMax;
     private bool _wasCompleted;
@@ -43,10 +32,10 @@ public class ProgressBarElement : Element
 
     public ProgressBarElement(Element? parent, Vec2f position, Vec2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
     {
-        MinValue = minValue;
-        MaxValue = maxValue;
+        MinValue = new(this, nameof(MinValue), minValue);
+        MaxValue = new(this, nameof(MaxValue), maxValue);;
         
-        Progress = minValue;
+        Progress = new(this, nameof(Progress), 0f);
         
         Position.Set(position);
 
@@ -63,10 +52,13 @@ public class ProgressBarElement : Element
         if (!Visible)
             return;
         
+        // keeps progress between the value limits
+        Progress.Set(Math.Clamp(Progress.Value, MinValue.Value, MaxValue.Value));
+        
         if (!_wasCompleted && Completed)
             CompletedEvent?.Invoke(this, EventArgs.Empty);
         
-        float normalizedProgress = (Progress - MinValue) / (MaxValue - MinValue); 
+        float normalizedProgress = (Progress.Value - MinValue.Value) / (MaxValue.Value - MinValue.Value); 
         Foreground.Size.Set(new(Background.Size.Value.X * normalizedProgress, Background.Size.Value.Y));
         
         _wasCompleted = Completed;

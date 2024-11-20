@@ -1,4 +1,3 @@
-using System.Linq;
 using Latte.Sfml;
 using Latte.Core.Type;
 
@@ -22,7 +21,7 @@ public class RectangleElement : ShapeElement
     {
         Position.Set(position);
         
-        Size = new(this, nameof(Size), size);
+        Size = new(this, nameof(Size), size) { ShouldAnimatorIgnore = true };
         Radius = new(this, nameof(Radius), radius);
     }
 
