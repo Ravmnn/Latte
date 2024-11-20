@@ -13,11 +13,15 @@ public struct Float(float value) : IAnimatable<Float>
     public static implicit operator Float(float @float) => new(@float);
 
     
-    public readonly AnimationState AnimateThis(Float to, float time, EasingType easingType = EasingType.Linear)
+    public readonly AnimationState AnimateThis(Float to, double time, EasingType easingType = EasingType.Linear)
         => Animate.Value(Value, to, time, easingType);
 
-    public readonly Float AnimationValuesToThis(float[] values)
-        => values.ToValue();
+    public readonly AnimationState AnimateThis(object to, double time, EasingType easingType = EasingType.Linear)
+        => AnimateThis((Float)to, time, easingType);
+    
+    
+    public readonly IAnimatable AnimationValuesToThis(float[] values)
+        => (Float)values.ToValue();
     
 
     public readonly override string ToString() => $"{Value}";

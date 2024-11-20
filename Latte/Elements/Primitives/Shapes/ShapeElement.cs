@@ -1,3 +1,4 @@
+using System.Linq;
 using SFML.Graphics;
 
 using Latte.Core.Type;
@@ -22,10 +23,10 @@ public abstract class ShapeElement : Element
     {
         SfmlShape = shape;
 
-        BorderSize = new(this, 0f);
+        BorderSize = new(this, nameof(BorderSize), 0f);
         
-        Color = new(this, SFML.Graphics.Color.White);
-        BorderColor = new(this, SFML.Graphics.Color.White);
+        Color = new(this, nameof(Color), SFML.Graphics.Color.White);
+        BorderColor = new(this, nameof(BorderColor), SFML.Graphics.Color.White);
     }
     
 

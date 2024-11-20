@@ -61,10 +61,14 @@ public class Vec2f(float x = default, float y = default) : Vec2<float>(x, y), IA
     public static implicit operator Vec2f(Vector2f vec2) => new(vec2.X, vec2.Y);
     
     
-    public AnimationState AnimateThis(Vec2f to, float time, EasingType easingType = EasingType.Linear)
+    public AnimationState AnimateThis(Vec2f to, double time, EasingType easingType = EasingType.Linear)
         => Animate.Vec2f(this, to, time, easingType);
+    
+    public AnimationState AnimateThis(object to, double time, EasingType easingType = EasingType.Linear)
+        => Animate.Vec2f(this, (Vec2f)to, time, easingType);
+    
 
-    public Vec2f AnimationValuesToThis(float[] values)
+    public IAnimatable AnimationValuesToThis(float[] values)
         => values.ToVec2f();
 }
 
@@ -74,10 +78,14 @@ public class Vec2i(int x = default, int y = default) : Vec2<int>(x, y), IAnimata
     public static implicit operator Vec2i(Vector2i vec2) => new(vec2.X, vec2.Y);
     
 
-    public AnimationState AnimateThis(Vec2i to, float time, EasingType easingType = EasingType.Linear)
+    public AnimationState AnimateThis(Vec2i to, double time, EasingType easingType = EasingType.Linear)
         => Animate.Vec2i(this, to, time, easingType);
+    
+    public AnimationState AnimateThis(object to, double time, EasingType easingType = EasingType.Linear)
+        => Animate.Vec2i(this, (Vec2i)to, time, easingType);
+    
 
-    public Vec2i AnimationValuesToThis(float[] values)
+    public IAnimatable AnimationValuesToThis(float[] values)
         => values.ToVec2i();
 }
 
@@ -87,9 +95,13 @@ public class Vec2u(uint x = default, uint y = default) : Vec2<uint>(x, y), IAnim
     public static implicit operator Vec2u(Vector2u vec2) => new(vec2.X, vec2.Y);
     
     
-    public AnimationState AnimateThis(Vec2u to, float time, EasingType easingType = EasingType.Linear)
+    public AnimationState AnimateThis(Vec2u to, double time, EasingType easingType = EasingType.Linear)
         => Animate.Vec2u(this, to, time, easingType);
+    
+    public AnimationState AnimateThis(object to, double time, EasingType easingType = EasingType.Linear)
+        => Animate.Vec2u(this, (Vec2u)to, time, easingType);
+    
 
-    public Vec2u AnimationValuesToThis(float[] values)
+    public IAnimatable AnimationValuesToThis(float[] values)
         => values.ToVec2u();
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using SFML.Graphics;
@@ -17,13 +18,18 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public Element? Parent { get; set; }
     public List<Element> Children { get; }
     
+    public Dictionary<string, Property> Properties { get; }
     protected List<AnimationState> PropertyAnimations { get; }
+    
+    public ElementKeyframeAnimator Animator { get; set; }
     
     public abstract Transformable Transformable { get; }
     
     public bool Visible { get; set; }
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
+    
+    private bool _initialized;
     
     public AnimatableProperty<Vec2f> Position { get; }
     public Vec2f AbsolutePosition
@@ -36,9 +42,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     public AnimatableProperty<Float> Rotation { get; }
     
-    public AlignmentType? Alignment { get; set; }
+    public Property<AlignmentType> Alignment { get; set; }
     public AnimatableProperty<Vec2f> AlignmentMargin { get; }
 
+    public event EventHandler? SetupEvent; 
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;
 
@@ -48,31 +55,48 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Parent = parent;
         Children = [];
 
+        Properties = [];
         PropertyAnimations = [];
+
+        Animator = new(this, 0.1);
      
         Visible = true;
+
+        _initialized = false;
         
-        Position = new(this, new());
-        Origin = new(this, new());
-        Rotation = new(this, 0f);
-        AlignmentMargin = new(this, new());
+        Position = new(this, nameof(Position), new());
+        Origin = new(this, nameof(Origin), new());
+        Rotation = new(this, nameof(Rotation), 0f);
+        Alignment = new(this, nameof(Alignment), AlignmentType.None);
+        AlignmentMargin = new(this, nameof(AlignmentMargin), new());
         
         Parent?.Children.Add(this);
     }
 
 
+    protected virtual void Setup()
+    {
+        Animator.DefaultProperties = ToKeyframe();
+        
+        _initialized = true;
+        
+        SetupEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
     public virtual void Update()
     {
+        if (!_initialized)
+            Setup();
+        
         if (!Visible)
             return;
         
-        if (Alignment is not null)
+        if (Alignment != AlignmentType.None)
             AbsolutePosition = GetAlignmentPosition(Alignment.Value) + AlignmentMargin;
      
+        UpdatePropertyAnimations();
         UpdateSfmlProperties();
-
-        foreach (AnimationState animation in PropertyAnimations)
-            animation.Update();
         
         UpdateEvent?.Invoke(this, EventArgs.Empty);
         
@@ -86,6 +110,20 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Transformable.Position = AbsolutePosition;
         Transformable.Origin = Origin.Value;
         Transformable.Rotation = Rotation.Value;
+    }
+
+
+    protected void UpdatePropertyAnimations()
+    {
+        for (int i = 0; i < PropertyAnimations.Count; i++)
+        {
+            AnimationState state = PropertyAnimations[i];
+            
+            state.Update();
+            
+            if (state.HasFinished)
+                PropertyAnimations.RemoveAt(i);
+        }
     }
 
     
@@ -139,4 +177,14 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         if (!PropertyAnimations.Contains(animation))
             PropertyAnimations.Add(animation);
     }
+
+
+    protected Property[] GetNonVectorProperties()
+        => (from property in Properties.Values
+            where property.Value is not Vec2f
+            select property).ToArray();
+
+
+    public Keyframe ToKeyframe()
+        => new(Keyframe.PropertiesToKeyframeProperties(GetNonVectorProperties()));
 }

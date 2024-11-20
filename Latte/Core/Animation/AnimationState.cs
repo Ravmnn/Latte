@@ -30,7 +30,7 @@ public class AnimationUpdatedEventArgs(float[] currentValues) : EventArgs
 /// <param name="startValues"> The start values. </param>
 /// <param name="endValues"> The final values. </param>
 /// <param name="time"> The time the animation will take to finish. </param>
-public class AnimationState(float[] startValues, float[] endValues, float time, EasingType easingType = EasingType.Linear) : IUpdateable
+public class AnimationState(float[] startValues, float[] endValues, double time, EasingType easingType = EasingType.Linear) : IUpdateable
 {
     public float[] StartValues { get; } = startValues;
     public float[] EndValues { get; } = endValues;
@@ -52,6 +52,7 @@ public class AnimationState(float[] startValues, float[] endValues, float time, 
     public float EasedProgress { get; private set; }
 
     public bool HasFinished => ElapsedTime >= Time;
+    public bool Paused { get; set; }
 
 
     public event EventHandler<AnimationUpdatedEventArgs>? Updated;
@@ -63,13 +64,13 @@ public class AnimationState(float[] startValues, float[] endValues, float time, 
     /// </summary>
     public void Update()
     {
-        if (HasFinished)
+        if (HasFinished || Paused)
             return;
 
         OnUpdated(new AnimationUpdatedEventArgs(CurrentValues));
 
         if (HasFinished)
-            OnFinished(EventArgs.Empty);
+            OnFinished();
     }
     
 
@@ -95,6 +96,14 @@ public class AnimationState(float[] startValues, float[] endValues, float time, 
         Updated?.Invoke(this, eventArgs);
     }
 
-    protected virtual void OnFinished(EventArgs eventArgs)
-        => Finished?.Invoke(this, eventArgs);
+
+    public void Finish()
+    {
+        ElapsedTime = Time;
+        OnFinished();
+    }
+    
+
+    protected virtual void OnFinished()
+        => Finished?.Invoke(this, EventArgs.Empty);
 }

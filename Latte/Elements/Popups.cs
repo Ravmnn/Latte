@@ -14,12 +14,12 @@ public class ProgressBarPopup : WindowElement
     
     public ProgressBarPopup(string title) : base(title, new(), new(300, 200))
     {
-        Alignment = AlignmentType.Center;
+        Alignment.Set(AlignmentType.Center);
         
         CloseOnComplete = true;
 
         ProgressBar = new(this, new(), new(Size.Value.X - 30, 20));
-        ProgressBar.Alignment = AlignmentType.HorizontalCenter | AlignmentType.Bottom;
+        ProgressBar.Alignment.Set(AlignmentType.HorizontalCenter | AlignmentType.Bottom);
         ProgressBar.AlignmentMargin.Set(new(0, -10));
     }
 

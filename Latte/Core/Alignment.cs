@@ -1,6 +1,5 @@
 using System;
 
-using SFML.System;
 using SFML.Graphics;
 
 using Latte.Core.Type;
@@ -12,6 +11,8 @@ namespace Latte.Core;
 [Flags]
 public enum AlignmentType
 {
+    None = 0,
+    
     Top = 1 << 0,
     Bottom = 1 << 1,
     Left = 1 << 2,

@@ -21,7 +21,7 @@ public enum WindowElementStyle
     Resizable = 1 << 1,
     Moveable = 1 << 2,
     
-    Default = Closeable | Resizable | Moveable
+    Default = Closeable | Resizable | Moveable // TODO: implement resizing feature
 }
 
 
@@ -57,7 +57,7 @@ public class WindowElement : RectangleElement, IDraggable
         : base(null, position, size)
     {
         Title = new(this, new(), 20, title);
-        Title.Alignment = AlignmentType.HorizontalCenter | AlignmentType.Top;
+        Title.Alignment.Set(AlignmentType.HorizontalCenter | AlignmentType.Top);
         Title.AlignmentMargin.Set(new(0, 10));
         
         Color.Set(new(50, 50, 50, 220));
@@ -66,7 +66,7 @@ public class WindowElement : RectangleElement, IDraggable
         {
             Color = { Value = new(255, 100, 100) },
             
-            Alignment = AlignmentType.TopRight,
+            Alignment = { Value = AlignmentType.TopRight },
             AlignmentMargin = { Value = new(-7, 8) },
             
             Radius = { Value = 3f }

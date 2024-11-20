@@ -16,7 +16,7 @@ public class ProgressBarElement : Element
     public RectangleElement Foreground { get; }
     public RectangleElement Background { get; }
 
-    private float _progress;
+    private float _progress; // TODO: update to use AnimatableProperty
     public float Progress
     {
         get => _progress;

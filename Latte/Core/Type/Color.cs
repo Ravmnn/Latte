@@ -60,10 +60,14 @@ public struct ColorRGBA : IAnimatable<ColorRGBA>
     public static implicit operator ColorRGBA(Color color) => new(color.R, color.G, color.B, color.A);
 
 
-    public readonly AnimationState AnimateThis(ColorRGBA to, float time, EasingType easingType = EasingType.Linear)
+    public readonly AnimationState AnimateThis(ColorRGBA to, double time, EasingType easingType = EasingType.Linear)
         => Animate.Color(this, to, time, easingType);
     
-    public readonly ColorRGBA AnimationValuesToThis(float[] values)
+    public AnimationState AnimateThis(object to, double time, EasingType easingType = EasingType.Linear)
+        => Animate.Color(this, (ColorRGBA)to, time, easingType);
+    
+    
+    public readonly IAnimatable AnimationValuesToThis(float[] values)
         => values.ToColor();
 
     

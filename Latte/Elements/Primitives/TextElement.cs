@@ -21,7 +21,7 @@ public class TextElement : Element
     
     public override Transformable Transformable => Text;
     
-    public Text Text { get; protected set; } 
+    public Text Text { get; protected set; } // TODO: add properties
     
 
     public TextElement(Element? parent, Vector2f position, uint size, string text, Font? font = null) : base(parent)
