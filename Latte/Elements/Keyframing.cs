@@ -19,11 +19,21 @@ public class Keyframe() : IEnumerable
     {
         Properties = ElementPropertiesToKeyframeProperties(properties);
     }
-        
+
     
-    public void Add(string name, IAnimatable value) => Properties[name] = value;
+    // must implement for using collection initialization list
+    public void Add(string name, IAnimatable value) => Set(name, value);
+    
+    public void Set(string name, IAnimatable value) => Properties[name] = value;
     public bool Remove(string name) => Properties.Remove(name);
     public bool Exists(string name) => Properties.ContainsKey(name);
+
+
+    public void SetIfNotDefined(string name, IAnimatable value)
+    {
+        if (!Exists(name))
+            Set(name, value);
+    }
     
     
     public IEnumerator GetEnumerator()

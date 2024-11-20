@@ -45,21 +45,14 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         Normal = new();
         Hover = new();
         Down = new();
+    }
+
+
+    protected override void Setup()
+    {
+        SetDefaultKeyframeAnimation();
         
-        // TODO: make that a default behavior
-        /*
-        Hover =
-        {
-           { "Radius", new Float(10f) }  
-        },
-           
-        Down =
-        {
-            { "Radius", new Float(15f) }
-        } 
-        */
-        
-        SetKeyframeColoring(Color);
+        base.Setup();
     }
 
 
@@ -69,6 +62,33 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         (this as IDefaultClickable).ProcessMouseEvents();
         
         base.Update();
+    }
+    
+    
+    protected void SetDefaultKeyframeAnimation()
+    {
+        const byte colorDecreaseAmount = 25;
+        const float radiusIncreaseAmount = 3.5f;
+        
+        Normal.SetIfNotDefined("Radius", Radius.Value);
+        Hover.SetIfNotDefined("Radius", new Float(Radius.Value + radiusIncreaseAmount));
+        Down.SetIfNotDefined("Radius", new Float(Radius.Value + radiusIncreaseAmount * 2f));
+        
+        ColorRGBA color = Color;
+        
+        Normal.SetIfNotDefined("Color", color);
+        
+        color.R -= colorDecreaseAmount;
+        color.G -= colorDecreaseAmount;
+        color.B -= colorDecreaseAmount;
+
+        Hover.SetIfNotDefined("Color", color);
+        
+        color.R -= colorDecreaseAmount;
+        color.G -= colorDecreaseAmount;
+        color.B -= colorDecreaseAmount;
+        
+        Down.SetIfNotDefined("Color", color);
     }
     
     
@@ -105,24 +125,4 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     
     protected bool IsPointOverThis(Vec2f point)
         => Math.IsPointOverRoundedRect(point, AbsolutePosition, Size, Radius.Value);
-    
-
-    public void SetKeyframeColoring(ColorRGBA color)
-    {
-        const byte decreaseAmount = 30;
-        
-        Normal["Color"] = color;
-        
-        color.R -= decreaseAmount;
-        color.G -= decreaseAmount;
-        color.B -= decreaseAmount;
-
-        Hover["Color"] = color;
-        
-        color.R -= decreaseAmount;
-        color.G -= decreaseAmount;
-        color.B -= decreaseAmount;
-        
-        Down["Color"] = color;
-    }
 }

@@ -4,7 +4,6 @@ using SFML.Graphics;
 using Latte.Sfml;
 using Latte.Core;
 using Latte.Core.Application;
-using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
@@ -64,17 +63,7 @@ class Program
             Alignment = { Value = AlignmentType.HorizontalCenter | AlignmentType.Top },
             AlignmentMargin = { Value = new(0, 10) },
 
-            Radius = { Value = 5f },
-            
-            Hover =
-            {
-                { "Radius", new Float(10f) }  
-            },
-           
-            Down =
-            {
-                { "Radius", new Float(15f) }
-            } 
+            Radius = { Value = 5f }
         };
         
         RoundedRectangleShape rrect = new(new(300, 300), 10f, 16)

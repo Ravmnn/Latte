@@ -12,8 +12,6 @@ public abstract class Property
     public string Name { get; }
     public object Value { get; set; }
     
- 
-    // TODO: add events
     
     public Property(Element owner, string name, object value)
     {

@@ -53,6 +53,8 @@ public class WindowElement : RectangleElement, IDraggable
     public event EventHandler? MouseDownEvent;
     public event EventHandler? MouseUpEvent;
 
+    public event EventHandler? DraggingEvent;
+
 
     public WindowElement(string title, Vec2f position, Vec2f size, WindowElementStyle style = WindowElementStyle.Default)
         : base(null, position, size)
@@ -68,7 +70,12 @@ public class WindowElement : RectangleElement, IDraggable
             Color = { Value = new(255, 100, 100) },
             
             Alignment = { Value = AlignmentType.TopRight },
-            AlignmentMargin = { Value = new(-7, 8) }
+            AlignmentMargin = { Value = new(-7, 8) },
+            
+            Down =
+            {
+                { "Scale", new Vec2f(0.95f, 0.95f) }
+            }
         };
         CloseButton.MouseUpEvent += (_, _) => Close();
 
@@ -87,9 +94,9 @@ public class WindowElement : RectangleElement, IDraggable
         
         LastDraggerPosition = DraggerPosition;
         DraggerPosition = App.MainWindow.WorldMousePosition;
-        
+
         if (Style.HasFlag(WindowElementStyle.Moveable) && Dragging)
-            AbsolutePosition += DraggerPositionDelta; // TODO: add dragging event
+            OnDragging();
         
         CloseButton.Visible = Style.HasFlag(WindowElementStyle.Closeable);
         
@@ -130,6 +137,13 @@ public class WindowElement : RectangleElement, IDraggable
     {
         Dragging = false;
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    public virtual void OnDragging()
+    {
+        AbsolutePosition += DraggerPositionDelta;
+        DraggingEvent?.Invoke(this, EventArgs.Empty);
     }
 
     
