@@ -16,7 +16,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
 {
     public TextElement Text { get; protected set; }
 
-    public MouseClickState MouseClickState { get; }
+    public MouseClickState ClickState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
     
     public event EventHandler? MouseEnterEvent;
@@ -40,7 +40,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         BorderColor.Set(new(100, 100, 100));
         BorderSize.Set(1f);
 
-        MouseClickState = new();
+        ClickState = new();
 
         Normal = new();
         Hover = new();
@@ -112,7 +112,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     
     public virtual void OnMouseUp()
     {
-        Animator.Animate(MouseClickState.IsMouseHover ? Hover : Normal);
+        Animator.Animate(ClickState.IsMouseHover ? Hover : Normal);
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
 

@@ -11,10 +11,10 @@ namespace Latte.Core;
 
 public static class Math
 {
-    public static bool IsPointOverRect(Vec2f point, Vec2f position, Vec2f size)
+    public static bool IsPointOverRect(this Vec2f point, Vec2f position, Vec2f size)
         => new FloatRect(position, size).Contains((Vector2f)point);
     
-    public static bool IsPointOverRect(Vec2f point, FloatRect rect)
+    public static bool IsPointOverRect(this Vec2f point, FloatRect rect)
         => IsPointOverRect(point, rect.Position, rect.Size);
     
     
