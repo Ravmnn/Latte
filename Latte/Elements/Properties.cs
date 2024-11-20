@@ -19,7 +19,7 @@ public abstract class Property
         Name = name;
         Value = value;
         
-        Owner.Properties.Add(Name, this);
+        Owner.Properties.Add(this);
     }
     
     
@@ -61,13 +61,11 @@ public abstract class AnimatableProperty(Element owner, string name, object valu
     
     public void Animate(object to, double time, EasingType easingType = EasingType.Linear)
     {
-        AnimationState?.Finish();
+        AnimationState?.Abort();
 
         AnimationState = Value.AnimateThis(to, time, easingType);
-        AnimationState.Updated += (_, args) => Value = Value.AnimationValuesToThis(args.CurrentValues);
-        AnimationState.Finished += (_, _) => AnimationState = null;
-        
-        Owner.AddPropertyAnimation(AnimationState);
+        AnimationState.UpdatedEvent += (_, args) => Value = Value.AnimationValuesToThis(args.CurrentValues);
+        AnimationState.FinishedEvent += (_, _) => AnimationState = null;
     }
 }
 

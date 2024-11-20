@@ -4,6 +4,7 @@ using SFML.System;
 
 using Latte.Core;
 using Latte.Core.Application;
+using Latte.Core.Type;
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
 
@@ -53,7 +54,7 @@ public class WindowElement : RectangleElement, IDraggable
     public event EventHandler? MouseUpEvent;
 
 
-    public WindowElement(string title, Vector2f position, Vector2f size, WindowElementStyle style = WindowElementStyle.Default)
+    public WindowElement(string title, Vec2f position, Vec2f size, WindowElementStyle style = WindowElementStyle.Default)
         : base(null, position, size)
     {
         Title = new(this, new(), 20, title);
@@ -67,9 +68,7 @@ public class WindowElement : RectangleElement, IDraggable
             Color = { Value = new(255, 100, 100) },
             
             Alignment = { Value = AlignmentType.TopRight },
-            AlignmentMargin = { Value = new(-7, 8) },
-            
-            Radius = { Value = 3f }
+            AlignmentMargin = { Value = new(-7, 8) }
         };
         CloseButton.MouseUpEvent += (_, _) => Close();
 
@@ -134,6 +133,6 @@ public class WindowElement : RectangleElement, IDraggable
     }
 
     
-    public bool IsPointOver(Vector2f point)
+    public bool IsPointOver(Vec2f point)
         => Math.IsPointOverRoundedRect(point, AbsolutePosition, Size, Radius.Value);
 }

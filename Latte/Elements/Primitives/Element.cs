@@ -6,7 +6,6 @@ using SFML.Graphics;
 
 using Latte.Core;
 using Latte.Core.Type;
-using Latte.Core.Animation;
 using Latte.Core.Application;
 
 
@@ -18,9 +17,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public Element? Parent { get; set; }
     public List<Element> Children { get; }
     
-    public Dictionary<string, Property> Properties { get; }
-    protected List<AnimationState> PropertyAnimations { get; }
-    
+    public List<Property> Properties { get; }
+
     public ElementKeyframeAnimator Animator { get; set; }
     
     public abstract Transformable Transformable { get; }
@@ -56,7 +54,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Children = [];
 
         Properties = [];
-        PropertyAnimations = [];
 
         Animator = new(this, 0.1);
      
@@ -115,15 +112,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     protected void UpdatePropertyAnimations()
     {
-        for (int i = 0; i < PropertyAnimations.Count; i++)
-        {
-            AnimationState state = PropertyAnimations[i];
-            
-            state.Update();
-            
-            if (state.HasFinished)
-                PropertyAnimations.RemoveAt(i);
-        }
+        foreach (Property property in Properties)
+            if (property is AnimatableProperty { AnimationState: not null } animatableProperty)
+                animatableProperty.AnimationState.Update();
     }
 
     
@@ -172,15 +163,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public void Hide() => Visible = false;
 
 
-    public void AddPropertyAnimation(AnimationState animation)
-    {
-        if (!PropertyAnimations.Contains(animation))
-            PropertyAnimations.Add(animation);
-    }
-
-
     protected Property[] GetNonVectorProperties()
-        => (from property in Properties.Values
+        => (from property in Properties
             where property.Value is not Vec2f
             select property).ToArray();
 

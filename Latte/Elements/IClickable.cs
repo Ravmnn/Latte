@@ -1,9 +1,9 @@
 using System;
 
-using SFML.System;
 using SFML.Window;
 
 using Latte.Core.Application;
+using Latte.Core.Type;
 
 
 namespace Latte.Elements;
@@ -39,7 +39,7 @@ public interface IClickable
     void OnMouseUp();
     
     
-    bool IsPointOver(Vector2f point);
+    bool IsPointOver(Vec2f point);
 }
 
 

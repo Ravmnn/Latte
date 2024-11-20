@@ -1,6 +1,6 @@
 using System;
-using System.Collections;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 
 using Latte.Core.Animation;
@@ -21,18 +21,20 @@ public class Keyframe() : IEnumerable
     }
         
     
-    public void Add(string name, IAnimatable value)
-        => Properties[name] = value;
-    
-    public bool Remove(string name)
-        => Properties.Remove(name);
-    
-    public bool Exists(string name)
-        => Properties.ContainsKey(name);
+    public void Add(string name, IAnimatable value) => Properties[name] = value;
+    public bool Remove(string name) => Properties.Remove(name);
+    public bool Exists(string name) => Properties.ContainsKey(name);
     
     
     public IEnumerator GetEnumerator()
         => Properties.GetEnumerator();
+
+
+    public IAnimatable this[string name]
+    {
+        get => Properties[name];
+        set => Properties[name] = value;
+    }
 
 
     public static Dictionary<string, IAnimatable> ElementPropertiesToKeyframeProperties(Property[] properties)
@@ -63,9 +65,9 @@ public class ElementKeyframeAnimator(Element element, double time, EasingType ea
     
     public static void Animate(Element element, Keyframe to, double time, EasingType easingType = EasingType.Linear)
     {
-        foreach (var (key, property) in element.Properties)
+        foreach (Property property in element.Properties)
         {
-            if (!to.Properties.TryGetValue(key, out IAnimatable? targetValue))
+            if (!to.Properties.TryGetValue(property.Name, out IAnimatable? targetValue))
                 continue;
 
             if (property is not AnimatableProperty animatableProperty)

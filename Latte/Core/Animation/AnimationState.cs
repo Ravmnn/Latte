@@ -52,11 +52,13 @@ public class AnimationState(float[] startValues, float[] endValues, double time,
     public float EasedProgress { get; private set; }
 
     public bool HasFinished => ElapsedTime >= Time;
+    public bool HasAborted { get; private set; }
     public bool Paused { get; set; }
 
 
-    public event EventHandler<AnimationUpdatedEventArgs>? Updated;
-    public event EventHandler? Finished;
+    public event EventHandler<AnimationUpdatedEventArgs>? UpdatedEvent;
+    public event EventHandler? FinishedEvent;
+    public event EventHandler? AbortedEvent;
 
     
     /// <summary>
@@ -64,7 +66,7 @@ public class AnimationState(float[] startValues, float[] endValues, double time,
     /// </summary>
     public void Update()
     {
-        if (HasFinished || Paused)
+        if (HasFinished || HasAborted || Paused)
             return;
 
         OnUpdated(new AnimationUpdatedEventArgs(CurrentValues));
@@ -93,17 +95,20 @@ public class AnimationState(float[] startValues, float[] endValues, double time,
         if (HasFinished)
             eventArgs.CurrentValues = CurrentValues = EndValues;
 
-        Updated?.Invoke(this, eventArgs);
+        UpdatedEvent?.Invoke(this, eventArgs);
     }
 
 
-    public void Finish()
+    public void Abort()
     {
-        ElapsedTime = Time;
-        OnFinished();
+        HasAborted = true;
+        OnAborted();
     }
     
 
     protected virtual void OnFinished()
-        => Finished?.Invoke(this, EventArgs.Empty);
+        => FinishedEvent?.Invoke(this, EventArgs.Empty);
+    
+    protected virtual void OnAborted()
+        => AbortedEvent?.Invoke(this, EventArgs.Empty);
 }

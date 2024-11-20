@@ -1,8 +1,8 @@
 using System;
 
-using SFML.System;
 using SFML.Graphics;
 
+using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
 
 
@@ -41,7 +41,7 @@ public class ProgressBarElement : Element
     public event EventHandler? CompletedEvent;
 
 
-    public ProgressBarElement(Element? parent, Vector2f position, Vector2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
+    public ProgressBarElement(Element? parent, Vec2f position, Vec2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
     {
         MinValue = minValue;
         MaxValue = maxValue;

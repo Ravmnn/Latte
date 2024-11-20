@@ -1,6 +1,5 @@
 using System;
 
-using SFML.System;
 using SFML.Graphics;
 
 using Latte.Core;
@@ -24,7 +23,7 @@ public class TextElement : Element
     public Text Text { get; protected set; } // TODO: add properties
     
 
-    public TextElement(Element? parent, Vector2f position, uint size, string text, Font? font = null) : base(parent)
+    public TextElement(Element? parent, Vec2f position, uint size, string text, Font? font = null) : base(parent)
     {
         Text = new(text, font ?? DefaultTextFont)
         {

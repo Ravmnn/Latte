@@ -1,7 +1,5 @@
 using System;
 
-using SFML.System;
-
 using Latte.Core;
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
@@ -30,7 +28,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     public Keyframe Down { get; set; }
     
     
-    public ButtonElement(Element? parent, Vector2f position, Vector2f size, string text) : base(parent, position, size)
+    public ButtonElement(Element? parent, Vec2f position, Vec2f size, string text) : base(parent, position, size)
     {
         Text = new(this, new(), 32, text)
         {
@@ -43,20 +41,11 @@ public class ButtonElement : RectangleElement, IDefaultClickable
 
         MouseClickState = new();
 
-        Normal = new()
-        {
-            { "Color", new ColorRGBA(255, 255, 255) }
-        };
+        Normal = new();
+        Hover = new();
+        Down = new();
         
-        Hover = new()
-        {
-            { "Color", new ColorRGBA(220, 220, 220) }
-        };
-        
-        Down = new()
-        {
-            { "Color", new ColorRGBA(180, 180, 180) }
-        };
+        KeyframesFromColor(Color);
     }
 
 
@@ -93,8 +82,29 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
 
-
-
-    public virtual bool IsPointOver(Vector2f point)
+    
+    public virtual bool IsPointOver(Vec2f point)
         => Math.IsPointOverRoundedRect(point, AbsolutePosition, Size, Radius.Value);
+    
+    // BUG: clicking is working even if the button is clipped
+
+
+    public void KeyframesFromColor(ColorRGBA color)
+    {
+        const byte decreaseAmount = 30;
+        
+        Normal["Color"] = color;
+        
+        color.R -= decreaseAmount;
+        color.G -= decreaseAmount;
+        color.B -= decreaseAmount;
+
+        Hover["Color"] = color;
+        
+        color.R -= decreaseAmount;
+        color.G -= decreaseAmount;
+        color.B -= decreaseAmount;
+        
+        Down["Color"] = color;
+    }
 }
