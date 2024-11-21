@@ -28,8 +28,7 @@ public abstract class Property
 }
 
 
-public class Property<T>(Element owner, string name, T value) : Property(owner, name, value)
-    where T : notnull
+public class Property<T>(Element owner, string name, T value) : Property(owner, name, value) where T : notnull
 {
     public new T Value
     {
@@ -56,18 +55,18 @@ public abstract class AnimatableProperty(Element owner, string name, object valu
         set => base.Value = value;
     }
     
-    public AnimationState? AnimationState { get; protected set; }
+    public AnimationData? Animation { get; protected set; }
     
-    public bool ShouldAnimatorIgnore { get; set; }
+    public bool ShouldAnimatorIgnore { get; set; } // TODO: remove
     
     
-    public void Animate(object to, double time, EasingType easingType = EasingType.Linear)
+    public void Animate(object to, double time, Easing easing = Easing.Linear)
     {
-        AnimationState?.Abort();
+        Animation?.Abort();
 
-        AnimationState = Value.AnimateThis(to, time, easingType);
-        AnimationState.UpdatedEvent += (_, args) => Value = Value.AnimationValuesToThis(args.CurrentValues);
-        AnimationState.FinishedEvent += (_, _) => AnimationState = null;
+        Animation = Value.AnimateThis(to, time, easing);
+        Animation.UpdateEvent += (_, args) => Value = Value.AnimationValuesToThis(args.CurrentValues);
+        Animation.FinishEvent += (_, _) => Animation = null;
     }
 }
 
@@ -89,7 +88,7 @@ public class AnimatableProperty<T>(Element owner, string name, T value) : Animat
     public static implicit operator T(AnimatableProperty<T> property) => property.Get();
     
     
-    public void Animate(T to, double time, EasingType easingType = EasingType.Linear)
-        => base.Animate(to, time, easingType);
+    public void Animate(T to, double time, Easing easing = Easing.Linear)
+        => base.Animate(to, time, easing);
     
 }

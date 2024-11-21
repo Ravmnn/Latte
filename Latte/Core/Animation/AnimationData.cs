@@ -30,7 +30,7 @@ public class AnimationUpdatedEventArgs(float[] currentValues) : EventArgs
 /// <param name="startValues"> The start values. </param>
 /// <param name="endValues"> The final values. </param>
 /// <param name="time"> The time the animation will take to finish. </param>
-public class AnimationState(float[] startValues, float[] endValues, double time, EasingType easingType = EasingType.Linear) : IUpdateable
+public class AnimationData(float[] startValues, float[] endValues, double time, Easing easing = Easing.Linear) : IUpdateable
 {
     public float[] StartValues { get; } = startValues;
     public float[] EndValues { get; } = endValues;
@@ -39,7 +39,7 @@ public class AnimationState(float[] startValues, float[] endValues, double time,
     public double Time { get; } = time;
     public double ElapsedTime { get; private set; }
 
-    public EasingType EasingType { get; } = easingType;
+    public Easing Easing { get; } = easing;
 
     /// <summary>
     /// How much the animation has progressed from 0 to 1.
@@ -56,9 +56,9 @@ public class AnimationState(float[] startValues, float[] endValues, double time,
     public bool Paused { get; set; }
 
 
-    public event EventHandler<AnimationUpdatedEventArgs>? UpdatedEvent;
-    public event EventHandler? FinishedEvent;
-    public event EventHandler? AbortedEvent;
+    public event EventHandler<AnimationUpdatedEventArgs>? UpdateEvent;
+    public event EventHandler? FinishEvent;
+    public event EventHandler? AbortEvent;
 
     
     /// <summary>
@@ -69,23 +69,30 @@ public class AnimationState(float[] startValues, float[] endValues, double time,
         if (HasFinished || HasAborted || Paused)
             return;
 
-        OnUpdated(new AnimationUpdatedEventArgs(CurrentValues));
+        OnUpdate(new(CurrentValues));
 
         if (HasFinished)
-            OnFinished();
+            OnFinish();
     }
     
 
-    protected void UpdateProgress()
+    private void UpdateProgress()
     {
         ElapsedTime += App.DeltaTimeInSeconds;
         Progress = (float)(ElapsedTime / Time);
 
-        EasedProgress = EasingFunctions.Ease(Progress, EasingType);
+        EasedProgress = EasingFunctions.Ease(Progress, Easing);
+    }
+
+
+    public void Abort()
+    {
+        HasAborted = true;
+        OnAbort();
     }
     
-
-    protected virtual void OnUpdated(AnimationUpdatedEventArgs eventArgs)
+    
+    private void OnUpdate(AnimationUpdatedEventArgs eventArgs)
     {
         UpdateProgress();
 
@@ -95,20 +102,13 @@ public class AnimationState(float[] startValues, float[] endValues, double time,
         if (HasFinished)
             eventArgs.CurrentValues = CurrentValues = EndValues;
 
-        UpdatedEvent?.Invoke(this, eventArgs);
-    }
-
-
-    public void Abort()
-    {
-        HasAborted = true;
-        OnAborted();
+        UpdateEvent?.Invoke(this, eventArgs);
     }
     
 
-    protected virtual void OnFinished()
-        => FinishedEvent?.Invoke(this, EventArgs.Empty);
+    private void OnFinish()
+        => FinishEvent?.Invoke(this, EventArgs.Empty);
     
-    protected virtual void OnAborted()
-        => AbortedEvent?.Invoke(this, EventArgs.Empty);
+    private void OnAbort()
+        => AbortEvent?.Invoke(this, EventArgs.Empty);
 }

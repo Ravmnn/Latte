@@ -52,25 +52,25 @@ public class Keyframe() : IEnumerable
 }
 
 
-public class ElementKeyframeAnimator(Element element, double time, EasingType easingType = EasingType.Linear)
+public class ElementKeyframeAnimator(Element element, double time, Easing easing = Easing.Linear)
 {
     public Element Element { get; set; } = element;
     public Keyframe? DefaultProperties { get; set; }
 
     public double Time { get; set; } = time;
-    public EasingType EasingType { get; set; } = easingType;
+    public Easing Easing { get; set; } = easing;
 
 
     public void Animate(Keyframe to)
     {
         if (DefaultProperties is not null)
-            Animate(Element, DefaultProperties, Time, EasingType);
+            Animate(Element, DefaultProperties, Time, Easing);
         
-        Animate(Element, to, Time, EasingType);
+        Animate(Element, to, Time, Easing);
     }
     
     
-    public static void Animate(Element element, Keyframe to, double time, EasingType easingType = EasingType.Linear)
+    public static void Animate(Element element, Keyframe to, double time, Easing easing = Easing.Linear)
     {
         foreach (Property property in element.Properties)
         {
@@ -81,7 +81,7 @@ public class ElementKeyframeAnimator(Element element, double time, EasingType ea
                 throw new InvalidOperationException($"Property \"{property.Name}\" is not an AnimatableProperty.");
          
             if (!animatableProperty.ShouldAnimatorIgnore)
-                animatableProperty.Animate(targetValue, time, easingType);
+                animatableProperty.Animate(targetValue, time, easing);
         }
     }
 }

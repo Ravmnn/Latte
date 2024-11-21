@@ -11,12 +11,15 @@ namespace Latte.Elements.Primitives;
 
 public class TextElement : Element
 {
-    private static Font? _defaultFont;
+    private static Font? s_defaultFont;
+    
+    
     public static Font DefaultTextFont
     {
-        get => _defaultFont ?? throw new InvalidOperationException("Default font is not defined.");
-        set => _defaultFont = value;
+        get => s_defaultFont ?? throw new InvalidOperationException("Default font is not defined.");
+        set => s_defaultFont = value;
     }
+    
     
     public override Transformable Transformable => SfmlText;
     
@@ -51,7 +54,7 @@ public class TextElement : Element
         Color = new(this, nameof(Color), SFML.Graphics.Color.White);
         BorderColor = new(this, nameof(BorderColor), SFML.Graphics.Color.Black);
         
-        Position.Set(position);
+        RelativePosition.Set(position);
     }
     
 
@@ -72,7 +75,7 @@ public class TextElement : Element
         => SfmlText.GetGlobalBounds();
 
 
-    public override Vec2f GetAlignmentPosition(AlignmentType alignment)
+    public override Vec2f GetAlignmentPosition(Alignments alignment)
     {
         // text local bounds work quite different
         // https://learnsfml.com/basics/graphics/how-to-center-text/#set-a-string

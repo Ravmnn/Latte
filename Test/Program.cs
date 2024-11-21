@@ -24,7 +24,7 @@ class Program
         App.Elements.Add(new RectangleElement(null, new(), new(700, 700))
         {
             Color = { Value = Color.Green },
-            Alignment = { Value = AlignmentType.Center },
+            Alignment = { Value = Alignments.Center },
             BorderSize = { Value = 4f },
             BorderColor = { Value = Color.White }
         });
@@ -35,24 +35,24 @@ class Program
             BorderColor = { Value = Color.White },
             Radius = { Value = 5f }
         };
-
+        
         App.Elements.Add(window);
 
         RectangleElement rect = new(App.Elements[0], new(), new(200, 200))
         {
-            Alignment = { Value = AlignmentType.Center},
+            Alignment = { Value = Alignments.Center},
             
             Color = { Value = new(80, 80, 255) }
         };
 
         _ = new TextElement(rect, new(), 30, "this is a large text!!!")
         {
-            Alignment = { Value = AlignmentType.Center}
+            Alignment = { Value = Alignments.Center}
         };
         
         _ = new ButtonElement(App.Elements[0], new(), new(200, 90), "Press me!!")
         {
-            Alignment = { Value = AlignmentType.BottomRight},
+            Alignment = { Value = Alignments.BottomRight},
             AlignmentMargin = { Value = new(30, 40) },
             
             Radius = { Value = 3f }
@@ -60,7 +60,7 @@ class Program
         
         _ = new ButtonElement(App.Elements[0], new(), new(300, 130), "Press me!!")
         {
-            Alignment = { Value = AlignmentType.HorizontalCenter | AlignmentType.Top },
+            Alignment = { Value = Alignments.HorizontalCenter | Alignments.Top },
             AlignmentMargin = { Value = new(0, 10) },
 
             Radius = { Value = 5f }
@@ -74,16 +74,16 @@ class Program
             OutlineThickness = 6f
         };
         
-        while (App.MainWindow.IsOpen)
+        while (App.Window.IsOpen)
         {
-            App.MainWindow.Clear();
+            App.Window.Clear();
             
             App.Update();
             App.Draw();
             
-            App.MainWindow.Draw(rrect);
+            App.Window.Draw(rrect);
             
-            App.MainWindow.Display();
+            App.Window.Display();
         }
     }
 }

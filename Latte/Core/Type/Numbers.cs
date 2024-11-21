@@ -13,11 +13,8 @@ public struct Float(float value) : IAnimatable<Float>
     public static implicit operator Float(float @float) => new(@float);
 
     
-    public readonly AnimationState AnimateThis(Float to, double time, EasingType easingType = EasingType.Linear)
-        => Animate.Value(Value, to, time, easingType);
-
-    public readonly AnimationState AnimateThis(object to, double time, EasingType easingType = EasingType.Linear)
-        => AnimateThis((Float)to, time, easingType);
+    public readonly AnimationData AnimateThis(Float to, double time, Easing easing = Easing.Linear)
+        => Animate.Value(Value, to, time, easing);
     
     
     public readonly IAnimatable AnimationValuesToThis(float[] values)

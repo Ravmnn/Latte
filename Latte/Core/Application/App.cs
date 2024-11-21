@@ -17,41 +17,67 @@ namespace Latte.Core.Application;
 
 public static class App
 {
-    private static Window? _mainWindow;
-    public static Window MainWindow
+    private static Window? s_window;
+    private static View? s_mainView;
+    private static View? s_elementView;
+    
+    private static bool s_initialized;
+    
+    private static Vec2i s_lastMousePosition;
+    private static Vec2f s_lastWorldMousePosition;
+    
+    private static readonly Stopwatch s_deltaTimeStopwatch;
+    
+    
+    public static Window Window
     {
-        get => _mainWindow ?? throw AppNotInitializedException();    
-        private set => _mainWindow = value;
+        get => s_window ?? throw AppNotInitializedException();    
+        private set => s_window = value;
     }
 
-    private static View? _mainView;
     public static View MainView
     {
-        get => _mainView ?? throw AppNotInitializedException();
-        private set => _mainView = value;
+        get => s_mainView ?? throw AppNotInitializedException();
+        private set => s_mainView = value;
     }
     
-    private static View? _UIView;
-    public static View UIView
+    public static View ElementView
     {
-        get => _UIView ?? throw AppNotInitializedException();
-        private set => _UIView = value;
+        get => s_elementView ?? throw AppNotInitializedException();
+        private set => s_elementView = value;
     }
     
-    private static bool _initialized;
-    
-    public static List<Element> Elements { get; set; } = [];
+    public static Vec2i MousePosition { get; private set; }
+    public static Vec2i MousePositionDelta => MousePosition - s_lastMousePosition;
+    public static Vec2f WorldMousePosition { get; private set; }
+    public static Vec2f WorldMousePositionDelta => WorldMousePosition - s_lastWorldMousePosition;
     
     public static TimeSpan DeltaTime { get; private set; }
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
     public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
+    
+    public static List<Element> Elements { get; }
+    
 
-    private static Stopwatch _deltaTimeStopwatch = new();
+    static App()
+    {
+        s_lastMousePosition = new();
+        s_lastWorldMousePosition = new();
+        
+        MousePosition = new();
+        WorldMousePosition = new();
+        
+        s_deltaTimeStopwatch = new();
+        
+        DeltaTime = TimeSpan.Zero;
+        
+        Elements = [];
+    }
     
 
     public static void Init(VideoMode mode, string title, Font defaultFont, Styles styles = Styles.Default, ContextSettings settings = new())
     {
-        if (_initialized)
+        if (s_initialized)
         {
             Console.WriteLine("App has already been initialized.");
             return;
@@ -61,53 +87,66 @@ public static class App
         // this should be ALWAYS initialized before MainWindow
         _ = new GameWindow(new(), new() { StartVisible = false });
         
-        MainWindow = new(mode, title, styles, settings);
-        MainWindow.Resized += (_, args) => OnWindowResized(new(args.Width, args.Height));
+        Window = new(mode, title, styles, settings);
+        Window.Resized += (_, args) => OnWindowResized(new(args.Width, args.Height));
 
-        MainView = new(MainWindow.GetView());
-        UIView = new(MainView);
+        MainView = new(Window.GetView());
+        ElementView = new(MainView); // TODO: enum RenderMode: Pinned or Unpinned
         
         TextElement.DefaultTextFont = defaultFont;
         
-        _initialized = true;
+        s_deltaTimeStopwatch.Start();
 
-        DeltaTime = TimeSpan.Zero;
-        _deltaTimeStopwatch = new();
-        _deltaTimeStopwatch.Start();
+        s_initialized = true;
     }
     
 
     public static void Update()
     {
-        DeltaTime = _deltaTimeStopwatch.Elapsed;
-        _deltaTimeStopwatch.Restart();
+        UpdateDeltaTime();
+        UpdateMousePositionProperties();
         
-        MainWindow.ProcessEvents();
-        MainWindow.SetView(UIView);
-        
+        Window.ProcessEvents();
+        Window.SetView(ElementView);
+
         foreach (Element element in Elements)
             element.Update();
         
-        MainWindow.SetView(MainView);
+        Window.SetView(MainView);
+    }
+
+    private static void UpdateMousePositionProperties()
+    {
+        s_lastMousePosition = MousePosition;
+        s_lastWorldMousePosition = WorldMousePosition;
+
+        MousePosition = Window.MousePosition;
+        WorldMousePosition = Window.WorldMousePosition;
+    }
+
+    private static void UpdateDeltaTime()
+    {
+        DeltaTime = s_deltaTimeStopwatch.Elapsed;
+        s_deltaTimeStopwatch.Restart();
     }
 
 
     public static void Draw()
     {
         // use a separated view to draw UI elements
-        MainWindow.SetView(UIView);
+        Window.SetView(ElementView);
         
         foreach (Element element in Elements)
-            element.Draw(MainWindow);
+            element.Draw(Window);
         
-        MainWindow.SetView(MainView);
+        Window.SetView(MainView);
     }
 
 
     public static bool IsMouseOverAnyElementBound()
     {
         foreach (Element element in Elements)
-            if (element.Visible && element.GetBounds().Contains((Vector2f)MainWindow.WorldMousePosition))
+            if (element.Visible && element.GetBounds().Contains((Vector2f)Window.WorldMousePosition))
                 return true;
 
         return false;
@@ -118,8 +157,8 @@ public static class App
     {
         MainView.Size = newSize;
         
-        UIView.Size = newSize;
-        UIView.Center = (Vector2f)newSize / 2f;
+        ElementView.Size = newSize;
+        ElementView.Center = (Vector2f)newSize / 2f;
     }
     
     

@@ -1,6 +1,5 @@
 using System;
 
-using SFML.Window;
 using SFML.Graphics;
 
 using Latte.Core;
@@ -11,31 +10,15 @@ using Latte.Core.Application;
 namespace Latte.Elements;
 
 
-public class MouseCornerState
-{
-    public bool Top { get; set; }
-    public bool Bottom { get; set; }
-    public bool Left { get; set; }
-    public bool Right { get; set; }
-    
-    public bool TopLeft => Top && Left;
-    public bool TopRight => Top && Right;
-    public bool BottomLeft => Bottom && Left;
-    public bool BottomRight => Bottom && Right;
-    
-    public bool Any => Top || Bottom || Left || Right;
-}
-
-
 public interface IResizable
 {
     FloatRect Rect { get; }
-    float CornerSize { get; }
+    float CornerResizeAreaSize { get; }
+    
+    Corners CornersToResize { get; set; }
     
     Vec2f? MinSize { get; }
     Vec2f? MaxSize { get; }
-    
-    MouseCornerState ResizeCorner { get; }
     
     bool Resizing { get; }
     bool WasResizing { get; }
@@ -56,47 +39,25 @@ public interface IResizable
 
 public interface IDefaultResizable : IResizable
 {
-    void UpdateCornerStateProperties()
+    void UpdateCornersToResize()
     {
         // the corners being resized should not change while resizing
         if (Resizing)
             return;
         
-        Vec2f point = App.MainWindow.WorldMousePosition;
+        Vec2f point = App.Window.WorldMousePosition;
         
-        FloatRect left = Rect with { Width = CornerSize };
-        FloatRect right = Rect with { Left = Rect.Left + Rect.Width - CornerSize, Width = CornerSize };
-        FloatRect top = Rect with { Height = CornerSize };
-        FloatRect bottom = Rect with { Top = Rect.Top + Rect.Height - CornerSize, Height = CornerSize };
+        FloatRect left = Rect with { Width = CornerResizeAreaSize };
+        FloatRect right = Rect with { Left = Rect.Left + Rect.Width - CornerResizeAreaSize, Width = CornerResizeAreaSize };
+        FloatRect top = Rect with { Height = CornerResizeAreaSize };
+        FloatRect bottom = Rect with { Top = Rect.Top + Rect.Height - CornerResizeAreaSize, Height = CornerResizeAreaSize };
 
-        ResizeCorner.Left = point.IsPointOverRect(left);
-        ResizeCorner.Right = point.IsPointOverRect(right);
-        ResizeCorner.Top = point.IsPointOverRect(top);
-        ResizeCorner.Bottom = point.IsPointOverRect(bottom);
-    }
-
-    Cursor GetCursorTypeFromResizeCorner()
-    {
-        if (ResizeCorner.TopLeft)
-            return new(Cursor.CursorType.SizeTopLeft);
+        CornersToResize = Corners.None;
         
-        if (ResizeCorner.TopRight)
-            return new(Cursor.CursorType.SizeTopRight);
-        
-        if (ResizeCorner.BottomLeft)
-            return new(Cursor.CursorType.SizeBottomLeft);
-        
-        if (ResizeCorner.BottomRight)
-            return new(Cursor.CursorType.SizeBottomRight);
-        
-     
-        if (ResizeCorner.Left || ResizeCorner.Right)
-            return new(Cursor.CursorType.SizeHorizontal);
-        
-        if (ResizeCorner.Top || ResizeCorner.Bottom)
-            return new(Cursor.CursorType.SizeVertical);
-
-        return new(Cursor.CursorType.Arrow);
+        CornersToResize |= point.IsPointOverRect(left) ? Corners.Left : Corners.None;
+        CornersToResize |= point.IsPointOverRect(right) ? Corners.Right : Corners.None;
+        CornersToResize |= point.IsPointOverRect(top) ? Corners.Top : Corners.None;
+        CornersToResize |= point.IsPointOverRect(bottom) ? Corners.Bottom : Corners.None;
     }
 
 

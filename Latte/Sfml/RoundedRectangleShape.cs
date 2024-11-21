@@ -11,11 +11,15 @@ namespace Latte.Sfml;
 // https://github.com/SFML/SFML/wiki/Source%3A-Draw-Rounded-Rectangle
 
 // it was modified to solve some problems with the rounded corner
-// rendering. If Radius == 0, this class behaves like a RectangleShape
+// rendering. If Radius == 0, this class literally behaves like a RectangleShape
 
 public class RoundedRectangleShape : Shape
 {
     private Vector2f _size;
+    private float _radius;
+    private uint _cornerPointCount;
+    
+    
     public Vector2f Size
     {
         get => _size;
@@ -26,7 +30,6 @@ public class RoundedRectangleShape : Shape
         }
     }
 
-    private float _radius;
     public float Radius
     {
         get => _radius;
@@ -37,7 +40,6 @@ public class RoundedRectangleShape : Shape
         }
     }
 
-    private uint _cornerPointCount;
     public uint CornerPointCount
     {
         get => _cornerPointCount;
@@ -71,7 +73,7 @@ public class RoundedRectangleShape : Shape
 
     public override Vector2f GetPoint(uint index)
     {
-        const float pi = 3.141592654f;
+        const float Pi = 3.141592654f;
 
         // this GetPoint will not work properly if Radius is 0
         if (Radius == 0f)
@@ -108,7 +110,7 @@ public class RoundedRectangleShape : Shape
                 break;
         }
 
-        return new(Radius * MathF.Cos(deltaAngle * (index - centerIndex) * pi / 180f) + center.X,
-            -Radius * MathF.Sin(deltaAngle * (index - centerIndex) * pi / 180f) + center.Y);
+        return new(Radius * MathF.Cos(deltaAngle * (index - centerIndex) * Pi / 180f) + center.X,
+            -Radius * MathF.Sin(deltaAngle * (index - centerIndex) * Pi / 180f) + center.Y);
     }
 }

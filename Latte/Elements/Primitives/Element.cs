@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 using SFML.Graphics;
 
-using Latte.Sfml;
 using Latte.Core;
 using Latte.Core.Type;
 using Latte.Core.Application;
@@ -15,6 +14,8 @@ namespace Latte.Elements.Primitives;
 
 public abstract class Element : IUpdateable, IDrawable, IAlignable
 {
+    private bool _initialized;
+    
     public Element? Parent { get; set; }
     public List<Element> Children { get; }
     
@@ -24,17 +25,15 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public abstract Transformable Transformable { get; }
     
-    public bool Visible { get; set; }
+    public bool Visible { get; set; } // TODO: add event when changing this
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
     
-    private bool _initialized;
-    
-    public AnimatableProperty<Vec2f> Position { get; }
+    public AnimatableProperty<Vec2f> RelativePosition { get; }
     public Vec2f AbsolutePosition
     {
-        get => Parent is not null ? Position + Parent.AbsolutePosition : Position;
-        set => Position.Set(Parent is not null ? value - Parent.AbsolutePosition : value);
+        get => Parent is not null ? RelativePosition + Parent.AbsolutePosition : RelativePosition;
+        set => RelativePosition.Set(Parent is not null ? value - Parent.AbsolutePosition : value);
     }
     
     public AnimatableProperty<Vec2f> Origin { get; }
@@ -43,7 +42,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public AnimatableProperty<Vec2f> Scale { get; }
     
-    public Property<AlignmentType> Alignment { get; set; }
+    public Property<Alignments> Alignment { get; set; }
     public AnimatableProperty<Vec2f> AlignmentMargin { get; }
 
     public event EventHandler? SetupEvent; 
@@ -53,23 +52,23 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     protected Element(Element? parent)
     {
+        _initialized = false;
+
         Parent = parent;
         Children = [];
 
         Properties = [];
 
-        Animator = new(this, 0.1);
+        Animator = new(this, 0.15);
      
         Visible = true;
-
-        _initialized = false;
         
-        Position = new(this, nameof(Position), new()) { ShouldAnimatorIgnore = true };
+        RelativePosition = new(this, nameof(RelativePosition), new()) { ShouldAnimatorIgnore = true };
         Origin = new(this, nameof(Origin), new()) { ShouldAnimatorIgnore = true }; 
         Rotation = new(this, nameof(Rotation), 0f);
         Scale = new(this, nameof(Scale), new(1f, 1f));
         
-        Alignment = new(this, nameof(Alignment), AlignmentType.None);
+        Alignment = new(this, nameof(Alignment), Alignments.None);
         AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { ShouldAnimatorIgnore = true };
         
         Parent?.Children.Add(this);
@@ -94,7 +93,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         if (!Visible)
             return;
         
-        if (Alignment != AlignmentType.None)
+        if (Alignment != Alignments.None)
             AbsolutePosition = GetAlignmentPosition(Alignment.Value) + AlignmentMargin;
      
         UpdatePropertyAnimations();
@@ -116,11 +115,11 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     }
 
 
-    protected void UpdatePropertyAnimations()
+    private void UpdatePropertyAnimations()
     {
         foreach (Property property in Properties)
-            if (property is AnimatableProperty { AnimationState: not null } animatableProperty)
-                animatableProperty.AnimationState.Update();
+            if (property is AnimatableProperty { Animation: not null } animatableProperty)
+                animatableProperty.Animation.Update();
     }
 
     
@@ -141,28 +140,21 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
             child.Draw(target);
     }
 
-    protected virtual void BeginDraw()
-    {
-        ClipArea.BeginClip(GetFinalClipArea());
-    }
+    protected virtual void BeginDraw() => ClipArea.BeginClip(GetFinalClipArea());
+    protected virtual void EndDraw() => ClipArea.EndClip();
 
-    protected virtual void EndDraw()
-    {
-        ClipArea.EndClip();
-    }
 
-    
-    public IntRect GetFinalClipArea() => ClipArea.OverlapElementsClipArea(this);
-    public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.MainWindow.RectSize;
+    public IntRect GetFinalClipArea() => ClipArea.OverlapElementClipAreaToParents(this);
+    public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.Window.WindowRect;
     public virtual IntRect GetThisClipArea() => GetBounds().ToWindowCoordinates();
 
 
     public abstract FloatRect GetBounds();
-    public FloatRect ParentBounds() => Parent?.GetBounds() ?? (FloatRect)App.MainWindow.RectSize;
+    public FloatRect GetParentBounds() => Parent?.GetBounds() ?? (FloatRect)App.Window.WindowRect;
 
 
-    public virtual Vec2f GetAlignmentPosition(AlignmentType alignment)
-        => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), ParentBounds(), alignment);
+    public virtual Vec2f GetAlignmentPosition(Alignments alignment)
+        => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), GetParentBounds(), alignment);
     
     
     public void Show() => Visible = true;
@@ -173,6 +165,5 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         => (from property in Properties where property is AnimatableProperty select property as AnimatableProperty).ToArray();
 
 
-    public Keyframe ToKeyframe()
-        => new(GetAnimatableProperties());
+    public Keyframe ToKeyframe() => new(GetAnimatableProperties());
 }

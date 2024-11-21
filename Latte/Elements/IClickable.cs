@@ -24,7 +24,7 @@ public class MouseClickState
 
 public interface IClickable
 {
-    MouseClickState ClickState { get; }
+    MouseClickState MouseState { get; }
     bool DisableTruePressOnlyWhenMouseIsUp { get; }
     
     event EventHandler? MouseEnterEvent;
@@ -45,32 +45,32 @@ public interface IClickable
 
 public interface IDefaultClickable : IClickable
 {
-    void UpdateClickStateProperties()
+    void UpdateMouseState()
     {
-        ClickState.WasMouseHover = ClickState.IsMouseHover;
-        ClickState.WasMouseDown = ClickState.IsMouseDown;
-        ClickState.WasTruePressed = ClickState.IsTruePressed;
+        MouseState.WasMouseHover = MouseState.IsMouseHover;
+        MouseState.WasMouseDown = MouseState.IsMouseDown;
+        MouseState.WasTruePressed = MouseState.IsTruePressed;
         
-        ClickState.IsMouseHover = IsPointOver(App.MainWindow.WorldMousePosition);
-        ClickState.IsMouseDown = Mouse.IsButtonPressed(Mouse.Button.Left);
-        ClickState.IsPressed = ClickState.IsMouseHover && ClickState.IsMouseDown;
+        MouseState.IsMouseHover = IsPointOver(App.Window.WorldMousePosition);
+        MouseState.IsMouseDown = Mouse.IsButtonPressed(Mouse.Button.Left);
+        MouseState.IsPressed = MouseState.IsMouseHover && MouseState.IsMouseDown;
         
-        if (!ClickState.IsTruePressed)
-            ClickState.IsTruePressed = ClickState.IsPressed && !ClickState.WasMouseDown;
+        if (!MouseState.IsTruePressed)
+            MouseState.IsTruePressed = MouseState.IsPressed && !MouseState.WasMouseDown;
         
-        if (ClickState.IsTruePressed && !(DisableTruePressOnlyWhenMouseIsUp ? ClickState.IsMouseDown : ClickState.IsPressed))
-            ClickState.IsTruePressed = false;
+        if (MouseState.IsTruePressed && !(DisableTruePressOnlyWhenMouseIsUp ? MouseState.IsMouseDown : MouseState.IsPressed))
+            MouseState.IsTruePressed = false;
     }
 
     void ProcessMouseEvents()
     {
-        bool entered = ClickState.IsMouseHover && !ClickState.WasMouseHover;
-        bool leaved = !ClickState.IsMouseHover && ClickState.WasMouseHover;
+        bool entered = MouseState.IsMouseHover && !MouseState.WasMouseHover;
+        bool leaved = !MouseState.IsMouseHover && MouseState.WasMouseHover;
         
-        if (ClickState.IsTruePressed && !ClickState.WasTruePressed)
+        if (MouseState.IsTruePressed && !MouseState.WasTruePressed)
             OnMouseDown();
         
-        else if (!ClickState.IsTruePressed && ClickState.WasTruePressed)
+        else if (!MouseState.IsTruePressed && MouseState.WasTruePressed)
             OnMouseUp();
         
         if (entered)

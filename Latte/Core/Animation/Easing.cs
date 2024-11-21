@@ -7,7 +7,7 @@ namespace Latte.Core.Animation;
 /// <summary>
 /// Definition of easing functions. 
 /// </summary>
-public enum EasingType
+public enum Easing
 {
     Linear,
 
@@ -43,44 +43,44 @@ public static class EasingFunctions
     }
 
 
-    public static float Ease(float t, EasingType type) => type switch
+    public static float Ease(float t, Easing type) => type switch
     {
-        EasingType.Linear => Linear(t),
+        Easing.Linear => Linear(t),
 
-        EasingType.EaseInQuad => InQuad(t),
-        EasingType.EaseInCubic => InCubic(t),
-        EasingType.EaseInQuart => InQuart(t),
-        EasingType.EaseInQuint => InQuint(t),
+        Easing.EaseInQuad => InQuad(t),
+        Easing.EaseInCubic => InCubic(t),
+        Easing.EaseInQuart => InQuart(t),
+        Easing.EaseInQuint => InQuint(t),
 
-        EasingType.EaseOutQuad => OutQuad(t),
-        EasingType.EaseOutCubic => OutCubic(t),
-        EasingType.EaseOutQuart => OutQuart(t),
-        EasingType.EaseOutQuint => OutQuint(t),
+        Easing.EaseOutQuad => OutQuad(t),
+        Easing.EaseOutCubic => OutCubic(t),
+        Easing.EaseOutQuart => OutQuart(t),
+        Easing.EaseOutQuint => OutQuint(t),
 
-        EasingType.EaseInOutQuad => InOutQuad(t),
-        EasingType.EaseInOutCubic => InOutCubic(t),
-        EasingType.EaseInOutQuart => InOutQuart(t),
-        EasingType.EaseInOutQuint => InOutQuint(t),
+        Easing.EaseInOutQuad => InOutQuad(t),
+        Easing.EaseInOutCubic => InOutCubic(t),
+        Easing.EaseInOutQuart => InOutQuart(t),
+        Easing.EaseInOutQuint => InOutQuint(t),
 
-        EasingType.EaseInExpo => InExpo(t),
-        EasingType.EaseOutExpo => OutExpo(t),
-        EasingType.EaseInOutExpo => InOutExpo(t),
+        Easing.EaseInExpo => InExpo(t),
+        Easing.EaseOutExpo => OutExpo(t),
+        Easing.EaseInOutExpo => InOutExpo(t),
 
-        EasingType.EaseInCirc => InCirc(t),
-        EasingType.EaseOutCirc => OutCirc(t),
-        EasingType.EaseInOutCirc => InOutCirc(t),
+        Easing.EaseInCirc => InCirc(t),
+        Easing.EaseOutCirc => OutCirc(t),
+        Easing.EaseInOutCirc => InOutCirc(t),
 
-        EasingType.EaseInElast => InElast(t),
-        EasingType.EaseOutElast => OutElast(t),
-        EasingType.EaseInOutElast => InOutElast(t),
+        Easing.EaseInElast => InElast(t),
+        Easing.EaseOutElast => OutElast(t),
+        Easing.EaseInOutElast => InOutElast(t),
 
-        EasingType.EaseInBack => InBack(t),
-        EasingType.EaseOutBack => OutBack(t),
-        EasingType.EaseInOutBack => InOutBack(t),
+        Easing.EaseInBack => InBack(t),
+        Easing.EaseOutBack => OutBack(t),
+        Easing.EaseInOutBack => InOutBack(t),
 
-        EasingType.EaseInBounce => InBounce(t),
-        EasingType.EaseOutBounce => OutBounce(t),
-        EasingType.EaseInOutBounce => InOutBounce(t),
+        Easing.EaseInBounce => InBounce(t),
+        Easing.EaseOutBounce => OutBounce(t),
+        Easing.EaseInOutBounce => InOutBounce(t),
 
         _ => Linear(t)
     };

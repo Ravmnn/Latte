@@ -18,7 +18,7 @@ public static class Math
         => IsPointOverRect(point, rect.Position, rect.Size);
     
     
-    public static bool IsPointOverRoundedRect(Vec2f point, Vec2f position, Vec2f size, float radius)
+    public static bool IsPointOverRoundedRect(this Vec2f point, Vec2f position, Vec2f size, float radius)
     {
         Vec2f leftTopCenter = new(position.X + radius, position.Y + radius);
         Vec2f rightTopCenter = new(position.X + size.X - radius, position.Y + radius);
@@ -38,17 +38,17 @@ public static class Math
         return overCorners || overRects;
     }
     
-    public static bool IsPointOverRoundedRect(Vec2f point, FloatRect rect, float radius)
+    public static bool IsPointOverRoundedRect(this Vec2f point, FloatRect rect, float radius)
         => IsPointOverRoundedRect(point, rect.Position, rect.Size, radius);
     
     
-    public static bool IsPointOverCircle(Vec2f point, Vec2f circleCenter, float radius)
+    public static bool IsPointOverCircle(this Vec2f point, Vec2f circleCenter, float radius)
         => Distance(point, circleCenter) <= radius;
 
 
     public static float Distance(float x1, float y1, float x2, float y2)
         => MathF.Sqrt(MathF.Pow(x2 - x1, 2f) + MathF.Pow(y2 - y1, 2f));
     
-    public static float Distance(Vec2f p1, Vec2f p2)
+    public static float Distance(this Vec2f p1, Vec2f p2)
         => Distance(p1.X, p1.Y, p2.X, p2.Y);
 }

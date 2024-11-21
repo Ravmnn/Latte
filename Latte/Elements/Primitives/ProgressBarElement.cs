@@ -11,6 +11,9 @@ namespace Latte.Elements.Primitives;
 
 public class ProgressBarElement : Element
 {
+    private bool _wasCompleted;
+    
+    
     public override Transformable Transformable => Foreground.Transformable;
 
     public RectangleElement Foreground { get; }
@@ -18,16 +21,15 @@ public class ProgressBarElement : Element
     
     public AnimatableProperty<Float> Progress { get; }
 
-    public Property<Float> MinValue { get; set; }
-    public Property<Float> MaxValue { get; set; }
+    public Property<Float> MinValue { get; }
+    public Property<Float> MaxValue { get; }
     
     public bool IsAtMax => Progress.Value >= MaxValue.Value;
     public bool IsAtMin => Progress.Value <= MinValue.Value;
 
     public bool Completed => IsAtMax;
-    private bool _wasCompleted;
     
-    public event EventHandler? CompletedEvent;
+    public event EventHandler? CompleteEvent;
 
 
     public ProgressBarElement(Element? parent, Vec2f position, Vec2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
@@ -37,7 +39,7 @@ public class ProgressBarElement : Element
         
         Progress = new(this, nameof(Progress), 0f);
         
-        Position.Set(position);
+        RelativePosition.Set(position);
 
         Background = new(this, new(), size);
         Background.Color.Set(Color.Black);
@@ -52,19 +54,27 @@ public class ProgressBarElement : Element
         if (!Visible)
             return;
         
-        // keeps progress between the value limits
-        Progress.Set(Math.Clamp(Progress.Value, MinValue.Value, MaxValue.Value));
+        KeepProgressBetweenLimits();
+        UpdateSizeBasedOnProgress();
         
         if (!_wasCompleted && Completed)
-            CompletedEvent?.Invoke(this, EventArgs.Empty);
-        
-        float normalizedProgress = (Progress.Value - MinValue.Value) / (MaxValue.Value - MinValue.Value); 
-        Foreground.Size.Set(new(Background.Size.Value.X * normalizedProgress, Background.Size.Value.Y));
+            CompleteEvent?.Invoke(this, EventArgs.Empty);
         
         _wasCompleted = Completed;
         
         base.Update();
     }
+    
+    private void UpdateSizeBasedOnProgress()
+        => Foreground.Size.Set(new(Background.Size.Value.X * CalculateNormalizedProgress(), Background.Size.Value.Y));
+    
+    
+    private float CalculateNormalizedProgress()
+        => (Progress.Value - MinValue.Value) / (MaxValue.Value - MinValue.Value);
+    
+    
+    private void KeepProgressBetweenLimits()
+        => Progress.Set(Math.Clamp(Progress.Value, MinValue.Value, MaxValue.Value));
 
 
     public override FloatRect GetBounds()

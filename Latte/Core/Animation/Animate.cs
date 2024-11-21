@@ -12,44 +12,44 @@ namespace Latte.Core.Animation;
 /// </summary>
 public static class Animate
 {
-    public static AnimationState Value(float from, float to, double time, EasingType easingType = EasingType.Linear) =>
-        new([from], [to], time, easingType);
+    public static AnimationData Value(float from, float to, double time, Easing easing = Easing.Linear) =>
+        new([from], [to], time, easing);
     
     
-    public static AnimationState Vec2f(Vec2f from, Vec2f to, double time, EasingType easingType = EasingType.Linear)
-        => new([from.X, from.Y], [to.X, to.Y], time, easingType);
+    public static AnimationData Vec2f(Vec2f from, Vec2f to, double time, Easing easing = Easing.Linear)
+        => new([from.X, from.Y], [to.X, to.Y], time, easing);
     
-    public static AnimationState Vec2i(Vec2i from, Vec2i to, double time, EasingType easingType = EasingType.Linear)
-        => new([from.X, from.Y], [to.X, to.Y], time, easingType);
+    public static AnimationData Vec2i(Vec2i from, Vec2i to, double time, Easing easing = Easing.Linear)
+        => new([from.X, from.Y], [to.X, to.Y], time, easing);
     
-    public static AnimationState Vec2u(Vec2u from, Vec2u to, double time, EasingType easingType = EasingType.Linear)
-        => new([from.X, from.Y], [to.X, to.Y], time, easingType);
+    public static AnimationData Vec2u(Vec2u from, Vec2u to, double time, Easing easing = Easing.Linear)
+        => new([from.X, from.Y], [to.X, to.Y], time, easing);
 
     
-    public static AnimationState Color(ColorRGBA from, ColorRGBA to, double time, EasingType easingType = EasingType.Linear)
-        => new([from.R, from.G, from.B, from.A], [to.R, to.G, to.B, to.A], time, easingType);
+    public static AnimationData Color(ColorRGBA from, ColorRGBA to, double time, Easing easing = Easing.Linear)
+        => new([from.R, from.G, from.B, from.A], [to.R, to.G, to.B, to.A], time, easing);
     
     
 
-    public static AnimationState Vector2f(Vector2f from, Vector2f to, double time, EasingType easingType = EasingType.Linear)
-        => Vec2f(from, to, time, easingType);
+    public static AnimationData Vector2f(Vector2f from, Vector2f to, double time, Easing easing = Easing.Linear)
+        => Vec2f(from, to, time, easing);
 
-    public static AnimationState Vector2i(Vector2i from, Vector2i to, double time, EasingType easingType = EasingType.Linear)
-        => Vec2i(from, to, time, easingType);
+    public static AnimationData Vector2i(Vector2i from, Vector2i to, double time, Easing easing = Easing.Linear)
+        => Vec2i(from, to, time, easing);
 
-    public static AnimationState Vector2u(Vector2u from, Vector2u to, double time, EasingType easingType = EasingType.Linear)
-        => Vec2u(from, to, time, easingType);
+    public static AnimationData Vector2u(Vector2u from, Vector2u to, double time, Easing easing = Easing.Linear)
+        => Vec2u(from, to, time, easing);
 
 
-    public static AnimationState SFColor(Color from, Color to, double time, EasingType easingType = EasingType.Linear)
-        => Color(from, to, time, easingType);
+    public static AnimationData SFColor(Color from, Color to, double time, Easing easing = Easing.Linear)
+        => Color(from, to, time, easing);
 }
 
 
 /// <summary>
 /// Converts a float[] to a specific data structure.
 /// </summary>
-public static class FloatArrayConverterExtensions
+public static class FloatArrayConversion
 {
     public static float ToValue(this float[] values)
         => values[0];

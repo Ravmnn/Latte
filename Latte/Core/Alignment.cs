@@ -9,7 +9,7 @@ namespace Latte.Core;
 
 
 [Flags]
-public enum AlignmentType
+public enum Alignments 
 {
     None = 0,
     
@@ -32,32 +32,32 @@ public enum AlignmentType
 
 public interface IAlignable
 {
-    Vec2f GetAlignmentPosition(AlignmentType alignment);
+    Vec2f GetAlignmentPosition(Alignments alignment);
 }
 
 
 public static class AlignmentCalculator
 {
-    public static Vec2f GetAlignedPositionOfChild(FloatRect child, FloatRect parent, AlignmentType alignment)
+    public static Vec2f GetAlignedPositionOfChild(FloatRect child, FloatRect parent, Alignments alignment)
     {
         Vec2f position = new();
 
-        if (alignment.HasFlag(AlignmentType.Top))
+        if (alignment.HasFlag(Alignments.Top))
             position.Y = parent.Top;
         
-        else if (alignment.HasFlag(AlignmentType.Bottom))
+        else if (alignment.HasFlag(Alignments.Bottom))
             position.Y = parent.Top + parent.Height - child.Height;
         
-        if (alignment.HasFlag(AlignmentType.Left))
+        if (alignment.HasFlag(Alignments.Left))
             position.X = parent.Left;
         
-        else if (alignment.HasFlag(AlignmentType.Right))
+        else if (alignment.HasFlag(Alignments.Right))
             position.X = parent.Left + parent.Width - child.Width;
 
-        if (alignment.HasFlag(AlignmentType.HorizontalCenter))
+        if (alignment.HasFlag(Alignments.HorizontalCenter))
             position.X = parent.Left + parent.Width / 2f - child.Width / 2f;
         
-        if (alignment.HasFlag(AlignmentType.VerticalCenter))
+        if (alignment.HasFlag(Alignments.VerticalCenter))
             position.Y = parent.Top + parent.Height / 2f - child.Height / 2f;
         
         return position;

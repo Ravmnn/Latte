@@ -1,6 +1,6 @@
 using SFML.Graphics;
 
-using Latte.Sfml;
+using Latte.Core;
 using Latte.Core.Type;
 
 
