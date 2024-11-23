@@ -23,28 +23,40 @@ public class Keyframe() : IEnumerable
     
     // must implement for using collection initialization list
     public void Add(string name, IAnimatable value) => Set(name, value);
-    
-    public void Set(string name, IAnimatable value) => Properties[name] = value;
     public bool Remove(string name) => Properties.Remove(name);
+    
+    
     public bool Exists(string name) => Properties.ContainsKey(name);
 
-
+    
+    public void Set(string name, IAnimatable value) => Properties[name] = value;
+    
     public void SetIfNotDefined(string name, IAnimatable value)
     {
         if (!Exists(name))
             Set(name, value);
     }
+
+    public void SetIfDefined(string name, IAnimatable value)
+    {
+        if (Exists(name))
+            Set(name, value);
+    }
     
     
-    public IEnumerator GetEnumerator()
-        => Properties.GetEnumerator();
-
-
+    public IAnimatable Get(string name) => Properties[name];
+    public bool TryGet(string name, out IAnimatable? value) => Properties.TryGetValue(name, out value);
+    
+    
     public IAnimatable this[string name]
     {
         get => Properties[name];
         set => Properties[name] = value;
     }
+    
+    
+    public IEnumerator GetEnumerator()
+        => Properties.GetEnumerator();
 
 
     public static Dictionary<string, IAnimatable> ElementPropertiesToKeyframeProperties(AnimatableProperty[] properties)
@@ -72,16 +84,17 @@ public class ElementKeyframeAnimator(Element element, double time, Easing easing
     
     public static void Animate(Element element, Keyframe to, double time, Easing easing = Easing.Linear)
     {
-        foreach (Property property in element.Properties)
+        foreach (Property elementProperty in element.Properties)
         {
-            if (!to.Properties.TryGetValue(property.Name, out IAnimatable? targetValue))
+            bool keyframePropertyExists = to.TryGet(elementProperty.Name, out IAnimatable? targetPropertyValue);
+            
+            if (!keyframePropertyExists)
                 continue;
             
-            if (property is not AnimatableProperty animatableProperty)
-                throw new InvalidOperationException($"Property \"{property.Name}\" is not an AnimatableProperty.");
-         
-            if (!animatableProperty.ShouldAnimatorIgnore)
-                animatableProperty.Animate(targetValue, time, easing);
+            if (elementProperty is not AnimatableProperty animatableElementProperty)
+                throw new InvalidOperationException($"Property \"{elementProperty.Name}\" is not an AnimatableProperty.");
+            
+            animatableElementProperty.Animate(targetPropertyValue!, time, easing);
         }
     }
 }

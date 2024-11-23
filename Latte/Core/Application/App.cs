@@ -15,6 +15,13 @@ using Latte.Elements.Primitives;
 namespace Latte.Core.Application;
 
 
+public enum RenderMode
+{
+    Pinned,
+    Unpinned
+}
+
+
 public static class App
 {
     private static Window? s_window;
@@ -47,6 +54,8 @@ public static class App
         private set => s_elementView = value;
     }
     
+    public static RenderMode RenderMode { get; set; }
+    
     public static Vec2i MousePosition { get; private set; }
     public static Vec2i MousePositionDelta => MousePosition - s_lastMousePosition;
     public static Vec2f WorldMousePosition { get; private set; }
@@ -63,6 +72,8 @@ public static class App
     {
         s_lastMousePosition = new();
         s_lastWorldMousePosition = new();
+        
+        RenderMode = RenderMode.Pinned;
         
         MousePosition = new();
         WorldMousePosition = new();
@@ -84,14 +95,14 @@ public static class App
         }
         
         // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
-        // this should be ALWAYS initialized before MainWindow
+        // this should be ALWAYS initialized before the window
         _ = new GameWindow(new(), new() { StartVisible = false });
         
         Window = new(mode, title, styles, settings);
-        Window.Resized += (_, args) => OnWindowResized(new(args.Width, args.Height));
+        Window.Resized += (_, args) => OnWindowResize(new(args.Width, args.Height));
 
         MainView = new(Window.GetView());
-        ElementView = new(MainView); // TODO: enum RenderMode: Pinned or Unpinned
+        ElementView = new(MainView);
         
         TextElement.DefaultTextFont = defaultFont;
         
@@ -107,12 +118,13 @@ public static class App
         UpdateMousePositionProperties();
         
         Window.ProcessEvents();
-        Window.SetView(ElementView);
+        
+        SetRenderView();
 
         foreach (Element element in Elements)
             element.Update();
         
-        Window.SetView(MainView);
+        UnsetRenderView();
     }
 
     private static void UpdateMousePositionProperties()
@@ -133,15 +145,21 @@ public static class App
 
     public static void Draw()
     {
-        // use a separated view to draw UI elements
-        Window.SetView(ElementView);
+        SetRenderView();
         
         foreach (Element element in Elements)
             element.Draw(Window);
         
-        Window.SetView(MainView);
+        UnsetRenderView();
     }
-
+    
+    
+    private static void SetRenderView()
+        => Window.SetView(RenderMode == RenderMode.Pinned ? ElementView : MainView);
+    
+    private static void UnsetRenderView()
+        => Window.SetView(MainView);
+    
 
     public static bool IsMouseOverAnyElementBound()
     {
@@ -153,7 +171,7 @@ public static class App
     }
 
 
-    private static void OnWindowResized(Vec2u newSize)
+    private static void OnWindowResize(Vec2u newSize)
     {
         MainView.Size = newSize;
         

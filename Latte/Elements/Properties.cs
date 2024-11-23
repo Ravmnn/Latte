@@ -56,12 +56,15 @@ public abstract class AnimatableProperty(Element owner, string name, object valu
     }
     
     public AnimationData? Animation { get; protected set; }
-    
-    public bool ShouldAnimatorIgnore { get; set; } // TODO: remove
+
+    public bool CanAnimate { get; set; } = true;
     
     
     public void Animate(object to, double time, Easing easing = Easing.Linear)
     {
+        if (!CanAnimate)
+            return;
+        
         Animation?.Abort();
 
         Animation = Value.AnimateThis(to, time, easing);

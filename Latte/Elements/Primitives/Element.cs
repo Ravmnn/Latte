@@ -15,6 +15,9 @@ namespace Latte.Elements.Primitives;
 public abstract class Element : IUpdateable, IDrawable, IAlignable
 {
     private bool _initialized;
+
+    private bool _visible;
+    
     
     public Element? Parent { get; set; }
     public List<Element> Children { get; }
@@ -24,8 +27,19 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public ElementKeyframeAnimator Animator { get; set; }
     
     public abstract Transformable Transformable { get; }
+
+    public bool Visible
+    {
+        get => _visible;
+        set
+        {
+            _visible = value;
+            VisibilityChangeEvent?.Invoke(this, EventArgs.Empty);
+        }
+    }
     
-    public bool Visible { get; set; } // TODO: add event when changing this
+    public event EventHandler? VisibilityChangeEvent;
+    
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
     
@@ -59,17 +73,19 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
         Properties = [];
 
-        Animator = new(this, 0.15);
+        Animator = new(this, 0.1);
      
-        Visible = true;
+        _visible = true;
+
+        VisibilityChangeEvent += (_, _) => OnVisibilityChange();
         
-        RelativePosition = new(this, nameof(RelativePosition), new()) { ShouldAnimatorIgnore = true };
-        Origin = new(this, nameof(Origin), new()) { ShouldAnimatorIgnore = true }; 
+        RelativePosition = new(this, nameof(RelativePosition), new()) { CanAnimate = false };
+        Origin = new(this, nameof(Origin), new()) { CanAnimate = false }; 
         Rotation = new(this, nameof(Rotation), 0f);
         Scale = new(this, nameof(Scale), new(1f, 1f));
         
         Alignment = new(this, nameof(Alignment), Alignments.None);
-        AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { ShouldAnimatorIgnore = true };
+        AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { CanAnimate = false };
         
         Parent?.Children.Add(this);
     }
@@ -157,8 +173,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), GetParentBounds(), alignment);
     
     
-    public void Show() => Visible = true;
-    public void Hide() => Visible = false;
+    public virtual void Show() => Visible = true;
+    public virtual void Hide() => Visible = false;
+    
+    protected virtual void OnVisibilityChange() {}
     
     
     public AnimatableProperty[] GetAnimatableProperties()
