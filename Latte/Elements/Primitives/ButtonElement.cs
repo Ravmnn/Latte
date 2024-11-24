@@ -8,6 +8,15 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
+/*
+ * BUG: mouse events are not blocked and go through all elements,
+ *      even if the element is behind another element. basically:
+ *      a button can be clicked even if there's a movable window
+ *      in front of it. the mouse event should be blocked by the
+ *      window, that way the button is not clicked or its states
+ *      are not modified by the mouse.
+ */
+
 public class ButtonElement : RectangleElement, IDefaultClickable
 {
     public TextElement Text { get; protected set; }

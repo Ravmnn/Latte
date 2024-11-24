@@ -13,7 +13,6 @@ namespace Latte.Core;
 // TODO: add checkbox
 // TODO: add text inputs
 // TODO: add layouts (horizontal, vertical, grid...)
-// TODO: add animations
 
 
 public class Window : RenderWindow

@@ -65,6 +65,14 @@ public static class App
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
     public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
     
+    
+    // Right-most elements in the list are updated first.
+    // Right-most elements in the list are drawn lastly,
+    // that way, it becomes over other elements already drawn.
+    
+    // The right-most position of the list could also be called the "top",
+    // while the left-most position, the "bottom"
+    
     public static List<Element> Elements { get; }
     
 
@@ -121,8 +129,9 @@ public static class App
         
         SetRenderView();
 
-        foreach (Element element in Elements)
-            element.Update();
+        // update order is reverse
+        for (int i = Elements.Count - 1; i >= 0; i--)
+            Elements[i].Update();
         
         UnsetRenderView();
     }
@@ -159,6 +168,37 @@ public static class App
     
     private static void UnsetRenderView()
         => Window.SetView(MainView);
+
+
+    public static void MoveElementIndexToTop(Element element)
+        => MoveElementByIndices(Elements.IndexOf(element), 0);
+
+    public static void MoveElementIndexToBottom(Element element)
+        => MoveElementByIndices(Elements.IndexOf(element), Elements.Count - 1);
+
+
+    public static void MoveElementIndexPosition(Element element, int amount)
+    {
+        int from = Elements.IndexOf(element);
+        int to = from + amount;
+
+        MoveElementByIndices(from, to);
+    }
+
+
+    private static void MoveElementByIndices(int from, int to)
+    {
+        if (from < 0 || from >= Elements.Count)
+            throw new ArgumentOutOfRangeException(nameof(from));
+        
+        if (to < 0 || to >= Elements.Count)
+            throw new ArgumentOutOfRangeException(nameof(to));
+        
+        Element element = Elements[from];
+        
+        Elements.RemoveAt(from);
+        Elements.Insert(to, element);
+    }
     
 
     public static bool IsMouseOverAnyElementBound()
@@ -182,4 +222,7 @@ public static class App
     
     private static InvalidOperationException AppNotInitializedException()
         => new("App not initialized.");
+
+    private static InvalidOperationException ElementNotFoundException()
+        => new("Element could not be found in App.");
 }

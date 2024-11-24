@@ -177,6 +177,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public virtual void Hide() => Visible = false;
     
     protected virtual void OnVisibilityChange() {}
+
+
+    public void Raise() => App.MoveElementIndexPosition(this, 1);
+    public void Lower() => App.MoveElementIndexPosition(this, -1);
+
+    public void FullRaise() => App.MoveElementIndexToTop(this);
+    public void FullLower() => App.MoveElementIndexToBottom(this);
     
     
     public AnimatableProperty[] GetAnimatableProperties()

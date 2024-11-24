@@ -1,7 +1,6 @@
 ﻿using SFML.Window;
 using SFML.Graphics;
 
-using Latte.Sfml;
 using Latte.Core;
 using Latte.Core.Application;
 using Latte.Elements;
@@ -37,7 +36,7 @@ class Program
         };
         
         App.Elements.Add(window);
-
+        
         RectangleElement rect = new(App.Elements[0], new(), new(200, 200))
         {
             Alignment = { Value = Alignments.Center},
@@ -66,13 +65,7 @@ class Program
             Radius = { Value = 5f }
         };
         
-        RoundedRectangleShape rrect = new(new(300, 300), 10f, 16)
-        {
-            Position = new(200, 200),
-            FillColor = new(255, 255, 100, 0),
-            OutlineColor = new(0, 255, 50),
-            OutlineThickness = 6f
-        };
+        window.Lower();
         
         while (App.Window.IsOpen)
         {
@@ -80,8 +73,6 @@ class Program
             
             App.Update();
             App.Draw();
-            
-            App.Window.Draw(rrect);
             
             App.Window.Display();
         }
