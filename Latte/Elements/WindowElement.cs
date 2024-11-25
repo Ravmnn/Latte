@@ -31,8 +31,6 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     
     public WindowElementStyles Styles { get; set; }
     
-    public bool IsClosed { get; private set; }
-    
     public event EventHandler? OpenEvent;
     public event EventHandler? CloseEvent;
     
@@ -104,9 +102,6 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     
     public override void Update()
     {
-        if (!Visible)
-            return;
-        
         (this as IDefaultClickable).UpdateMouseState();
         (this as IDefaultClickable).ProcessMouseEvents();
         

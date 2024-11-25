@@ -20,13 +20,13 @@ class Program
             AntialiasingLevel = 16
         });
         
-        App.Elements.Add(new RectangleElement(null, new(), new(700, 700))
+        RectangleElement rectangle = new(null, new(), new(700, 700))
         {
             Color = { Value = Color.Green },
             Alignment = { Value = Alignments.Center },
             BorderSize = { Value = 4f },
             BorderColor = { Value = Color.White }
-        });
+        };
 
         WindowElement window = new("Test Window", new(), new(400, 400))
         {
@@ -34,10 +34,13 @@ class Program
             BorderColor = { Value = Color.White },
             Radius = { Value = 5f }
         };
+
+        _ = new ButtonElement(window, new(), new(130, 70), "Button")
+        {
+            Alignment = { Value = Alignments.Center }
+        };
         
-        App.Elements.Add(window);
-        
-        RectangleElement rect = new(App.Elements[0], new(), new(200, 200))
+        RectangleElement rect = new(rectangle, new(), new(200, 200))
         {
             Alignment = { Value = Alignments.Center},
             
@@ -49,7 +52,7 @@ class Program
             Alignment = { Value = Alignments.Center}
         };
         
-        _ = new ButtonElement(App.Elements[0], new(), new(200, 90), "Press me!!")
+        _ = new ButtonElement(rectangle, new(), new(200, 90), "Press me!!")
         {
             Alignment = { Value = Alignments.BottomRight},
             AlignmentMargin = { Value = new(30, 40) },
@@ -57,7 +60,7 @@ class Program
             Radius = { Value = 3f }
         };
         
-        _ = new ButtonElement(App.Elements[0], new(), new(300, 130), "Press me!!")
+        _ = new ButtonElement(rectangle, new(), new(300, 130), "Press me!!")
         {
             Alignment = { Value = Alignments.HorizontalCenter | Alignments.Top },
             AlignmentMargin = { Value = new(0, 10) },
@@ -65,7 +68,8 @@ class Program
             Radius = { Value = 5f }
         };
         
-        window.Lower();
+        App.AddElement(rectangle);
+        App.AddElement(window);
         
         while (App.Window.IsOpen)
         {

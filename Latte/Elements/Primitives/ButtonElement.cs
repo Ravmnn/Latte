@@ -8,15 +8,6 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
-/*
- * BUG: mouse events are not blocked and go through all elements,
- *      even if the element is behind another element. basically:
- *      a button can be clicked even if there's a movable window
- *      in front of it. the mouse event should be blocked by the
- *      window, that way the button is not clicked or its states
- *      are not modified by the mouse.
- */
-
 public class ButtonElement : RectangleElement, IDefaultClickable
 {
     public TextElement Text { get; protected set; }
@@ -44,7 +35,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         
         BorderColor.Set(new(100, 100, 100));
         BorderSize.Set(1f);
-
+        
         MouseState = new();
 
         Normal = new();
@@ -59,13 +50,10 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         
         base.Setup();
     }
-
-
+    
+    
     public override void Update()
     {
-        if (!Visible)
-            return;
-        
         (this as IDefaultClickable).UpdateMouseState();
         (this as IDefaultClickable).ProcessMouseEvents();
         
@@ -86,7 +74,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         
         Normal.SetIfNotDefined("Color", color);
         Hover.SetIfNotDefined("Color", color -= ColorDecreaseAmount);
-        Down.SetIfNotDefined("Color", color -= ColorDecreaseAmount);
+        Down.SetIfNotDefined("Color", color - ColorDecreaseAmount);
     }
     
     

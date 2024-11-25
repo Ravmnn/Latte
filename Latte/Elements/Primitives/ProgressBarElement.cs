@@ -51,9 +51,6 @@ public class ProgressBarElement : Element
 
     public override void Update()
     {
-        if (!Visible)
-            return;
-        
         KeepProgressBetweenLimits();
         UpdateSizeBasedOnProgress();
         

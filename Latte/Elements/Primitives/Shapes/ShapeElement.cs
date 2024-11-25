@@ -32,9 +32,6 @@ public abstract class ShapeElement : Element
 
     public override void Draw(RenderTarget target)
     {
-        if (!Visible)
-            return;
-        
         BeginDraw();
         target.Draw(SfmlShape);
         EndDraw();

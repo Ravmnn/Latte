@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 using SFML.System;
 using SFML.Window;
@@ -9,6 +10,7 @@ using SFML.Graphics;
 using OpenTK.Windowing.Desktop;
 
 using Latte.Core.Type;
+using Latte.Elements;
 using Latte.Elements.Primitives;
 
 
@@ -66,14 +68,8 @@ public static class App
     public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
     
     
-    // Right-most elements in the list are updated first.
-    // Right-most elements in the list are drawn lastly,
-    // that way, it becomes over other elements already drawn.
-    
-    // The right-most position of the list could also be called the "top",
-    // while the left-most position, the "bottom"
-    
-    public static List<Element> Elements { get; }
+    // Elements are ordered based on their priority
+    public static List<Element> Elements { get; private set; }
     
 
     static App()
@@ -122,18 +118,45 @@ public static class App
 
     public static void Update()
     {
+        Window.ProcessEvents();
+        
+        SortElementListByDepth();
+        
         UpdateDeltaTime();
         UpdateMousePositionProperties();
         
-        Window.ProcessEvents();
-        
         SetRenderView();
-
-        // update order is reverse
-        for (int i = Elements.Count - 1; i >= 0; i--)
-            Elements[i].Update();
+        
+        UpdateElementsMouseInputCatch();
+        UpdateElements();
         
         UnsetRenderView();
+    }
+
+    private static void UpdateElements()
+    {
+        foreach (Element element in Elements)
+            if (element.Visible)
+                element.Update();
+    }
+
+    private static void UpdateElementsMouseInputCatch()
+    {
+        bool mouseInputWasCaught = false;
+        
+        for (int i = Elements.Count - 1; i >= 0; i--)
+        {
+            Element element = Elements[i];
+            IClickable? clickable = element as IClickable;
+            
+            bool isMouseOver = clickable?.IsPointOver(WorldMousePosition) ?? WorldMousePosition.IsPointOverRect(element.GetBounds());
+
+            if (clickable is not null)
+                clickable.MouseState.IsMouseInputCaught = !mouseInputWasCaught && isMouseOver;
+
+            if (element.BlocksMouseInput && isMouseOver)
+                mouseInputWasCaught = true;
+        }
     }
 
     private static void UpdateMousePositionProperties()
@@ -150,16 +173,28 @@ public static class App
         DeltaTime = s_deltaTimeStopwatch.Elapsed;
         s_deltaTimeStopwatch.Restart();
     }
+    
+    
+    private static void SortElementListByDepth()
+        => Elements = (from element in Elements
+            orderby element.Priority
+            select element).ToList();
 
 
     public static void Draw()
     {
         SetRenderView();
         
-        foreach (Element element in Elements)
-            element.Draw(Window);
+        DrawElements();
         
         UnsetRenderView();
+    }
+
+    private static void DrawElements()
+    {
+        foreach (Element element in Elements)
+            if (element.Visible)
+                element.Draw(Window);
     }
     
     
@@ -170,44 +205,18 @@ public static class App
         => Window.SetView(MainView);
 
 
-    public static void MoveElementIndexToTop(Element element)
-        => MoveElementByIndices(Elements.IndexOf(element), 0);
-
-    public static void MoveElementIndexToBottom(Element element)
-        => MoveElementByIndices(Elements.IndexOf(element), Elements.Count - 1);
-
-
-    public static void MoveElementIndexPosition(Element element, int amount)
+    public static void AddElement(Element element)
     {
-        int from = Elements.IndexOf(element);
-        int to = from + amount;
-
-        MoveElementByIndices(from, to);
+        Elements.Add(element);
+        AddElementsHierarchy(element.Children);
     }
 
-
-    private static void MoveElementByIndices(int from, int to)
+    private static void AddElementsHierarchy(List<Element> elements)
     {
-        if (from < 0 || from >= Elements.Count)
-            throw new ArgumentOutOfRangeException(nameof(from));
+        Elements.AddRange(elements);
         
-        if (to < 0 || to >= Elements.Count)
-            throw new ArgumentOutOfRangeException(nameof(to));
-        
-        Element element = Elements[from];
-        
-        Elements.RemoveAt(from);
-        Elements.Insert(to, element);
-    }
-    
-
-    public static bool IsMouseOverAnyElementBound()
-    {
-        foreach (Element element in Elements)
-            if (element.Visible && element.GetBounds().Contains((Vector2f)Window.WorldMousePosition))
-                return true;
-
-        return false;
+        foreach (Element element in elements)
+            AddElementsHierarchy(element.Children);
     }
 
 

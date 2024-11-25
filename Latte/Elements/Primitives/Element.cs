@@ -16,7 +16,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 {
     private bool _initialized;
 
-    private bool _visible;
+    private bool _visible; // BUG: make visibility change based on parent's visibility
     
     
     public Element? Parent { get; set; }
@@ -42,6 +42,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
+    
+    public int Priority { get; set; }
+
+    public bool BlocksMouseInput { get; protected set; }
     
     public AnimatableProperty<Vec2f> RelativePosition { get; }
     public Vec2f AbsolutePosition
@@ -78,6 +82,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         _visible = true;
 
         VisibilityChangeEvent += (_, _) => OnVisibilityChange();
+
+        BlocksMouseInput = true;
         
         RelativePosition = new(this, nameof(RelativePosition), new()) { CanAnimate = false };
         Origin = new(this, nameof(Origin), new()) { CanAnimate = false }; 
@@ -106,19 +112,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         if (!_initialized)
             Setup();
         
-        if (!Visible)
-            return;
-        
         if (Alignment != Alignments.None)
             AbsolutePosition = GetAlignmentPosition(Alignment.Value) + AlignmentMargin;
-     
+            
         UpdatePropertyAnimations();
         UpdateSfmlProperties();
         
         UpdateEvent?.Invoke(this, EventArgs.Empty);
-        
-        foreach (Element child in Children)
-            child.Update();
     }
     
     
@@ -147,13 +147,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         if (ShouldDrawClipArea)
             Debug.DrawLineRect(target, (FloatRect)GetClipArea(), Color.Magenta);
         
-        if (!Visible)
-            return;
-        
         DrawEvent?.Invoke(this, EventArgs.Empty);
-        
-        foreach (Element child in Children)
-            child.Draw(target);
     }
 
     protected virtual void BeginDraw() => ClipArea.BeginClip(GetFinalClipArea());
@@ -179,11 +173,11 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     protected virtual void OnVisibilityChange() {}
 
 
-    public void Raise() => App.MoveElementIndexPosition(this, 1);
-    public void Lower() => App.MoveElementIndexPosition(this, -1);
+    public void Raise() => Priority++;
+    public void Lower() => Priority--;
 
-    public void FullRaise() => App.MoveElementIndexToTop(this);
-    public void FullLower() => App.MoveElementIndexToBottom(this);
+    public void FullRaise() => Priority = App.Elements.Last().Priority + 1;
+    public void FullLower() => Priority = App.Elements.First().Priority - 1;
     
     
     public AnimatableProperty[] GetAnimatableProperties()

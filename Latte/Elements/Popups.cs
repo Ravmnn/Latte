@@ -26,10 +26,7 @@ public class ProgressBarPopup : WindowElement
 
     public override void Update()
     {
-        if (!Visible)
-            return;
-        
-        if (!IsClosed && CloseOnComplete && ProgressBar.Completed)
+        if (Visible && CloseOnComplete && ProgressBar.Completed)
             Close();
         
         base.Update();

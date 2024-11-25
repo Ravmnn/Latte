@@ -2,7 +2,6 @@ using System;
 
 using SFML.Window;
 
-using Latte.Core.Application;
 using Latte.Core.Type;
 
 
@@ -18,7 +17,12 @@ public class MouseClickState
     
     public bool WasMouseHover { get; set; }
     public bool WasMouseDown { get; set; }
+    public bool WasPressed { get; set; }
     public bool WasTruePressed { get; set; }
+    
+    
+    public bool IsMouseInputCaught { get; set; }
+    public bool WasMouseInputCaught { get; set; }
 }
 
 
@@ -49,9 +53,11 @@ public interface IDefaultClickable : IClickable
     {
         MouseState.WasMouseHover = MouseState.IsMouseHover;
         MouseState.WasMouseDown = MouseState.IsMouseDown;
+        MouseState.WasPressed = MouseState.IsPressed;
         MouseState.WasTruePressed = MouseState.IsTruePressed;
-        
-        MouseState.IsMouseHover = IsPointOver(App.Window.WorldMousePosition);
+        MouseState.WasMouseInputCaught = MouseState.IsMouseInputCaught;
+
+        MouseState.IsMouseHover = MouseState.IsMouseInputCaught;
         MouseState.IsMouseDown = Mouse.IsButtonPressed(Mouse.Button.Left);
         MouseState.IsPressed = MouseState.IsMouseHover && MouseState.IsMouseDown;
         

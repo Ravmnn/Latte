@@ -40,6 +40,8 @@ public class TextElement : Element
 
     public TextElement(Element? parent, Vec2f position, uint size, string text, Font? font = null) : base(parent)
     {
+        BlocksMouseInput = false;
+        
         SfmlText = new(text, font ?? DefaultTextFont);
         
         Text = new(this, nameof(Text), text);
@@ -60,9 +62,6 @@ public class TextElement : Element
 
     public override void Draw(RenderTarget target)
     {
-        if (!Visible)
-            return;
-        
         BeginDraw();
         target.Draw(SfmlText);
         EndDraw();
