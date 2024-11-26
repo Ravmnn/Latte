@@ -43,6 +43,8 @@ public static class ClipArea
 
             else if (area.Value.Intersects(newArea, out IntRect overlap))
                 area = overlap;
+            
+            // BUG: not working when area is full outside the parent clip area
 
             element = element.Parent;
         } while (element is not null);

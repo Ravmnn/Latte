@@ -12,16 +12,35 @@ using Latte.Core.Application;
 namespace Latte.Elements.Primitives;
 
 
+public class ElementEventArgs(Element? element) : EventArgs
+{
+    public Element? Element { get; } = element;
+}
+
+
 public abstract class Element : IUpdateable, IDrawable, IAlignable
 {
+    private Element? _parent;
+    
     private bool _initialized;
 
-    private bool _visible; // BUG: make visibility change based on parent's visibility
-    private bool _wasVisible;
+    private bool _visible;
+
+
+    public Element? Parent
+    {
+        get => _parent;
+        set
+        {
+            _parent = value;
+            OnParentChange();
+        }
+    }
+
+    public event EventHandler<ElementEventArgs>? ParentChangeEvent;
     
-    
-    public Element? Parent { get; set; }
     public List<Element> Children { get; }
+    public event EventHandler<ElementEventArgs>? ChildAddedEvent;
     
     public List<Property> Properties { get; }
 
@@ -34,9 +53,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public bool Visible
     {
         get => _visible && ParentVisible;
-        set => _visible = value;
+        set
+        {
+            _visible = value;
+            OnVisibilityChange();
+        }
     }
-    
+
     public event EventHandler? VisibilityChangeEvent;
     
     public bool ShouldDrawElementBoundaries { get; set; }
@@ -70,17 +93,15 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     protected Element(Element? parent)
     {
         _initialized = false;
-
+        
         Parent = parent;
         Children = [];
 
         Properties = [];
 
-        Animator = new(this, 0.1);
-     
-        _wasVisible = _visible = true;
+        Animator = new(this, 0.07);
 
-        VisibilityChangeEvent += (_, _) => OnVisibilityChange();
+        Visible = true;
 
         BlocksMouseInput = true;
         
@@ -91,8 +112,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         
         Alignment = new(this, nameof(Alignment), Alignments.None);
         AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { CanAnimate = false };
-        
-        Parent?.Children.Add(this);
     }
 
 
@@ -108,25 +127,24 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     public virtual void Update()
     {
+        CanOnlyHaveChildOfTypeAttribute.Check(this);
+        
+        RemoveNonChildren();
+        
         if (!_initialized)
             Setup();
-        
-        if (_wasVisible != Visible)
-            VisibilityChangeEvent?.Invoke(this, EventArgs.Empty);
         
         AlignElement();
         
         UpdatePropertyAnimations();
         UpdateSfmlProperties();
         
-        _wasVisible = Visible;
-        
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
 
     private void AlignElement()
     {
-        if (Alignment != Alignments.None)
+        if (Parent is not GridLayout && Alignment != Alignments.None)
             AbsolutePosition = GetAlignmentPosition(Alignment.Value) + AlignmentMargin;
     }
 
@@ -144,6 +162,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Transformable.Rotation = Rotation.Value;
         Transformable.Scale = Scale.Value;
     }
+
+    protected void RemoveNonChildren()
+        => Children.RemoveAll(element => element.Parent != this);
+    
 
     
     public virtual void Draw(RenderTarget target)
@@ -176,8 +198,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public virtual void Show() => Visible = true;
     public virtual void Hide() => Visible = false;
-    
-    protected virtual void OnVisibilityChange() {}
+
+    protected virtual void OnVisibilityChange()
+        => VisibilityChangeEvent?.Invoke(this, EventArgs.Empty);
 
 
     public void Raise() => Priority++;
@@ -192,4 +215,20 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
 
     public Keyframe ToKeyframe() => new(GetAnimatableProperties());
+
+
+    protected virtual void OnParentChange()
+    {
+        Priority = Parent?.Priority + 1 ?? Priority;
+        
+        Parent?.OnChildAdded(this);
+        ParentChangeEvent?.Invoke(this, new(Parent));
+    }
+    
+    
+    protected virtual void OnChildAdded(Element child)
+    {
+        Children.Add(child);
+        ChildAddedEvent?.Invoke(this, new(child));
+    }
 }

@@ -94,8 +94,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         
         CornersToResize = new();
         CornerResizeAreaSize = 10f;
-
-        MaxSize = new(400, 400);
+        
         MinSize = new(50, 50);
     }
     
@@ -236,6 +235,12 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     }
 
     
-    public bool IsPointOver(Vec2f point)
+    public virtual bool IsPointOver(Vec2f point)
+        => IsPointOverClipArea(point) && IsPointOverThis(point);
+    
+    protected bool IsPointOverClipArea(Vec2f point)
+        => point.IsPointOverRect(GetFinalClipArea().ToWorldCoordinates());
+    
+    protected bool IsPointOverThis(Vec2f point)
         => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius.Value);
 }

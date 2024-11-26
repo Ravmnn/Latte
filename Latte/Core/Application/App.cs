@@ -122,10 +122,10 @@ public static class App
         
         SortElementListByDepth();
         
+        SetRenderView();
+        
         UpdateDeltaTime();
         UpdateMousePositionProperties();
-        
-        SetRenderView();
         
         UpdateElementsMouseInputCatch();
         UpdateElements();
@@ -154,7 +154,7 @@ public static class App
             if (clickable is not null)
                 clickable.MouseState.IsMouseInputCaught = !mouseInputWasCaught && isMouseOver;
 
-            if (element.Visible && element.BlocksMouseInput && isMouseOver)
+            if (element.Visible && element.BlocksMouseInput && isMouseOver && !mouseInputWasCaught)
                 mouseInputWasCaught = true;
         }
     }
@@ -177,8 +177,8 @@ public static class App
     
     private static void SortElementListByDepth()
         => Elements = (from element in Elements
-            orderby element.Priority
-            select element).ToList();
+                        orderby element.Priority
+                        select element).ToList();
 
 
     public static void Draw()
@@ -207,17 +207,35 @@ public static class App
 
     public static void AddElement(Element element)
     {
-        Elements.Add(element);
+        AddSingleElement(element);
         AddElementsHierarchy(element.Children);
     }
 
     private static void AddElementsHierarchy(List<Element> elements)
     {
-        Elements.AddRange(elements);
+        AddSingleElements(elements);
         
         foreach (Element element in elements)
             AddElementsHierarchy(element.Children);
     }
+
+    private static void AddSingleElement(Element element)
+    {
+        if (!HasElement(element))
+            Elements.Add(element);
+    }
+    
+    private static void AddSingleElements(IEnumerable<Element> elements)
+    {
+        foreach (Element element in elements)
+            AddSingleElement(element);
+    }
+
+
+    public static bool HasElement(Element element)
+        => Elements.Contains(element); 
+    
+    // TODO: implement RemoveElement (and all its children)
 
 
     private static void OnWindowResize(Vec2u newSize)
