@@ -17,6 +17,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     private bool _initialized;
 
     private bool _visible; // BUG: make visibility change based on parent's visibility
+    private bool _wasVisible;
     
     
     public Element? Parent { get; set; }
@@ -28,14 +29,12 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public abstract Transformable Transformable { get; }
 
+    protected bool ParentVisible => Parent?.Visible ?? true;
+    
     public bool Visible
     {
-        get => _visible;
-        set
-        {
-            _visible = value;
-            VisibilityChangeEvent?.Invoke(this, EventArgs.Empty);
-        }
+        get => _visible && ParentVisible;
+        set => _visible = value;
     }
     
     public event EventHandler? VisibilityChangeEvent;
@@ -79,7 +78,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
         Animator = new(this, 0.1);
      
-        _visible = true;
+        _wasVisible = _visible = true;
 
         VisibilityChangeEvent += (_, _) => OnVisibilityChange();
 
@@ -112,15 +111,31 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         if (!_initialized)
             Setup();
         
-        if (Alignment != Alignments.None)
-            AbsolutePosition = GetAlignmentPosition(Alignment.Value) + AlignmentMargin;
-            
+        if (_wasVisible != Visible)
+            VisibilityChangeEvent?.Invoke(this, EventArgs.Empty);
+        
+        AlignElement();
+        
         UpdatePropertyAnimations();
         UpdateSfmlProperties();
         
+        _wasVisible = Visible;
+        
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
-    
+
+    private void AlignElement()
+    {
+        if (Alignment != Alignments.None)
+            AbsolutePosition = GetAlignmentPosition(Alignment.Value) + AlignmentMargin;
+    }
+
+    private void UpdatePropertyAnimations()
+    {
+        foreach (Property property in Properties)
+            if (property is AnimatableProperty { Animation: not null } animatableProperty)
+                animatableProperty.Animation.Update();
+    }
     
     protected virtual void UpdateSfmlProperties()
     {
@@ -128,14 +143,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Transformable.Origin = Origin.Value;
         Transformable.Rotation = Rotation.Value;
         Transformable.Scale = Scale.Value;
-    }
-
-
-    private void UpdatePropertyAnimations()
-    {
-        foreach (Property property in Properties)
-            if (property is AnimatableProperty { Animation: not null } animatableProperty)
-                animatableProperty.Animation.Update();
     }
 
     

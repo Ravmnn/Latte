@@ -154,7 +154,7 @@ public static class App
             if (clickable is not null)
                 clickable.MouseState.IsMouseInputCaught = !mouseInputWasCaught && isMouseOver;
 
-            if (element.BlocksMouseInput && isMouseOver)
+            if (element.Visible && element.BlocksMouseInput && isMouseOver)
                 mouseInputWasCaught = true;
         }
     }
