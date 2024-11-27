@@ -19,19 +19,19 @@ class Program
             AntialiasingLevel = 16
         });
 
-        WindowElement window = new("Test Window", new(), new(400, 400))
+        WindowElement window = new("Test Window", new(), new(600, 600))
         {
             BorderSize = { Value = 2f },
             BorderColor = { Value = Color.White },
             Radius = { Value = 5f }
         };
 
-        GridLayout layout = new(window, new(), 10, 1, 50f, 50f)
+        GridLayout layout = new(window, new(), 8, 5, 50f, 50f)
         {
             Alignment = { Value = Alignments.Center }
         };
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 40; i++)
             layout.AddElement(new ButtonElement(null, new(), new(30, 30), "")
             {
                 Alignment = { Value = Alignments.Center }

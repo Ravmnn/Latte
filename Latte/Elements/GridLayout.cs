@@ -54,7 +54,7 @@ public class GridLayout : RectangleElement
     }
 
 
-    public GridLayoutCell FindAvailableCell()
+    protected GridLayoutCell FindAvailableCell()
     {
         foreach (GridLayoutCell cell in Cells)
             if (cell.Children.Count == 0)
@@ -64,7 +64,7 @@ public class GridLayout : RectangleElement
     }
     
 
-    public void CreateCells()
+    protected void CreateCells()
     {
         for (int row = 0; row < Rows; row++)
             for (int col = 0; col < Columns; col++)
