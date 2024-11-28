@@ -29,7 +29,7 @@ public static class ClipArea
     }
 
 
-    public static IntRect OverlapElementClipAreaToParents(Element start)
+    public static IntRect? OverlapElementClipAreaToParents(Element start)
     {
         Element? element = start;
         IntRect? area = null;
@@ -41,14 +41,25 @@ public static class ClipArea
             if (area is null)
                 area = newArea;
 
-            else if (area.Value.Intersects(newArea, out IntRect overlap))
+            if (area.Value.Intersects(newArea, out IntRect overlap))
                 area = overlap;
-            
-            // BUG: not working when area is full outside the parent clip area
+            else
+                return null;
 
             element = element.Parent;
         } while (element is not null);
 
         return area.Value;
+    }
+
+
+    public static IntRect GetTopMostClipAreaOfElement(Element element)
+    {
+        Element currentElement = element;
+        
+        while (currentElement.Parent is not null)
+            currentElement = currentElement.Parent;
+
+        return currentElement.GetThisClipArea();
     }
 }

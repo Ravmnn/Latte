@@ -16,6 +16,8 @@ public class GridLayoutCell : RectangleElement
     }
 }
 
+// TODO: add ability to change size of the grid after construction
+
 
 [CanOnlyHaveChildOfType(typeof(GridLayoutCell))]
 public class GridLayout : RectangleElement

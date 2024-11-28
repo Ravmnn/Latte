@@ -36,6 +36,8 @@ public static class App
     private static Vec2f s_lastWorldMousePosition;
     
     private static readonly Stopwatch s_deltaTimeStopwatch;
+
+    private static bool _mouseInputWasCaught;
     
     
     public static Window Window
@@ -83,6 +85,8 @@ public static class App
         WorldMousePosition = new();
         
         s_deltaTimeStopwatch = new();
+
+        _mouseInputWasCaught = false;
         
         DeltaTime = TimeSpan.Zero;
         
@@ -142,20 +146,20 @@ public static class App
 
     private static void UpdateElementsMouseInputCatch()
     {
-        bool mouseInputWasCaught = false;
+        _mouseInputWasCaught = false;
         
         for (int i = Elements.Count - 1; i >= 0; i--)
         {
             Element element = Elements[i];
             IClickable? clickable = element as IClickable;
             
-            bool isMouseOver = clickable?.IsPointOver(WorldMousePosition) ?? WorldMousePosition.IsPointOverRect(element.GetBounds());
+            bool isMouseOver = clickable?.IsPointOver(WorldMousePosition) ?? element.IsPointOverBounds(WorldMousePosition);
 
             if (clickable is not null)
-                clickable.MouseState.IsMouseInputCaught = !mouseInputWasCaught && isMouseOver;
+                clickable.MouseState.IsMouseInputCaught = !_mouseInputWasCaught && isMouseOver;
 
-            if (element.Visible && element.BlocksMouseInput && isMouseOver && !mouseInputWasCaught)
-                mouseInputWasCaught = true;
+            if (element.Visible && element.BlocksMouseInput && isMouseOver && !_mouseInputWasCaught)
+                _mouseInputWasCaught = true;
         }
     }
 
@@ -236,6 +240,9 @@ public static class App
         => Elements.Contains(element); 
     
     // TODO: implement RemoveElement (and all its children)
+
+
+    public static bool IsMouseOverAnyElement() => _mouseInputWasCaught;
 
 
     private static void OnWindowResize(Vec2u newSize)

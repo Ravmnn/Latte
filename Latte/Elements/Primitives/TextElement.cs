@@ -62,6 +62,9 @@ public class TextElement : Element
 
     public override void Draw(RenderTarget target)
     {
+        if (!IsInsideClipArea())
+            return;
+        
         BeginDraw();
         target.Draw(SfmlText);
         EndDraw();

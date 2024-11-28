@@ -32,7 +32,7 @@ class Program
         };
 
         for (int i = 0; i < 40; i++)
-            layout.AddElement(new ButtonElement(null, new(), new(30, 30), "")
+            layout.AddElement(new ButtonElement(null, new(), new(30, 30), "Btn")
             {
                 Alignment = { Value = Alignments.Center }
             });

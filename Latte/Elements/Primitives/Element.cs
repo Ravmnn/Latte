@@ -26,6 +26,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     private bool _visible;
 
+    private int _priority;
+
 
     public Element? Parent
     {
@@ -64,8 +66,20 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
+
+    public int Priority
+    {
+        get => _priority;
+        set
+        {
+            _priority = value;
+            OnPriorityChange();
+        }
+    }
     
-    public int Priority { get; set; }
+    protected int LastPriority { get; private set; }
+    
+    public event EventHandler? PriorityChangeEvent;
 
     public bool BlocksMouseInput { get; protected set; }
     
@@ -112,6 +126,11 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         
         Alignment = new(this, nameof(Alignment), Alignments.None);
         AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { CanAnimate = false };
+
+        if (Parent is null)
+            return;
+
+        Parent.PriorityChangeEvent += (_, _) => AddParentPriorityDeltaToThis();
     }
 
 
@@ -138,6 +157,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         
         UpdatePropertyAnimations();
         UpdateSfmlProperties();
+
+        LastPriority = Priority;
         
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
@@ -183,11 +204,21 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     protected virtual void EndDraw() => ClipArea.EndClip();
 
 
-    public IntRect GetFinalClipArea() => ClipArea.OverlapElementClipAreaToParents(this);
+    public IntRect GetFinalClipArea() => ClipArea.OverlapElementClipAreaToParents(this) ?? new();
     public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.Window.WindowRect;
     public virtual IntRect GetThisClipArea() => GetBounds().ToWindowCoordinates();
 
+    public bool IsInsideClipArea()
+        => GetBounds().Intersects((FloatRect)GetFinalClipArea());
 
+
+    public bool IsPointOverBounds(Vec2f point)
+        => IsPointOverClipArea(point) && point.IsPointOverRect(GetBounds());
+    
+    public bool IsPointOverClipArea(Vec2f point)
+        => point.IsPointOverRect(GetFinalClipArea().ToWorldCoordinates());
+    
+    
     public abstract FloatRect GetBounds();
     public FloatRect GetParentBounds() => Parent?.GetBounds() ?? (FloatRect)App.Window.WindowRect;
 
@@ -208,6 +239,15 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     public void FullRaise() => Priority = App.Elements.Last().Priority + 1;
     public void FullLower() => Priority = App.Elements.First().Priority - 1;
+
+
+    private void AddParentPriorityDeltaToThis()
+    {
+        if (Parent is null)
+            return;
+
+        Priority += Parent.Priority - Parent.LastPriority;
+    }
     
     
     public AnimatableProperty[] GetAnimatableProperties()
@@ -231,4 +271,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Children.Add(child);
         ChildAddedEvent?.Invoke(this, new(child));
     }
+
+
+    protected virtual void OnPriorityChange()
+        => PriorityChangeEvent?.Invoke(this, EventArgs.Empty);
 }

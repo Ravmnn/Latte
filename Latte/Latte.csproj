@@ -9,6 +9,7 @@
         <Title>An immediate mode GUI for SFML.Net</Title>
         <PackageTags>imgui gui ui sfml graphics rendering interface</PackageTags>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

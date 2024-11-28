@@ -32,10 +32,13 @@ public abstract class ShapeElement : Element
 
     public override void Draw(RenderTarget target)
     {
+        if (!IsInsideClipArea())
+            return;
+        
         BeginDraw();
         target.Draw(SfmlShape);
         EndDraw();
-        
+           
         base.Draw(target);
     }
 
