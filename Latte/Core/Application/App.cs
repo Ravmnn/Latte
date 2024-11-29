@@ -236,15 +236,30 @@ public static class App
     }
 
 
+    public static void RemoveElement(Element element)
+    {
+        Elements.Remove(element);
+
+        for (int i = 0; i < Elements.Count; i++)
+        {
+            Element el = Elements[i];
+
+            if (!el.IsChildOf(element))
+                continue;
+            
+            Elements.Remove(el);
+            i--;
+        }
+    }
+
+
     public static bool HasElement(Element element)
         => Elements.Contains(element); 
-    
-    // TODO: implement RemoveElement (and all its children)
 
 
     public static bool IsMouseOverAnyElement() => _mouseInputWasCaught;
 
-
+    
     private static void OnWindowResize(Vec2u newSize)
     {
         MainView.Size = newSize;

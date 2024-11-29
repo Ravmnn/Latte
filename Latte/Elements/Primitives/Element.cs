@@ -234,6 +234,22 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         => VisibilityChangeEvent?.Invoke(this, EventArgs.Empty);
 
 
+    public bool IsChildOf(Element parent)
+    {
+        Element? currentParent = Parent;
+
+        while (currentParent is not null)
+        {
+            if (currentParent == parent)
+                return true;
+            
+            currentParent = currentParent.Parent;
+        }
+
+        return false;
+    }
+
+
     public void Raise() => Priority++;
     public void Lower() => Priority--;
 

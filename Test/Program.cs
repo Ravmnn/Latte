@@ -38,6 +38,7 @@ class Program
             });
 
         App.AddElement(window);
+        App.RemoveElement(layout);
         
         while (App.Window.IsOpen)
         {
