@@ -41,7 +41,8 @@ class Program
 
         GridLayout layout = new(window, new(), 5, 5, 50f, 50f)
         {
-            Alignment = { Value = Alignments.Center }
+            Alignment = { Value = Alignments.Center },
+            GrowDirection = GridLayoutGrowDirection.Vertically
         };
 
         for (int i = 0; i < 25; i++)

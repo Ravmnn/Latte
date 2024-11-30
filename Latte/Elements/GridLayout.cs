@@ -1,5 +1,6 @@
+using System;
 using System.Collections.Generic;
-using System.Threading;
+
 using Latte.Core.Type;
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
@@ -10,7 +11,7 @@ namespace Latte.Elements;
 
 public class GridLayoutCell : RectangleElement
 {
-    public GridLayoutCell(Element? parent, Vec2f position, Vec2f size) : base(parent, position, size)
+    public GridLayoutCell(GridLayout parent, Vec2f position, Vec2f size) : base(parent, position, size)
     {
         Color.Value = SFML.Graphics.Color.Transparent;
     }
@@ -40,6 +41,9 @@ public class GridLayout : RectangleElement
         get => _rows;
         set
         {
+            if (MaxRows is not null)
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(value, MaxRows.Value, nameof(value));
+
             _rows = value;
             RecreationRequired = true;
         }
@@ -50,10 +54,16 @@ public class GridLayout : RectangleElement
         get => _columns;
         set
         {
+            if (MaxColumns is not null)
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(value, MaxColumns.Value, nameof(value));
+            
             _columns = value;
             RecreationRequired = true;
         }
     }
+    
+    public uint? MaxRows { get; set; }
+    public uint? MaxColumns { get; set; }
 
     public float RowSpacing
     {
@@ -76,8 +86,9 @@ public class GridLayout : RectangleElement
     }
     
     public GridLayoutGrowDirection GrowDirection { get; set; }
+    public bool Fixed { get; set; }
     
-    protected bool RecreationRequired { get; set; }
+    public bool RecreationRequired { get; set; }
     
 
     public GridLayout(Element? parent, Vec2f position, uint rows, uint columns, float rowSpacing, float columnSpacing)
@@ -109,9 +120,7 @@ public class GridLayout : RectangleElement
 
 
     public void AddElement(Element element)
-    {
-        element.Parent = FindAvailableCell();
-    }
+        => element.Parent = FindAvailableCell();
 
 
     protected GridLayoutCell FindAvailableCell()
@@ -128,6 +137,9 @@ public class GridLayout : RectangleElement
 
     protected void GrowLayout()
     {
+        if (Fixed)
+            throw new InvalidOperationException("Layout is fixed and can't be resized.");
+        
         switch (GrowDirection)
         {
             case GridLayoutGrowDirection.Horizontally:
@@ -149,30 +161,44 @@ public class GridLayout : RectangleElement
         
         Cells = new GridLayoutCell[Rows, Columns];
         
-        // TODO: clean all this mess
-        
-        for (int row = 0; row < Rows; row++)
-        for (int col = 0; col < Columns; col++)
+        for (uint row = 0; row < Rows; row++)
+        for (uint col = 0; col < Columns; col++)
         {
-            Cells[row, col] = row < oldCells.GetLength(0) && col < oldCells.GetLength(1) && oldCells[row, col] is not null ? oldCells[row, col] : new(this, new(), new());
-        }
-        
-        for (int row = 0; row < Rows; row++)
-        for (int col = 0; col < Columns; col++)
-        {
-            List<Element> cellChildren = [];
-            
-            if (row < oldCells.GetLength(0) && col < oldCells.GetLength(1) && oldCells[row, col] is {} oldCell)
-                cellChildren = oldCell.Children;
-            
-            Cells[row, col]!.RelativePosition.Value = new(col * ColumnSpacing, row * RowSpacing);
-            Cells[row, col]!.Size.Value = new(ColumnSpacing, RowSpacing);
-            
-            cellChildren.ForEach(child => child.Parent = Cells[row, col]);
+            InitializeCellBasedOnOldCellMatrix(oldCells, row, col, out List<Element> oldCellChildren);
+            UpdateCellGeometry(row, col);
+
+            oldCellChildren.ForEach(child => child.Parent = Cells[row, col]);
         }
 
         Size.Value = new(Columns * ColumnSpacing, Rows * RowSpacing);
         
         RecreationRequired = false;
     }
+
+    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCell?[,] oldCells, uint row, uint col, out List<Element> oldCellChildren)
+    {
+        if (AreIndicesInsideMatrixBounds(oldCells, row, col) && oldCells[row, col] is not null)
+        {
+            oldCellChildren = oldCells[row, col]!.Children;
+            Cells[row, col] = oldCells[row, col];
+        }
+        else
+        {
+            oldCellChildren = [];
+            Cells[row, col] = new(this, new(), new());
+        }
+    }
+
+    private void UpdateCellGeometry(uint row, uint col)
+    {
+        if (Cells[row, col] is null)
+            return;
+        
+        Cells[row, col]!.RelativePosition.Value = new(col * ColumnSpacing, row * RowSpacing);
+        Cells[row, col]!.Size.Value = new(ColumnSpacing, RowSpacing);
+    }
+
+
+    private static bool AreIndicesInsideMatrixBounds<T>(T[,] matrix, uint row, uint col)
+        => row < matrix.GetLength(0) && col < matrix.GetLength(1);
 }
