@@ -127,6 +127,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Alignment = new(this, nameof(Alignment), Alignments.None);
         AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { CanAnimate = false };
 
+        App.AddElement(this);
+        
         if (Parent is null)
             return;
 
@@ -242,7 +244,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         {
             if (currentParent == parent)
                 return true;
-            
+             
             currentParent = currentParent.Parent;
         }
 

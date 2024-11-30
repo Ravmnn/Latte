@@ -122,9 +122,11 @@ public static class App
 
     public static void Update()
     {
+        ThrowAppNotInitializedExceptionIfNotInitialized();
+        
         Window.ProcessEvents();
         
-        SortElementListByDepth();
+        SortElementListByPriority();
         
         SetRenderView();
         
@@ -179,7 +181,7 @@ public static class App
     }
     
     
-    private static void SortElementListByDepth()
+    private static void SortElementListByPriority()
         => Elements = (from element in Elements
                         orderby element.Priority
                         select element).ToList();
@@ -187,6 +189,8 @@ public static class App
 
     public static void Draw()
     {
+        ThrowAppNotInitializedExceptionIfNotInitialized();
+        
         SetRenderView();
         
         DrawElements();
@@ -238,7 +242,8 @@ public static class App
 
     public static void RemoveElement(Element element)
     {
-        Elements.Remove(element);
+        if (!Elements.Remove(element))
+            return;
 
         for (int i = 0; i < Elements.Count; i++)
         {
@@ -267,11 +272,15 @@ public static class App
         ElementView.Size = newSize;
         ElementView.Center = (Vector2f)newSize / 2f;
     }
+
+
+    private static void ThrowAppNotInitializedExceptionIfNotInitialized()
+    {
+        if (!s_initialized)
+            throw AppNotInitializedException();
+    }
     
     
     private static InvalidOperationException AppNotInitializedException()
         => new("App not initialized.");
-
-    private static InvalidOperationException ElementNotFoundException()
-        => new("Element could not be found in App.");
 }

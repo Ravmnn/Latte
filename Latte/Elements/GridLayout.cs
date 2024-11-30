@@ -51,8 +51,6 @@ public class GridLayout : RectangleElement
     public void AddElement(Element element)
     {
         element.Parent = FindAvailableCell();
-        
-        // TODO: probably all elements should be automatically added to App in construction
     }
 
 

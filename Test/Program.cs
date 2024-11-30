@@ -36,9 +36,6 @@ class Program
             {
                 Alignment = { Value = Alignments.Center }
             });
-
-        App.AddElement(window);
-        App.RemoveElement(layout);
         
         while (App.Window.IsOpen)
         {
