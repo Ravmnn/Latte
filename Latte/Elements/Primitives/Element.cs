@@ -34,6 +34,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         get => _parent;
         set
         {
+            if (_parent == value)
+                return;
+            
             _parent = value;
             OnParentChange();
         }
@@ -57,6 +60,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         get => _visible && ParentVisible;
         set
         {
+            if (_visible == value)
+                return;
+            
             _visible = value;
             OnVisibilityChange();
         }
@@ -72,6 +78,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         get => _priority;
         set
         {
+            if (_priority == value)
+                return;
+            
             _priority = value;
             OnPriorityChange();
         }

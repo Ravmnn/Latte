@@ -141,7 +141,10 @@ public static class App
 
     private static void UpdateElements()
     {
-        foreach (Element element in Elements)
+        // use Elements.ToList() to avoid: InvalidOperationException "Collection was modified".
+        // don't need to use it with DrawElements(), since it SHOULD not modify the element list.
+        
+        foreach (Element element in Elements.ToList())
             if (element.Visible)
                 element.Update();
     }
