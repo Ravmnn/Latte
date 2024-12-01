@@ -125,13 +125,13 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
     public void ProcessDragging()
     {
-        AbsolutePosition += App.WorldMousePositionDelta;
+        AbsolutePosition += App.ElementViewMousePositionDelta;
     }
 
 
     public void ProcessResizing()
     {
-        Vec2f delta = App.WorldMousePositionDelta;
+        Vec2f delta = App.ElementViewMousePositionDelta;
         
         if (CornersToResize.HasFlag(Corners.Top))
             ResizeCorners(top: delta.Y, bottom: -delta.Y);
@@ -181,12 +181,18 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
     protected virtual void OnOpen()
     {
+        if (Visible)
+            return;
+        
         Show();
         OpenEvent?.Invoke(this, EventArgs.Empty);
     }
     
     protected virtual void OnClose()
     {
+        if (!Visible)
+            return;
+        
         Hide();
         CloseEvent?.Invoke(this, EventArgs.Empty);
     }

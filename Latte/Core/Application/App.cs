@@ -33,7 +33,8 @@ public static class App
     private static bool s_initialized;
     
     private static Vec2i s_lastMousePosition;
-    private static Vec2f s_lastWorldMousePosition;
+    private static Vec2f s_lastElementViewMousePosition;
+    private static Vec2f s_lastMainViewMousePosition;
     
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
@@ -42,7 +43,7 @@ public static class App
     
     public static Window Window
     {
-        get => s_window ?? throw AppNotInitializedException();    
+        get => s_window ?? throw AppNotInitializedException();
         private set => s_window = value;
     }
 
@@ -54,16 +55,25 @@ public static class App
     
     public static View ElementView
     {
-        get => s_elementView ?? throw AppNotInitializedException();
+        get
+        {
+            if (RenderMode == RenderMode.Unpinned)
+                return MainView;
+            
+            return s_elementView ?? throw AppNotInitializedException();
+        }
+        
         private set => s_elementView = value;
     }
-    
+
     public static RenderMode RenderMode { get; set; }
     
     public static Vec2i MousePosition { get; private set; }
     public static Vec2i MousePositionDelta => MousePosition - s_lastMousePosition;
-    public static Vec2f WorldMousePosition { get; private set; }
-    public static Vec2f WorldMousePositionDelta => WorldMousePosition - s_lastWorldMousePosition;
+    public static Vec2f ElementViewMousePosition { get; private set; }
+    public static Vec2f MainViewMousePosition { get; private set; }
+    public static Vec2f ElementViewMousePositionDelta => ElementViewMousePosition - s_lastElementViewMousePosition;
+    public static Vec2f MainViewMousePositionDelta => MainViewMousePosition - s_lastMainViewMousePosition;
     
     public static TimeSpan DeltaTime { get; private set; }
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
@@ -77,12 +87,14 @@ public static class App
     static App()
     {
         s_lastMousePosition = new();
-        s_lastWorldMousePosition = new();
+        s_lastElementViewMousePosition = new();
+        s_lastMainViewMousePosition = new();
         
         RenderMode = RenderMode.Pinned;
         
         MousePosition = new();
-        WorldMousePosition = new();
+        ElementViewMousePosition = new();
+        MainViewMousePosition = new();
         
         s_deltaTimeStopwatch = new();
 
@@ -91,10 +103,14 @@ public static class App
         DeltaTime = TimeSpan.Zero;
         
         Elements = [];
+        
+        // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
+        // this should be ALWAYS initialized before the window
+        _ = new GameWindow(new(), new() { StartVisible = false });
     }
-    
 
-    public static void Init(VideoMode mode, string title, Font defaultFont, Styles styles = Styles.Default, ContextSettings settings = new())
+
+    public static void Init(Font defaultFont)
     {
         if (s_initialized)
         {
@@ -102,21 +118,28 @@ public static class App
             return;
         }
         
-        // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
-        // this should be ALWAYS initialized before the window
-        _ = new GameWindow(new(), new() { StartVisible = false });
-        
-        Window = new(mode, title, styles, settings);
-        Window.Resized += (_, args) => OnWindowResize(new(args.Width, args.Height));
-
-        MainView = new(Window.GetView());
-        ElementView = new(MainView);
-        
         TextElement.DefaultTextFont = defaultFont;
         
         s_deltaTimeStopwatch.Start();
 
         s_initialized = true;
+    }
+
+
+    public static void Init(VideoMode mode, string title, Font defaultFont, Styles style = Styles.Default, ContextSettings settings = new())
+    {
+        Init(defaultFont);
+        InitWindow(new(mode, title, style, settings));
+    }
+    
+
+    public static void InitWindow(Window window)
+    {
+        Window = window;
+        Window.Resized += (_, args) => OnWindowResize(new(args.Width, args.Height));
+
+        MainView = new(Window.GetView());
+        ElementView = new(MainView);
     }
     
 
@@ -124,19 +147,20 @@ public static class App
     {
         ThrowAppNotInitializedExceptionIfNotInitialized();
         
-        Window.ProcessEvents();
+        Window.Update();
         
         SortElementListByPriority();
         
-        SetRenderView();
+        UpdateMousePositionProperties();
+        
+        SetElementRenderView();
         
         UpdateDeltaTime();
-        UpdateMousePositionProperties();
         
         UpdateElementsMouseInputCatch();
         UpdateElements();
         
-        UnsetRenderView();
+        UnsetElementRenderView();
     }
 
     private static void UpdateElements()
@@ -158,7 +182,7 @@ public static class App
             Element element = Elements[i];
             IClickable? clickable = element as IClickable;
             
-            bool isMouseOver = clickable?.IsPointOver(WorldMousePosition) ?? element.IsPointOverBounds(WorldMousePosition);
+            bool isMouseOver = clickable?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
 
             if (clickable is not null)
                 clickable.MouseState.IsMouseInputCaught = !_mouseInputWasCaught && isMouseOver;
@@ -171,10 +195,12 @@ public static class App
     private static void UpdateMousePositionProperties()
     {
         s_lastMousePosition = MousePosition;
-        s_lastWorldMousePosition = WorldMousePosition;
+        s_lastElementViewMousePosition = ElementViewMousePosition;
+        s_lastMainViewMousePosition = MainViewMousePosition;
 
         MousePosition = Window.MousePosition;
-        WorldMousePosition = Window.WorldMousePosition;
+        ElementViewMousePosition = Window.MapPixelToCoords(MousePosition, ElementView);
+        MainViewMousePosition = Window.MapPixelToCoords(MousePosition, MainView);
     }
 
     private static void UpdateDeltaTime()
@@ -194,11 +220,13 @@ public static class App
     {
         ThrowAppNotInitializedExceptionIfNotInitialized();
         
-        SetRenderView();
+        Window.Draw();
+        
+        SetElementRenderView();
         
         DrawElements();
         
-        UnsetRenderView();
+        UnsetElementRenderView();
     }
 
     private static void DrawElements()
@@ -209,10 +237,10 @@ public static class App
     }
     
     
-    private static void SetRenderView()
-        => Window.SetView(RenderMode == RenderMode.Pinned ? ElementView : MainView);
+    private static void SetElementRenderView()
+        => Window.SetView(ElementView);
     
-    private static void UnsetRenderView()
+    private static void UnsetElementRenderView()
         => Window.SetView(MainView);
 
 

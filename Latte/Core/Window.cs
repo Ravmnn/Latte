@@ -16,10 +16,10 @@ namespace Latte.Core;
 // TODO: add layouts (horizontal, vertical, grid...)
 
 
-public class Window : RenderWindow
+public class Window : RenderWindow, IUpdateable, IDrawable
 {
     public Vec2i MousePosition => Mouse.GetPosition(this);
-    public Vec2f WorldMousePosition => MapPixelToCoords(MousePosition);
+    public Vec2f ViewMousePosition => MapPixelToCoords(MousePosition);
     
     public IntRect WindowRect => new(new(0, 0), (Vector2i)Size);
 
@@ -32,9 +32,17 @@ public class Window : RenderWindow
     }
 
 
-    public void ProcessEvents()
+    public virtual void Update()
     {
         DispatchEvents();
+    }
+
+
+    public void Draw() => Draw(this);
+
+    public virtual void Draw(RenderTarget target)
+    {
+        
     }
 
 

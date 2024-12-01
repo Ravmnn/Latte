@@ -45,7 +45,7 @@ public interface IDefaultResizable : IResizable
         if (Resizing)
             return;
         
-        Vec2f point = App.Window.WorldMousePosition;
+        Vec2f point = App.Window.ViewMousePosition;
         
         FloatRect left = Rect with { Width = CornerResizeAreaSize };
         FloatRect right = Rect with { Left = Rect.Left + Rect.Width - CornerResizeAreaSize, Width = CornerResizeAreaSize };

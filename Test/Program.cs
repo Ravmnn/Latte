@@ -25,7 +25,7 @@ class Program
         {
             AntialiasingLevel = 16
         });
-
+        
         WindowElement window = new("Test Window", new(), new(600, 600))
         {
             BorderSize = { Value = 2f },
