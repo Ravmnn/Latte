@@ -11,7 +11,7 @@ namespace Latte.Elements;
 
 public class GridLayoutCell : RectangleElement
 {
-    public GridLayoutCell(GridLayout parent, Vec2f position, Vec2f size) : base(parent, position, size)
+    public GridLayoutCell(GridLayoutElement parent, Vec2f position, Vec2f size) : base(parent, position, size)
     {
         Color.Value = SFML.Graphics.Color.Transparent;
     }
@@ -26,7 +26,7 @@ public enum GridLayoutGrowDirection
 
 
 [CanOnlyHaveChildOfType(typeof(GridLayoutCell))]
-public class GridLayout : RectangleElement
+public class GridLayoutElement : RectangleElement
 {
     private uint _rows;
     private uint _columns;
@@ -93,7 +93,7 @@ public class GridLayout : RectangleElement
     public bool RecreationRequired { get; set; }
     
 
-    public GridLayout(Element? parent, Vec2f position, uint rows, uint columns, float cellWidth, float cellHeight)
+    public GridLayoutElement(Element? parent, Vec2f position, uint rows, uint columns, float cellWidth, float cellHeight)
         : base(parent, position, new())
     {
         _rows = rows;

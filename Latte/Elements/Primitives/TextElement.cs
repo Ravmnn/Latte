@@ -6,12 +6,18 @@ using Latte.Core;
 using Latte.Core.Type;
 
 
+using Math = System.Math;
+
+
 namespace Latte.Elements.Primitives;
 
 
 public class TextElement : Element
 {
     private static Font? s_defaultFont;
+
+
+    private float _lastFitTargetWidth;
     
     
     public static Font DefaultTextFont
@@ -59,6 +65,26 @@ public class TextElement : Element
         RelativePosition.Set(position);
     }
     
+    
+    protected override void UpdateSfmlProperties()
+    {
+        base.UpdateSfmlProperties();
+
+        // round to avoid blurry text
+        Transformable.Position = new(MathF.Round(AbsolutePosition.X), MathF.Round(AbsolutePosition.Y));
+        Transformable.Origin = new(MathF.Round(Origin.Value.X), MathF.Round(Origin.Value.Y));
+
+        SfmlText.DisplayedString = Text;
+        SfmlText.Style = Style.Value;
+        
+        SfmlText.CharacterSize = Size.Value;
+        SfmlText.LetterSpacing = LetterSpacing.Value;
+        SfmlText.LineSpacing = LineSpacing.Value;
+        
+        SfmlText.FillColor = Color.Value;
+        SfmlText.OutlineColor = BorderColor.Value;
+    }
+    
 
     public override void Draw(RenderTarget target)
     {
@@ -91,22 +117,25 @@ public class TextElement : Element
     }
 
 
-    protected override void UpdateSfmlProperties()
+    public override void ApplySizePolicy()
     {
-        base.UpdateSfmlProperties();
-
-        // round to avoid blurry text
-        Transformable.Position = new(MathF.Round(AbsolutePosition.X), MathF.Round(AbsolutePosition.Y));
-        Transformable.Origin = new(MathF.Round(Origin.Value.X), MathF.Round(Origin.Value.Y));
-
-        SfmlText.DisplayedString = Text;
-        SfmlText.Style = Style.Value;
+        FloatRect rect = GetSizePolicyRect();
         
-        SfmlText.CharacterSize = Size.Value;
-        SfmlText.LetterSpacing = LetterSpacing.Value;
-        SfmlText.LineSpacing = LineSpacing.Value;
+        if (Text.Value.Length == 0 || Math.Abs(_lastFitTargetWidth - rect.Width) < 0.1f)
+            return;
         
-        SfmlText.FillColor = Color.Value;
-        SfmlText.OutlineColor = BorderColor.Value;
+        uint usize = (uint)Math.Floor(Size.Value * rect.Size.X / GetBounds().Width);
+        
+        // ignore Y axis
+        AbsolutePosition.X = rect.Position.X;
+        Size.Set(usize);
+        
+        _lastFitTargetWidth = rect.Width;
+        
+        // currentCharacterSize = currentWidth
+        // targetCharacterSize  = targetWidth
+        
+        // targetCharacterSize * currentWidth = currentCharacterSize * targetWidth
+        // targetCharacterSize = (currentCharacterSize * targetWidth) / currentWidth
     }
 }

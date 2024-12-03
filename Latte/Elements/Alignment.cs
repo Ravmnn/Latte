@@ -5,7 +5,7 @@ using SFML.Graphics;
 using Latte.Core.Type;
 
 
-namespace Latte.Core;
+namespace Latte.Elements;
 
 
 [Flags]
@@ -40,7 +40,7 @@ public static class AlignmentCalculator
 {
     public static Vec2f GetAlignedPositionOfChild(FloatRect child, FloatRect parent, Alignments alignment)
     {
-        Vec2f position = new();
+        Vec2f position = child.Position;
 
         if (alignment.HasFlag(Alignments.Top))
             position.Y = parent.Top;

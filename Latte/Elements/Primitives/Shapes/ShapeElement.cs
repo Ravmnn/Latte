@@ -30,6 +30,16 @@ public abstract class ShapeElement : Element
     }
     
 
+    protected override void UpdateSfmlProperties()
+    {
+        base.UpdateSfmlProperties();
+
+        SfmlShape.OutlineThickness = BorderSize.Value;
+        SfmlShape.FillColor = Color.Value;
+        SfmlShape.OutlineColor = BorderColor.Value;
+    }
+    
+    
     public override void Draw(RenderTarget target)
     {
         if (!IsInsideClipArea())
@@ -43,30 +53,18 @@ public abstract class ShapeElement : Element
     }
 
 
-    public override IntRect GetThisClipArea()
-    {
-        // ignore border when clipping elements
-        
-        FloatRect bounds = GetBounds();
-        bounds.Top += BorderSize.Value;
-        bounds.Left += BorderSize.Value;
-        bounds.Width -= BorderSize.Value * 2;
-        bounds.Height -= BorderSize.Value * 2;
+    public override IntRect GetThisClipArea() =>
+        GetBorderLessBounds().ToWindowCoordinates(); // ignore border when clipping elements
 
-        return bounds.ToWindowCoordinates();
-    }
-    
-    
+
     public override FloatRect GetBounds()
         => SfmlShape.GetGlobalBounds();
 
-
-    protected override void UpdateSfmlProperties()
-    {
-        base.UpdateSfmlProperties();
-
-        SfmlShape.OutlineThickness = BorderSize.Value;
-        SfmlShape.FillColor = Color.Value;
-        SfmlShape.OutlineColor = BorderColor.Value;
-    }
+    public FloatRect GetBorderLessBounds()
+        => GetBounds().ShrinkRect(BorderSize.Value);
+    
+    
+    // using bounds with borders causes a bug
+    public override FloatRect GetSizePolicyRect(SizePolicyType policyType)
+        => SizePolicyCalculator.GetRectOfChild(GetBorderLessBounds(), GetParentBounds(), policyType);
 }

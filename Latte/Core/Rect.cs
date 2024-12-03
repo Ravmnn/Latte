@@ -26,8 +26,34 @@ public enum Corners
 }
 
 
+public record struct FloatRectVertices(Vec2f TopLeft, Vec2f TopRight, Vec2f BottomLeft, Vec2f BottomRight)
+{
+    public FloatRectVertices(FloatRect rect) : this(
+        rect.Position, 
+        new(rect.Left + rect.Width, rect.Top),
+        new(rect.Left, rect.Top + rect.Height), 
+        rect.Position + rect.Size
+    ) {}
+    
+    
+    public FloatRectVertices() : this(new())
+    {}
+    
+    
+    public static implicit operator FloatRect(FloatRectVertices vertices) => vertices.VerticesToRect();
+    public static implicit operator FloatRectVertices(FloatRect rect) => rect.RectToVertices();
+}
+
+
 public static class RectExtensions
 {
+    public static FloatRect VerticesToRect(this FloatRectVertices vertices)
+        => new(vertices.TopLeft, vertices.BottomRight - vertices.TopLeft);
+
+    public static FloatRectVertices RectToVertices(this FloatRect rect)
+        => new(rect);
+    
+    
     public static IntRect ToWindowCoordinates(this FloatRect rect)
     {
         Vec2i transformedPosition = App.Window.MapCoordsToPixel(rect.Position);
@@ -43,5 +69,16 @@ public static class RectExtensions
         Vec2f transformedSize = App.Window.MapPixelToCoords(rect.Position + rect.Size) - transformedPosition;
         
         return new(transformedPosition, transformedSize);
+    }
+    
+    
+    public static FloatRect ShrinkRect(this FloatRect rect, float amount)
+    {
+        rect.Top += amount;
+        rect.Left += amount;
+        rect.Width -= amount * 2;
+        rect.Height -= amount * 2;
+
+        return rect;
     }
 }

@@ -1,3 +1,5 @@
+using SFML.Graphics;
+
 using Latte.Sfml;
 using Latte.Core.Type;
 
@@ -33,5 +35,13 @@ public class RectangleElement : ShapeElement
         
         SfmlShape.Size = Size.Value;
         SfmlShape.Radius = Radius.Value;
+    }
+    
+
+    public override void ApplySizePolicy()
+    {
+        FloatRect rect = GetSizePolicyRect();
+        AbsolutePosition = rect.Position;
+        Size.Set(rect.Size);
     }
 }

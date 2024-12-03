@@ -241,8 +241,12 @@ public static class App
     private static void DrawElements()
     {
         foreach (Element element in s_elements)
+        {
             if (element.Initialized && element.Visible)
                 element.Draw(Window);
+
+            element.DrawDebug(Window);
+        }
     }
     
     

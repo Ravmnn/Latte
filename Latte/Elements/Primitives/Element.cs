@@ -9,6 +9,9 @@ using Latte.Core.Type;
 using Latte.Core.Application;
 
 
+using Color = SFML.Graphics.Color;
+
+
 namespace Latte.Elements.Primitives;
 
 
@@ -18,7 +21,7 @@ public class ElementEventArgs(Element? element) : EventArgs
 }
 
 
-public abstract class Element : IUpdateable, IDrawable, IAlignable
+public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePoliciable
 {
     private Element? _parent;
 
@@ -69,7 +72,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public event EventHandler? VisibilityChangeEvent;
     
     public bool Initialized { get; private set; }
-    
+
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
 
@@ -105,8 +108,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public AnimatableProperty<Vec2f> Scale { get; }
     
-    public Property<Alignments> Alignment { get; set; }
+    public Property<Alignments> Alignment { get; }
     public AnimatableProperty<Vec2f> AlignmentMargin { get; }
+    
+    public Property<SizePolicyType> SizePolicy { get; }
 
     public event EventHandler? SetupEvent; 
     public event EventHandler? UpdateEvent;
@@ -134,6 +139,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         Alignment = new(this, nameof(Alignment), Alignments.None);
         AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { CanAnimate = false };
 
+        SizePolicy = new(this, nameof(SizePolicy), SizePolicyType.None);
+        
         App.AddElement(this);
         
         if (Parent is null)
@@ -147,6 +154,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     {
         Animator.DefaultProperties = ToKeyframe();
 
+        UpdateSfmlProperties();
+        
         Initialized = true;
         
         SetupEvent?.Invoke(this, EventArgs.Empty);
@@ -162,7 +171,11 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         if (!Initialized)
             Setup();
         
-        AlignElement();
+        if (SizePolicy.Value != SizePolicyType.None)
+            ApplySizePolicy();
+        
+        if (Alignment.Value != Alignments.None)
+            ApplyAlignment();
         
         UpdatePropertyAnimations();
         UpdateSfmlProperties();
@@ -171,13 +184,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
-
-    private void AlignElement()
-    {
-        if (Parent is not GridLayout && Alignment != Alignments.None)
-            AbsolutePosition = GetAlignmentPosition(Alignment.Value) + AlignmentMargin;
-    }
-
+    
     private void UpdatePropertyAnimations()
     {
         foreach (Property property in Properties)
@@ -200,13 +207,16 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     
     public virtual void Draw(RenderTarget target)
     {
+        DrawEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+    public virtual void DrawDebug(RenderTarget target)
+    {
         if (ShouldDrawElementBoundaries)
             Debug.DrawLineRect(target, GetBounds(), Color.Red);
         
         if (ShouldDrawClipArea)
             Debug.DrawLineRect(target, (FloatRect)GetClipArea(), Color.Magenta);
-        
-        DrawEvent?.Invoke(this, EventArgs.Empty);
     }
 
     protected virtual void BeginDraw() => ClipArea.BeginClip(GetFinalClipArea());
@@ -234,6 +244,19 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     public virtual Vec2f GetAlignmentPosition(Alignments alignment)
         => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), GetParentBounds(), alignment);
+
+    public Vec2f GetAlignmentPosition() => GetAlignmentPosition(Alignment);
+
+    public virtual FloatRect GetSizePolicyRect(SizePolicyType policyType)
+        => SizePolicyCalculator.GetRectOfChild(GetBounds(), GetParentBounds(), policyType);
+    
+    public FloatRect GetSizePolicyRect() => GetSizePolicyRect(SizePolicy);
+    
+    
+    public virtual void ApplyAlignment()
+        => AbsolutePosition = GetAlignmentPosition(Alignment) + AlignmentMargin;
+
+    public abstract void ApplySizePolicy();
     
     
     public virtual void Show() => Visible = true;

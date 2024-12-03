@@ -16,8 +16,8 @@ public class ProgressBarElement : Element
     
     public override Transformable Transformable => Foreground.Transformable;
 
-    public RectangleElement Foreground { get; }
-    public RectangleElement Background { get; }
+    protected RectangleElement Foreground { get; }
+    protected RectangleElement Background { get; }
     
     public AnimatableProperty<Float> Progress { get; }
 
@@ -76,4 +76,8 @@ public class ProgressBarElement : Element
 
     public override FloatRect GetBounds()
         => Background.GetBounds(); // only foreground change its size; use background then
+
+
+    public override void ApplySizePolicy()
+        => Background.ApplySizePolicy();
 }
