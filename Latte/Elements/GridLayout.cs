@@ -30,8 +30,8 @@ public class GridLayout : RectangleElement
 {
     private uint _rows;
     private uint _columns;
-    private float _rowSpacing;
-    private float _columnSpacing;
+    private float _cellHeight;
+    private float _cellWidth;
 
     
     public GridLayoutCell?[,] Cells { get; private set; }
@@ -64,23 +64,25 @@ public class GridLayout : RectangleElement
     
     public uint? MaxRows { get; set; }
     public uint? MaxColumns { get; set; }
-
-    public float RowSpacing
+    
+    // TODO: use Vec2f for size
+    
+    public float CellWidth
     {
-        get => _rowSpacing;
+        get => _cellWidth;
         set
         {
-            _rowSpacing = value;
+            _cellWidth = value;
             RecreationRequired = true;
         }
     }
-
-    public float ColumnSpacing
+    
+    public float CellHeight
     {
-        get => _columnSpacing;
+        get => _cellHeight;
         set
         {
-            _columnSpacing = value;
+            _cellHeight = value;
             RecreationRequired = true;
         }
     }
@@ -91,14 +93,14 @@ public class GridLayout : RectangleElement
     public bool RecreationRequired { get; set; }
     
 
-    public GridLayout(Element? parent, Vec2f position, uint rows, uint columns, float rowSpacing, float columnSpacing)
+    public GridLayout(Element? parent, Vec2f position, uint rows, uint columns, float cellWidth, float cellHeight)
         : base(parent, position, new())
     {
         _rows = rows;
         _columns = columns;
         
-        _rowSpacing = rowSpacing;
-        _columnSpacing = columnSpacing;
+        _cellWidth = cellWidth;
+        _cellHeight = cellHeight;
 
         GrowDirection = GridLayoutGrowDirection.Horizontally;
         
@@ -170,7 +172,7 @@ public class GridLayout : RectangleElement
             oldCellChildren.ForEach(child => child.Parent = Cells[row, col]);
         }
 
-        Size.Value = new(Columns * ColumnSpacing, Rows * RowSpacing);
+        Size.Value = new(Columns * CellWidth, Rows * CellHeight);
         
         RecreationRequired = false;
     }
@@ -194,8 +196,8 @@ public class GridLayout : RectangleElement
         if (Cells[row, col] is null)
             return;
         
-        Cells[row, col]!.RelativePosition.Value = new(col * ColumnSpacing, row * RowSpacing);
-        Cells[row, col]!.Size.Value = new(ColumnSpacing, RowSpacing);
+        Cells[row, col]!.RelativePosition.Value = new(col * CellWidth, row * CellHeight);
+        Cells[row, col]!.Size.Value = new(CellWidth, CellHeight);
     }
 
 

@@ -260,8 +260,13 @@ public static class App
 
     private static void AddSingleElement(Element element)
     {
-        if (!HasElement(element))
-            Elements.Add(element);
+        if (HasElement(element))
+            return;
+
+        if (Elements.Count > 0)
+            element.Priority = Elements.Last().Priority + 1;
+        
+        Elements.Add(element);
     }
     
     private static void AddSingleElements(IEnumerable<Element> elements)

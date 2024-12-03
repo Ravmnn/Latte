@@ -10,10 +10,10 @@ using Latte.Core.Type;
 namespace Latte.Core;
 
 
+// TODO: add AreaElement (like tabs)
 // TODO: add scrollable areas
 // TODO: add checkbox
 // TODO: add text inputs
-// TODO: add layouts (horizontal, vertical, grid...)
 
 
 public class Window : RenderWindow, IUpdateable, IDrawable

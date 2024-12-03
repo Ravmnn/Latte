@@ -15,6 +15,8 @@ namespace Latte.Elements;
 [Flags]
 public enum WindowElementStyles
 {
+    None = 0,
+    
     Closeable = 1 << 0,
     Resizable = 1 << 1,
     Moveable = 1 << 2,

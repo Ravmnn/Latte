@@ -24,6 +24,8 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     public Keyframe Hover { get; set; }
     public Keyframe Down { get; set; }
     
+    protected bool UseDefaultAnimation { get; set; }
+    
     
     public ButtonElement(Element? parent, Vec2f position, Vec2f size, string text) : base(parent, position, size)
     {
@@ -41,12 +43,15 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         Normal = new();
         Hover = new();
         Down = new();
+
+        UseDefaultAnimation = true;
     }
 
 
     protected override void Setup()
     {
-        SetDefaultKeyframeAnimation();
+        if (UseDefaultAnimation)
+            SetDefaultKeyframeAnimation();
         
         base.Setup();
     }

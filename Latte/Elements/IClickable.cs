@@ -76,7 +76,7 @@ public interface IDefaultClickable : IClickable
         if (MouseState.IsTruePressed && !MouseState.WasTruePressed)
             OnMouseDown();
         
-        else if (!MouseState.IsTruePressed && MouseState.WasTruePressed)
+        else if (!MouseState.IsTruePressed && MouseState.WasTruePressed && !MouseState.IsMouseDown)
             OnMouseUp();
         
         if (entered)
