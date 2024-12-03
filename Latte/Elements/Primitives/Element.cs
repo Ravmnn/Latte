@@ -21,8 +21,6 @@ public class ElementEventArgs(Element? element) : EventArgs
 public abstract class Element : IUpdateable, IDrawable, IAlignable
 {
     private Element? _parent;
-    
-    private bool _initialized;
 
     private bool _visible;
 
@@ -70,6 +68,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     public event EventHandler? VisibilityChangeEvent;
     
+    public bool Initialized { get; private set; }
+    
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
 
@@ -115,8 +115,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
 
     protected Element(Element? parent)
     {
-        _initialized = false;
-        
         Parent = parent;
         Children = [];
 
@@ -149,7 +147,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     {
         Animator.DefaultProperties = ToKeyframe();
 
-        _initialized = true;
+        Initialized = true;
         
         SetupEvent?.Invoke(this, EventArgs.Empty);
     }
@@ -161,7 +159,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
         
         RemoveNonChildren();
         
-        if (!_initialized)
+        if (!Initialized)
             Setup();
         
         AlignElement();
@@ -264,8 +262,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable
     public void Raise() => Priority++;
     public void Lower() => Priority--;
 
-    public void FullRaise() => Priority = App.Elements.Last().Priority + 1;
-    public void FullLower() => Priority = App.Elements.First().Priority - 1;
+    public void FullRaise() => Priority = App.GetElements().Last().Priority + 1;
+    public void FullLower() => Priority = App.GetElements().First().Priority - 1;
 
 
     private void AddParentPriorityDeltaToThis()

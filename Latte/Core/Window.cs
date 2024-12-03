@@ -10,6 +10,9 @@ using Latte.Core.Type;
 namespace Latte.Core;
 
 
+// TODO: automatically element size to fit parent (user can disable/enable)
+
+// TODO: add ImageElement
 // TODO: add AreaElement (like tabs)
 // TODO: add scrollable areas
 // TODO: add checkbox

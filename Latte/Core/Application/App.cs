@@ -38,7 +38,10 @@ public static class App
     
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
-    private static bool _mouseInputWasCaught;
+    private static bool s_mouseInputWasCaught;
+    
+    // Elements are ordered based on their priority
+    private static List<Element> s_elements;
     
     
     public static Window Window
@@ -78,17 +81,25 @@ public static class App
     public static TimeSpan DeltaTime { get; private set; }
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
     public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
-    
-    
-    // Elements are ordered based on their priority
-    public static List<Element> Elements { get; private set; }
+
+    public static event EventHandler? ElementAddedEvent;
+    public static event EventHandler? ElementRemovedEvent;
+    public static event EventHandler? ElementListModifiedEvent;
     
 
     static App()
     {
+        s_initialized = false;
+        
         s_lastMousePosition = new();
         s_lastElementViewMousePosition = new();
         s_lastMainViewMousePosition = new();
+        
+        s_deltaTimeStopwatch = new();
+        
+        s_mouseInputWasCaught = false;
+        
+        s_elements = [];
         
         RenderMode = RenderMode.Pinned;
         
@@ -96,13 +107,10 @@ public static class App
         ElementViewMousePosition = new();
         MainViewMousePosition = new();
         
-        s_deltaTimeStopwatch = new();
-
-        _mouseInputWasCaught = false;
-        
         DeltaTime = TimeSpan.Zero;
         
-        Elements = [];
+        ElementAddedEvent += (_, _) => ElementListModifiedEvent?.Invoke(null, EventArgs.Empty);
+        ElementRemovedEvent += (_, _) => ElementListModifiedEvent?.Invoke(null, EventArgs.Empty);
         
         // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
         // this should be ALWAYS initialized before the window
@@ -165,30 +173,31 @@ public static class App
 
     private static void UpdateElements()
     {
-        // use Elements.ToList() to avoid: InvalidOperationException "Collection was modified".
-        // don't need to use it with DrawElements(), since it SHOULD not modify the element list.
-        
-        foreach (Element element in Elements.ToList())
+        // use ToList() to avoid: InvalidOperationException "Collection was modified".
+        // don't need to use it with DrawElements(), since it SHOULD not modify the element list
+        // and SHOULD be used only for drawing stuff
+
+        foreach (Element element in s_elements.ToList())
             if (element.Visible)
                 element.Update();
     }
 
     private static void UpdateElementsMouseInputCatch()
     {
-        _mouseInputWasCaught = false;
+        s_mouseInputWasCaught = false;
         
-        for (int i = Elements.Count - 1; i >= 0; i--)
+        for (int i = s_elements.Count - 1; i >= 0; i--)
         {
-            Element element = Elements[i];
+            Element element = s_elements[i];
             IClickable? clickable = element as IClickable;
             
             bool isMouseOver = clickable?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
 
             if (clickable is not null)
-                clickable.MouseState.IsMouseInputCaught = !_mouseInputWasCaught && isMouseOver;
+                clickable.MouseState.IsMouseInputCaught = !s_mouseInputWasCaught && isMouseOver;
 
-            if (element.Visible && element.BlocksMouseInput && isMouseOver && !_mouseInputWasCaught)
-                _mouseInputWasCaught = true;
+            if (element.Visible && element.BlocksMouseInput && isMouseOver && !s_mouseInputWasCaught)
+                s_mouseInputWasCaught = true;
         }
     }
 
@@ -211,7 +220,7 @@ public static class App
     
     
     private static void SortElementListByPriority()
-        => Elements = (from element in Elements
+        => s_elements = (from element in s_elements
                         orderby element.Priority
                         select element).ToList();
 
@@ -231,8 +240,8 @@ public static class App
 
     private static void DrawElements()
     {
-        foreach (Element element in Elements)
-            if (element.Visible)
+        foreach (Element element in s_elements)
+            if (element.Initialized && element.Visible)
                 element.Draw(Window);
     }
     
@@ -242,6 +251,9 @@ public static class App
     
     private static void UnsetElementRenderView()
         => Window.SetView(MainView);
+    
+    
+    public static Element[] GetElements() => s_elements.ToArray();
 
 
     public static void AddElement(Element element)
@@ -263,10 +275,12 @@ public static class App
         if (HasElement(element))
             return;
 
-        if (Elements.Count > 0)
-            element.Priority = Elements.Last().Priority + 1;
+        if (s_elements.Count > 0)
+            element.Priority = s_elements.Last().Priority + 1;
         
-        Elements.Add(element);
+        s_elements.Add(element);
+        
+        ElementAddedEvent?.Invoke(null, EventArgs.Empty);
     }
     
     private static void AddSingleElements(IEnumerable<Element> elements)
@@ -276,29 +290,44 @@ public static class App
     }
 
 
-    public static void RemoveElement(Element element)
+    public static bool RemoveElement(Element element)
     {
-        if (!Elements.Remove(element))
-            return;
+        if (!RemoveSingleElement(element))
+            return false;
 
-        for (int i = 0; i < Elements.Count; i++)
+        RemoveElementsChildrenOf(element);
+        return true;
+    }
+
+    private static void RemoveElementsChildrenOf(Element parent)
+    {
+        for (int i = 0; i < s_elements.Count; i++)
         {
-            Element el = Elements[i];
+            Element element = s_elements[i];
 
-            if (!el.IsChildOf(element))
+            if (!element.IsChildOf(parent))
                 continue;
             
-            Elements.Remove(el);
+            RemoveSingleElement(element);
             i--;
         }
     }
 
+    private static bool RemoveSingleElement(Element element)
+    {
+        bool result = s_elements.Remove(element);
+
+        ElementRemovedEvent?.Invoke(null, EventArgs.Empty);
+        
+        return result;
+    }
+
 
     public static bool HasElement(Element element)
-        => Elements.Contains(element); 
+        => s_elements.Contains(element); 
 
 
-    public static bool IsMouseOverAnyElement() => _mouseInputWasCaught;
+    public static bool IsMouseOverAnyElement() => s_mouseInputWasCaught;
 
     
     private static void OnWindowResize(Vec2u newSize)
