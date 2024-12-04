@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 using SFML.System;
 using SFML.Window;
@@ -29,7 +27,7 @@ public static class App
     private static Window? s_window;
     private static View? s_mainView;
     private static View? s_elementView;
-    
+
     private static bool s_initialized;
     
     private static Vec2i s_lastMousePosition;
@@ -39,9 +37,6 @@ public static class App
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
     private static bool s_mouseInputWasCaught;
-    
-    // Elements are ordered based on their priority
-    private static List<Element> s_elements;
     
     
     public static Window Window
@@ -71,6 +66,9 @@ public static class App
 
     public static RenderMode RenderMode { get; set; }
     
+    public static Section Section { get; set; }
+    public static Element[] Elements => Section.Elements;
+    
     public static Vec2i MousePosition { get; private set; }
     public static Vec2i MousePositionDelta => MousePosition - s_lastMousePosition;
     public static Vec2f ElementViewMousePosition { get; private set; }
@@ -81,12 +79,6 @@ public static class App
     public static TimeSpan DeltaTime { get; private set; }
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
     public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
-
-    public static Element[] Elements => s_elements.ToArray();
-    
-    public static event EventHandler? ElementAddedEvent;
-    public static event EventHandler? ElementRemovedEvent;
-    public static event EventHandler? ElementListModifiedEvent;
     
 
     static App()
@@ -101,9 +93,9 @@ public static class App
         
         s_mouseInputWasCaught = false;
         
-        s_elements = [];
-        
         RenderMode = RenderMode.Pinned;
+
+        Section = new();
         
         MousePosition = new();
         ElementViewMousePosition = new();
@@ -111,11 +103,8 @@ public static class App
         
         DeltaTime = TimeSpan.Zero;
         
-        ElementAddedEvent += (_, _) => ElementListModifiedEvent?.Invoke(null, EventArgs.Empty);
-        ElementRemovedEvent += (_, _) => ElementListModifiedEvent?.Invoke(null, EventArgs.Empty);
-        
         // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
-        // this should be ALWAYS initialized before the window
+        // this must be ALWAYS initialized before the rendering window
         _ = new GameWindow(new(), new() { StartVisible = false });
     }
 
@@ -142,6 +131,8 @@ public static class App
         InitWindow(new(mode, title, style, settings));
     }
     
+    // TODO: add void Init(Window window, Font defaultFont) which call Init(defaultFont) and InitWindow(window)
+    
 
     public static void InitWindow(Window window)
     {
@@ -159,13 +150,10 @@ public static class App
         
         Window.Update();
         
-        SortElementListByPriority();
-        
         UpdateMousePositionProperties();
+        UpdateDeltaTime();
         
         SetElementRenderView();
-        
-        UpdateDeltaTime();
         
         UpdateElementsMouseInputCatch();
         UpdateElements();
@@ -179,7 +167,7 @@ public static class App
         // don't need to use it with DrawElements(), since it SHOULD not modify the element list
         // and SHOULD be used only for drawing stuff
 
-        foreach (Element element in s_elements.ToList())
+        foreach (Element element in Elements)
             if (element.Visible)
                 element.Update();
     }
@@ -188,9 +176,9 @@ public static class App
     {
         s_mouseInputWasCaught = false;
         
-        for (int i = s_elements.Count - 1; i >= 0; i--)
+        for (int i = Elements.Length - 1; i >= 0; i--)
         {
-            Element element = s_elements[i];
+            Element element = Elements[i];
             IClickable? clickable = element as IClickable;
             
             bool isMouseOver = clickable?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
@@ -219,12 +207,6 @@ public static class App
         DeltaTime = s_deltaTimeStopwatch.Elapsed;
         s_deltaTimeStopwatch.Restart();
     }
-    
-    
-    private static void SortElementListByPriority()
-        => s_elements = (from element in s_elements
-                        orderby element.Priority
-                        select element).ToList();
 
 
     public static void Draw()
@@ -242,7 +224,7 @@ public static class App
 
     private static void DrawElements()
     {
-        foreach (Element element in s_elements)
+        foreach (Element element in Elements)
         {
             if (element.CanDraw)
                 element.Draw(Window);
@@ -251,7 +233,6 @@ public static class App
         }
     }
     
-    
     private static void SetElementRenderView()
         => Window.SetView(ElementView);
     
@@ -259,77 +240,11 @@ public static class App
         => Window.SetView(MainView);
 
 
-    public static void AddElement(Element element)
-    {
-        AddSingleElement(element);
-        AddElementsHierarchy(element.Children);
-    }
-
-    private static void AddElementsHierarchy(List<Element> elements)
-    {
-        AddSingleElements(elements);
-        
-        foreach (Element element in elements)
-            AddElementsHierarchy(element.Children);
-    }
-
-    private static void AddSingleElement(Element element)
-    {
-        if (HasElement(element))
-            return;
-
-        if (s_elements.Count > 0)
-            element.Priority = s_elements.Last().Priority + 1;
-        
-        s_elements.Add(element);
-        
-        ElementAddedEvent?.Invoke(null, EventArgs.Empty);
-    }
+    public static void AddElement(Element element) => Section.AddElement(element);
+    public static bool RemoveElement(Element element) => Section.RemoveElement(element);
+    public static bool HasElement(Element element) => Section.HasElement(element);
     
-    private static void AddSingleElements(IEnumerable<Element> elements)
-    {
-        foreach (Element element in elements)
-            AddSingleElement(element);
-    }
-
-
-    public static bool RemoveElement(Element element)
-    {
-        if (!RemoveSingleElement(element))
-            return false;
-
-        RemoveElementsChildrenOf(element);
-        return true;
-    }
-
-    private static void RemoveElementsChildrenOf(Element parent)
-    {
-        for (int i = 0; i < s_elements.Count; i++)
-        {
-            Element element = s_elements[i];
-
-            if (!element.IsChildOf(parent))
-                continue;
-            
-            RemoveSingleElement(element);
-            i--;
-        }
-    }
-
-    private static bool RemoveSingleElement(Element element)
-    {
-        bool result = s_elements.Remove(element);
-
-        ElementRemovedEvent?.Invoke(null, EventArgs.Empty);
-        
-        return result;
-    }
-
-
-    public static bool HasElement(Element element)
-        => s_elements.Contains(element); 
-
-
+    
     public static bool IsMouseOverAnyElement() => s_mouseInputWasCaught;
 
     

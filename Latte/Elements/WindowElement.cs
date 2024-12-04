@@ -246,9 +246,6 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public virtual bool IsPointOver(Vec2f point)
         => IsPointOverClipArea(point) && IsPointOverThis(point);
     
-    protected bool IsPointOverClipArea(Vec2f point)
-        => point.IsPointOverRect(GetFinalClipArea().ToWorldCoordinates());
-    
     protected bool IsPointOverThis(Vec2f point)
         => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius.Value);
 }
