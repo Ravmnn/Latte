@@ -1,12 +1,8 @@
 ﻿using SFML.Window;
-using SFML.Graphics;
 
-using Latte.Core;
 using Latte.Core.Application;
-using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
-using Latte.Elements.Primitives.Shapes;
 
 
 namespace Latte.Test;
@@ -52,12 +48,24 @@ class Program
 
         // addButton.MouseUpEvent += (_, _) => AddButtonToLayout(layoutElement);
 
-        WindowElement rect = new("this is a text", new(), new(600, 400));
-
-
-        _ = new ButtonElement(rect, new(), new(200, 50), "long text yay")
+        WindowElement rect = new("this is a text", new(), new(600, 400))
         {
-            Alignment = { Value = Alignments.Center }
+            Title =
+            {
+                Color = { Value = new(0, 0, 0, 0)}
+            },
+            
+            Color = { Value = new(255, 255, 255) }
+        };
+
+
+        _ = new SpriteElement(rect, "../../../../github-logo.png", new(), new(52, 52))
+        {
+            BlocksMouseInput = false,
+            
+            Alignment = { Value = Alignments.Center },
+            
+            SizePolicy = { Value = SizePolicyType.FitParent }
         };
         
         

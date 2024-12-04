@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 using SFML.Graphics;
@@ -11,6 +12,7 @@ using Latte.Core.Application;
 
 
 using Color = SFML.Graphics.Color;
+using Debug = Latte.Core.Debug;
 
 
 namespace Latte.Elements.Primitives;
@@ -97,7 +99,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     
     public event EventHandler? PriorityChangeEvent;
 
-    public bool BlocksMouseInput { get; protected set; }
+    public bool BlocksMouseInput { get; set; }
     
     public AnimatableProperty<Vec2f> RelativePosition { get; }
     public Vec2f AbsolutePosition

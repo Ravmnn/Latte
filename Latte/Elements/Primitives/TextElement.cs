@@ -2,7 +2,6 @@ using System;
 
 using SFML.Graphics;
 
-using Latte.Core;
 using Latte.Core.Type;
 
 
@@ -49,6 +48,8 @@ public class TextElement : Element
         BlocksMouseInput = false;
         
         SfmlText = new(text, font ?? DefaultTextFont);
+    
+        RelativePosition.Set(position);
         
         Text = new(this, nameof(Text), text);
         Style = new(this, nameof(Style), SFML.Graphics.Text.Styles.Regular);
@@ -61,8 +62,6 @@ public class TextElement : Element
         
         Color = new(this, nameof(Color), SFML.Graphics.Color.White);
         BorderColor = new(this, nameof(BorderColor), SFML.Graphics.Color.Black);
-        
-        RelativePosition.Set(position);
     }
     
     
