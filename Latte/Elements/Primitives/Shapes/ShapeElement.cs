@@ -42,9 +42,6 @@ public abstract class ShapeElement : Element
     
     public override void Draw(RenderTarget target)
     {
-        if (!IsInsideClipArea())
-            return;
-        
         BeginDraw();
         target.Draw(SfmlShape);
         EndDraw();
@@ -66,5 +63,5 @@ public abstract class ShapeElement : Element
     
     // using bounds with borders causes a bug
     public override FloatRect GetSizePolicyRect(SizePolicyType policyType)
-        => SizePolicyCalculator.GetRectOfChild(GetBorderLessBounds(), GetParentBounds(), policyType);
+        => SizePolicyCalculator.CalculateChildRect(GetBorderLessBounds(), GetParentBounds(), policyType);
 }

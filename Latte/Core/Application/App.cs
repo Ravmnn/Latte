@@ -82,6 +82,8 @@ public static class App
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
     public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
 
+    public static Element[] Elements => s_elements.ToArray();
+    
     public static event EventHandler? ElementAddedEvent;
     public static event EventHandler? ElementRemovedEvent;
     public static event EventHandler? ElementListModifiedEvent;
@@ -242,7 +244,7 @@ public static class App
     {
         foreach (Element element in s_elements)
         {
-            if (element.Initialized && element.Visible)
+            if (element.CanDraw)
                 element.Draw(Window);
 
             element.DrawDebug(Window);
@@ -255,9 +257,6 @@ public static class App
     
     private static void UnsetElementRenderView()
         => Window.SetView(MainView);
-    
-    
-    public static Element[] GetElements() => s_elements.ToArray();
 
 
     public static void AddElement(Element element)

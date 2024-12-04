@@ -1,4 +1,3 @@
-
 using System;
 
 using SFML.Graphics;
@@ -26,7 +25,7 @@ public interface ISizePoliciable
 
 public static class SizePolicyCalculator
 {
-    public static FloatRect GetRectOfChild(FloatRect child, FloatRect parent, SizePolicyType policyType)
+    public static FloatRect CalculateChildRect(FloatRect child, FloatRect parent, SizePolicyType policyType)
     {
         FloatRect rect = child;
 

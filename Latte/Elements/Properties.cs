@@ -19,7 +19,7 @@ public abstract class Property
         Name = name;
         Value = value;
         
-        Owner.Properties.Add(this);
+        Owner.AddProperty(this);
     }
     
     

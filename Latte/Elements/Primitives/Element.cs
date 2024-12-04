@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 using SFML.Graphics;
 
@@ -24,7 +25,8 @@ public class ElementEventArgs(Element? element) : EventArgs
 public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePoliciable
 {
     private Element? _parent;
-
+    private List<Property> _properties;
+    
     private bool _visible;
 
     private int _priority;
@@ -43,12 +45,12 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         }
     }
 
-    public event EventHandler<ElementEventArgs>? ParentChangeEvent;
+    public event EventHandler<ElementEventArgs>? ParentChangeEvent; // TODO: rename all events
+    
+    public Property[] Properties => _properties.ToArray();
     
     public List<Element> Children { get; }
     public event EventHandler<ElementEventArgs>? ChildAddedEvent;
-    
-    public List<Property> Properties { get; }
 
     public ElementKeyframeAnimator Animator { get; set; }
     
@@ -75,6 +77,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public bool ShouldDrawElementBoundaries { get; set; }
     public bool ShouldDrawClipArea { get; set; }
+
+    public bool CanDraw => Initialized && Visible && IsInsideClipArea();
 
     public int Priority
     {
@@ -120,10 +124,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     protected Element(Element? parent)
     {
+        _properties = [];
+        
         Parent = parent;
         Children = [];
-
-        Properties = [];
 
         Animator = new(this, 0.07);
 
@@ -248,7 +252,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public Vec2f GetAlignmentPosition() => GetAlignmentPosition(Alignment);
 
     public virtual FloatRect GetSizePolicyRect(SizePolicyType policyType)
-        => SizePolicyCalculator.GetRectOfChild(GetBounds(), GetParentBounds(), policyType);
+        => SizePolicyCalculator.CalculateChildRect(GetBounds(), GetParentBounds(), policyType);
     
     public FloatRect GetSizePolicyRect() => GetSizePolicyRect(SizePolicy);
     
@@ -285,8 +289,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public void Raise() => Priority++;
     public void Lower() => Priority--;
 
-    public void FullRaise() => Priority = App.GetElements().Last().Priority + 1;
-    public void FullLower() => Priority = App.GetElements().First().Priority - 1;
+    public void FullRaise() => Priority = App.Elements.Last().Priority + 1;
+    public void FullLower() => Priority = App.Elements.First().Priority - 1;
 
 
     private void AddParentPriorityDeltaToThis()
@@ -296,6 +300,31 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
         Priority += Parent.Priority - Parent.LastPriority;
     }
+    
+    
+    public void AddProperty(Property property) => _properties.Add(property);
+    public bool RemoveProperty(Property property) => _properties.Remove(property);
+    public bool HasProperty(Property property) => _properties.Contains(property);
+    public Property GetProperty(string name)
+        => _properties.Find(property => property.Name == name)
+            ?? throw new ArgumentException($"Could not find property with name \"{name}\".");
+    
+    public bool TryGetProperty(string name, [MaybeNullWhen(false)] out Property property)
+    {
+        try
+        {
+            property = GetProperty(name);
+            return true;
+        }
+        catch
+        {
+            property = null;
+            return false;
+        }
+    }
+    
+
+    public Property this[string name] => GetProperty(name);
     
     
     public AnimatableProperty[] GetAnimatableProperties()
