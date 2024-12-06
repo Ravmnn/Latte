@@ -146,8 +146,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
         SizePolicy = new(this, nameof(SizePolicy), SizePolicyType.None);
         
-        App.AddElement(this);
-        
         if (Parent is null)
             return;
 

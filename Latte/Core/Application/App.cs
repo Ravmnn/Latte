@@ -153,6 +153,8 @@ public static class App
         
         SetElementRenderView();
         
+        Section.Update();
+        
         UpdateElementsMouseInputCatch();
         UpdateElements();
         
@@ -215,6 +217,7 @@ public static class App
         
         SetElementRenderView();
         
+        Section.Draw(Window);
         DrawElements();
         
         UnsetElementRenderView();
