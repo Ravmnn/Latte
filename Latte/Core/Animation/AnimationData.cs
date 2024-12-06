@@ -56,9 +56,9 @@ public class AnimationData(float[] startValues, float[] endValues, double time, 
     public bool Paused { get; set; }
 
 
-    public event EventHandler<AnimationUpdatedEventArgs>? UpdateEvent;
-    public event EventHandler? FinishEvent;
-    public event EventHandler? AbortEvent;
+    public event EventHandler<AnimationUpdatedEventArgs>? UpdatedEvent;
+    public event EventHandler? FinishedEvent;
+    public event EventHandler? AbortedEvent;
 
     
     /// <summary>
@@ -102,13 +102,13 @@ public class AnimationData(float[] startValues, float[] endValues, double time, 
         if (HasFinished)
             eventArgs.CurrentValues = CurrentValues = EndValues;
 
-        UpdateEvent?.Invoke(this, eventArgs);
+        UpdatedEvent?.Invoke(this, eventArgs);
     }
     
 
     private void OnFinish()
-        => FinishEvent?.Invoke(this, EventArgs.Empty);
+        => FinishedEvent?.Invoke(this, EventArgs.Empty);
     
     private void OnAbort()
-        => AbortEvent?.Invoke(this, EventArgs.Empty);
+        => AbortedEvent?.Invoke(this, EventArgs.Empty);
 }

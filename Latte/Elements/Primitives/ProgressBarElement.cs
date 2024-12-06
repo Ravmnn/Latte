@@ -29,7 +29,7 @@ public class ProgressBarElement : Element
 
     public bool Completed => IsAtMax;
     
-    public event EventHandler? CompleteEvent;
+    public event EventHandler? CompletedEvent;
 
 
     public ProgressBarElement(Element? parent, Vec2f position, Vec2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
@@ -55,7 +55,7 @@ public class ProgressBarElement : Element
         UpdateSizeBasedOnProgress();
         
         if (!_wasCompleted && Completed)
-            CompleteEvent?.Invoke(this, EventArgs.Empty);
+            CompletedEvent?.Invoke(this, EventArgs.Empty);
         
         _wasCompleted = Completed;
         

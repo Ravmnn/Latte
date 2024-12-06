@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 
 using Latte.Core.Type;
-using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
 
 
-namespace Latte.Elements;
+namespace Latte.Elements.Primitives;
 
 
 public class GridLayoutCell : RectangleElement
@@ -64,8 +63,6 @@ public class GridLayoutElement : RectangleElement
     
     public uint? MaxRows { get; set; }
     public uint? MaxColumns { get; set; }
-    
-    // TODO: use Vec2f for size
     
     public float CellWidth
     {

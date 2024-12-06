@@ -33,8 +33,8 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     
     public WindowElementStyles Styles { get; set; }
     
-    public event EventHandler? OpenEvent;
-    public event EventHandler? CloseEvent;
+    public event EventHandler? OpenedEvent;
+    public event EventHandler? ClosedEvent;
     
     public bool Dragging { get; protected set; }
     public bool WasDragging { get; protected set; }
@@ -187,7 +187,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
             return;
         
         Show();
-        OpenEvent?.Invoke(this, EventArgs.Empty);
+        OpenedEvent?.Invoke(this, EventArgs.Empty);
     }
     
     protected virtual void OnClose()
@@ -196,7 +196,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
             return;
         
         Hide();
-        CloseEvent?.Invoke(this, EventArgs.Empty);
+        ClosedEvent?.Invoke(this, EventArgs.Empty);
     }
     
     

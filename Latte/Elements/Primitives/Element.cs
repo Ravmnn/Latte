@@ -46,7 +46,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         }
     }
 
-    public event EventHandler<ElementEventArgs>? ParentChangeEvent; // TODO: rename all events
+    public event EventHandler<ElementEventArgs>? ParentChangedEvent;
     
     public Property[] Properties => _properties.ToArray();
     
@@ -72,7 +72,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         }
     }
 
-    public event EventHandler? VisibilityChangeEvent;
+    public event EventHandler? VisibilityChangedEvent;
     
     public bool Initialized { get; private set; }
 
@@ -96,7 +96,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     
     protected int LastPriority { get; private set; }
     
-    public event EventHandler? PriorityChangeEvent;
+    public event EventHandler? PriorityChangedEvent;
 
     public bool BlocksMouseInput { get; set; }
     
@@ -151,7 +151,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         if (Parent is null)
             return;
 
-        Parent.PriorityChangeEvent += (_, _) => AddParentPriorityDeltaToThis();
+        Parent.PriorityChangedEvent += (_, _) => AddParentPriorityDeltaToThis();
     }
 
 
@@ -268,7 +268,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public virtual void Hide() => Visible = false;
 
     protected virtual void OnVisibilityChange()
-        => VisibilityChangeEvent?.Invoke(this, EventArgs.Empty);
+        => VisibilityChangedEvent?.Invoke(this, EventArgs.Empty);
 
 
     public bool IsChildOf(Element parent)
@@ -340,7 +340,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Priority = Parent?.Priority + 1 ?? Priority;
         
         Parent?.OnChildAdded(this);
-        ParentChangeEvent?.Invoke(this, new(Parent));
+        ParentChangedEvent?.Invoke(this, new(Parent));
     }
     
     
@@ -352,5 +352,5 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
 
     protected virtual void OnPriorityChange()
-        => PriorityChangeEvent?.Invoke(this, EventArgs.Empty);
+        => PriorityChangedEvent?.Invoke(this, EventArgs.Empty);
 }

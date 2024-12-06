@@ -10,7 +10,6 @@ using Latte.Core.Type;
 namespace Latte.Core;
 
 
-// TODO: add AreaElement (like tabs)
 // TODO: add scrollable areas
 // TODO: add checkbox
 // TODO: add text inputs
@@ -23,7 +22,7 @@ public class Window : RenderWindow, IUpdateable, IDrawable
     
     public IntRect WindowRect => new(new(0, 0), (Vector2i)Size);
 
-    public event EventHandler? CloseEvent;
+    public event EventHandler? ClosedEvent;
     
     
     public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings settings = new()) : base(mode, title, style, settings)
@@ -48,7 +47,7 @@ public class Window : RenderWindow, IUpdateable, IDrawable
 
     public override void Close()
     {
-        CloseEvent?.Invoke(this, EventArgs.Empty);
+        ClosedEvent?.Invoke(this, EventArgs.Empty);
         base.Close();
         
         Environment.Exit(0); // force exit

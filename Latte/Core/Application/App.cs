@@ -131,8 +131,6 @@ public static class App
         InitWindow(new(mode, title, style, settings));
     }
     
-    // TODO: add void Init(Window window, Font defaultFont) which call Init(defaultFont) and InitWindow(window)
-    
 
     public static void InitWindow(Window window)
     {
