@@ -117,6 +117,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public AnimatableProperty<Vec2f> AlignmentMargin { get; }
 
     public Property<SizePolicyType> SizePolicy { get; }
+    public AnimatableProperty<Vec2f> SizePolicyMargin { get; }
 
     public event EventHandler? SetupEvent;
     public event EventHandler? UpdateEvent;
@@ -145,6 +146,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { CanAnimate = false };
 
         SizePolicy = new(this, nameof(SizePolicy), SizePolicyType.None);
+        SizePolicyMargin = new(this, nameof(SizePolicyMargin), new()) { CanAnimate = false };
 
         if (Parent is null)
             return;
@@ -257,7 +259,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public virtual FloatRect GetSizePolicyRect(SizePolicyType policyType)
         => SizePolicyCalculator.CalculateChildRect(GetBounds(), GetParentBounds(), policyType);
 
-    public FloatRect GetSizePolicyRect() => GetSizePolicyRect(SizePolicy);
+    public FloatRect GetSizePolicyRect()
+        => GetSizePolicyRect(SizePolicy).ShrinkRect(SizePolicyMargin);
 
 
     public virtual void ApplyAlignment()

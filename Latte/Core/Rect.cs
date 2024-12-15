@@ -70,15 +70,18 @@ public static class RectExtensions
         
         return new(transformedPosition, transformedSize);
     }
-    
-    
-    public static FloatRect ShrinkRect(this FloatRect rect, float amount)
+
+
+    public static FloatRect ShrinkRect(this FloatRect rect, Vec2f amount)
     {
-        rect.Top += amount;
-        rect.Left += amount;
-        rect.Width -= amount * 2;
-        rect.Height -= amount * 2;
+        rect.Top += amount.Y;
+        rect.Left += amount.X;
+        rect.Width -= amount.X * 2;
+        rect.Height -= amount.Y * 2;
 
         return rect;
     }
+    
+    
+    public static FloatRect ShrinkRect(this FloatRect rect, float amount) => ShrinkRect(rect, new Vec2f(amount, amount));
 }

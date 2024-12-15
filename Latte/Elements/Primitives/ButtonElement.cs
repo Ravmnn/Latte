@@ -10,7 +10,7 @@ namespace Latte.Elements.Primitives;
 
 public class ButtonElement : RectangleElement, IDefaultClickable
 {
-    public TextElement Text { get; protected set; }
+    public TextElement? Text { get; protected set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
@@ -27,14 +27,15 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     protected bool UseDefaultAnimation { get; set; }
     
     
-    public ButtonElement(Element? parent, Vec2f position, Vec2f size, string text) : base(parent, position, size)
+    public ButtonElement(Element? parent, Vec2f position, Vec2f size, string? text) : base(parent, position, size)
     {
-        Text = new(this, new(), 32, text)
-        {
-            Alignment = { Value = Alignments.Center },
-            
-            Color = { Value = SFML.Graphics.Color.Black }
-        };
+        if (text is not null)
+            Text = new(this, new(), 32, text)
+            {
+                Alignment = { Value = Alignments.Center },
+                
+                Color = { Value = SFML.Graphics.Color.Black }
+            };
         
         BorderColor.Set(new(100, 100, 100));
         BorderSize.Set(1f);
@@ -67,6 +68,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     }
     
     
+    // TODO: find a better way of setting default animations
     private void SetDefaultKeyframeAnimation()
     {
         const byte ColorDecreaseAmount = 25;

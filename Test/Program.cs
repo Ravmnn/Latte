@@ -23,30 +23,6 @@ class Program
         {
             AntialiasingLevel = 16
         });
-        
-        // WindowElement window = new("Test Window", new(), new(600, 600))
-        // {
-        //     BorderSize = { Value = 2f },
-        //     BorderColor = { Value = Color.White },
-        //     Radius = { Value = 5f }
-        // };
-        //
-        // var addButton = new ButtonElement(window, new(), new(120, 80), "Add a new button")
-        // {
-        //     Alignment = { Value = Alignments.BottomRight },
-        //     AlignmentMargin = { Value = new(-10, -10) }
-        // };
-        //
-        // GridLayoutElement layoutElement = new(window, new(), 5, 5, 50f, 50f)
-        // {
-        //     Alignment = { Value = Alignments.Center },
-        //     GrowDirection = GridLayoutGrowDirection.Vertically
-        // };
-        //
-        // for (int i = 0; i < 25; i++)
-        //     AddButtonToLayout(layoutElement);
-
-        // addButton.MouseUpEvent += (_, _) => AddButtonToLayout(layoutElement);
 
         WindowElement rect = new("this is a text", new(), new(600, 400))
         {
@@ -59,13 +35,9 @@ class Program
         };
 
 
-        _ = new SpriteElement(rect, "../../../../github-logo.png", new(), new(52, 52))
+        _ = new CheckBox(rect, new())
         {
-            BlocksMouseInput = false,
-            
-            Alignment = { Value = Alignments.Center },
-            
-            SizePolicy = { Value = SizePolicyType.FitParent }
+            Alignment = { Value = Alignments.Center }
         };
         
         App.AddElement(rect);
