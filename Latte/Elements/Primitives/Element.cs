@@ -26,8 +26,8 @@ public class ElementEventArgs(Element? element) : EventArgs
 public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePoliciable
 {
     private Element? _parent;
-    private List<Property> _properties;
-    
+    private readonly List<Property> _properties;
+
     private bool _visible;
 
     private int _priority;
@@ -40,25 +40,25 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         {
             if (_parent == value)
                 return;
-            
+
             _parent = value;
             OnParentChange();
         }
     }
 
     public event EventHandler<ElementEventArgs>? ParentChangedEvent;
-    
+
     public Property[] Properties => _properties.ToArray();
-    
+
     public List<Element> Children { get; }
     public event EventHandler<ElementEventArgs>? ChildAddedEvent;
 
     public ElementKeyframeAnimator Animator { get; set; }
-    
+
     public abstract Transformable Transformable { get; }
 
     protected bool ParentVisible => Parent?.Visible ?? true;
-    
+
     public bool Visible
     {
         get => _visible && ParentVisible;
@@ -66,14 +66,14 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         {
             if (_visible == value)
                 return;
-            
+
             _visible = value;
             OnVisibilityChange();
         }
     }
 
     public event EventHandler? VisibilityChangedEvent;
-    
+
     public bool Initialized { get; private set; }
 
     public bool ShouldDrawElementBoundaries { get; set; }
@@ -88,37 +88,37 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         {
             if (_priority == value)
                 return;
-            
+
             _priority = value;
             OnPriorityChange();
         }
     }
-    
+
     protected int LastPriority { get; private set; }
-    
+
     public event EventHandler? PriorityChangedEvent;
 
     public bool BlocksMouseInput { get; set; }
-    
+
     public AnimatableProperty<Vec2f> RelativePosition { get; }
     public Vec2f AbsolutePosition
     {
         get => Parent is not null ? RelativePosition + Parent.AbsolutePosition : RelativePosition;
         set => RelativePosition.Set(Parent is not null ? value - Parent.AbsolutePosition : value);
     }
-    
+
     public AnimatableProperty<Vec2f> Origin { get; }
 
     public AnimatableProperty<Float> Rotation { get; }
-    
+
     public AnimatableProperty<Vec2f> Scale { get; }
-    
+
     public Property<Alignments> Alignment { get; }
     public AnimatableProperty<Vec2f> AlignmentMargin { get; }
-    
+
     public Property<SizePolicyType> SizePolicy { get; }
 
-    public event EventHandler? SetupEvent; 
+    public event EventHandler? SetupEvent;
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;
 
@@ -126,7 +126,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     protected Element(Element? parent)
     {
         _properties = [];
-        
+
         Parent = parent;
         Children = [];
 
@@ -135,17 +135,17 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Visible = true;
 
         BlocksMouseInput = true;
-        
+
         RelativePosition = new(this, nameof(RelativePosition), new()) { CanAnimate = false };
-        Origin = new(this, nameof(Origin), new()) { CanAnimate = false }; 
+        Origin = new(this, nameof(Origin), new()) { CanAnimate = false };
         Rotation = new(this, nameof(Rotation), 0f);
         Scale = new(this, nameof(Scale), new(1f, 1f));
-        
+
         Alignment = new(this, nameof(Alignment), Alignments.None);
         AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { CanAnimate = false };
 
         SizePolicy = new(this, nameof(SizePolicy), SizePolicyType.None);
-        
+
         if (Parent is null)
             return;
 
@@ -158,9 +158,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Animator.DefaultProperties = ToKeyframe();
 
         UpdateSfmlProperties();
-        
+
         Initialized = true;
-        
+
         SetupEvent?.Invoke(this, EventArgs.Empty);
     }
 
@@ -168,33 +168,37 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public virtual void Update()
     {
         CanOnlyHaveChildOfTypeAttribute.Check(this);
-        
+
         RemoveNonChildren();
-        
+
         if (!Initialized)
             Setup();
-        
-        if (SizePolicy.Value != SizePolicyType.None)
-            ApplySizePolicy();
-        
-        if (Alignment.Value != Alignments.None)
-            ApplyAlignment();
-        
+
+        UpdateGeometry();
         UpdatePropertyAnimations();
         UpdateSfmlProperties();
 
         LastPriority = Priority;
-        
+
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
-    
+
+    private void UpdateGeometry()
+    {
+        if (SizePolicy.Value != SizePolicyType.None)
+            ApplySizePolicy();
+
+        if (Alignment.Value != Alignments.None)
+            ApplyAlignment();
+    }
+
     private void UpdatePropertyAnimations()
     {
         foreach (Property property in Properties)
             if (property is AnimatableProperty { Animation: not null } animatableProperty)
                 animatableProperty.Animation.Update();
     }
-    
+
     protected virtual void UpdateSfmlProperties()
     {
         Transformable.Position = AbsolutePosition;
@@ -205,9 +209,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     protected void RemoveNonChildren()
         => Children.RemoveAll(element => element.Parent != this);
-    
 
-    
+
+
     public virtual void Draw(RenderTarget target)
     {
         DrawEvent?.Invoke(this, EventArgs.Empty);
@@ -217,7 +221,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     {
         if (ShouldDrawElementBoundaries)
             Debug.DrawLineRect(target, GetBounds(), Color.Red);
-        
+
         if (ShouldDrawClipArea)
             Debug.DrawLineRect(target, (FloatRect)GetClipArea(), Color.Magenta);
     }
@@ -236,11 +240,11 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public bool IsPointOverBounds(Vec2f point)
         => IsPointOverClipArea(point) && point.IsPointOverRect(GetBounds());
-    
+
     public bool IsPointOverClipArea(Vec2f point)
         => point.IsPointOverRect(GetFinalClipArea().ToWorldCoordinates());
-    
-    
+
+
     public abstract FloatRect GetBounds();
     public FloatRect GetParentBounds() => Parent?.GetBounds() ?? (FloatRect)App.Window.WindowRect;
 
@@ -252,16 +256,16 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public virtual FloatRect GetSizePolicyRect(SizePolicyType policyType)
         => SizePolicyCalculator.CalculateChildRect(GetBounds(), GetParentBounds(), policyType);
-    
+
     public FloatRect GetSizePolicyRect() => GetSizePolicyRect(SizePolicy);
-    
-    
+
+
     public virtual void ApplyAlignment()
         => AbsolutePosition = GetAlignmentPosition(Alignment) + AlignmentMargin;
 
     public abstract void ApplySizePolicy();
-    
-    
+
+
     public virtual void Show() => Visible = true;
     public virtual void Hide() => Visible = false;
 
@@ -271,17 +275,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public bool IsChildOf(Element parent)
     {
-        Element? currentParent = Parent;
+        if (parent == Parent)
+            return true;
 
-        while (currentParent is not null)
-        {
-            if (currentParent == parent)
-                return true;
-             
-            currentParent = currentParent.Parent;
-        }
-
-        return false;
+        return parent.Parent is not null && IsChildOf(parent.Parent);
     }
 
 
@@ -299,15 +296,15 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
         Priority += Parent.Priority - Parent.LastPriority;
     }
-    
-    
+
+
     public void AddProperty(Property property) => _properties.Add(property);
     public bool RemoveProperty(Property property) => _properties.Remove(property);
     public bool HasProperty(Property property) => _properties.Contains(property);
     public Property GetProperty(string name)
         => _properties.Find(property => property.Name == name)
             ?? throw new ArgumentException($"Could not find property with name \"{name}\".");
-    
+
     public bool TryGetProperty(string name, [MaybeNullWhen(false)] out Property property)
     {
         try
@@ -321,11 +318,11 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
             return false;
         }
     }
-    
+
 
     public Property this[string name] => GetProperty(name);
-    
-    
+
+
     public AnimatableProperty[] GetAnimatableProperties()
         => (from property in Properties where property is AnimatableProperty select property as AnimatableProperty).ToArray();
 
@@ -336,12 +333,12 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     protected virtual void OnParentChange()
     {
         Priority = Parent?.Priority + 1 ?? Priority;
-        
+
         Parent?.OnChildAdded(this);
         ParentChangedEvent?.Invoke(this, new(Parent));
     }
-    
-    
+
+
     protected virtual void OnChildAdded(Element child)
     {
         Children.Add(child);

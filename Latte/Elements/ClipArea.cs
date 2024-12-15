@@ -38,8 +38,7 @@ public static class ClipArea
         {
             IntRect newArea = element.GetClipArea();
 
-            if (area is null)
-                area = newArea;
+            area ??= newArea;
 
             if (area.Value.Intersects(newArea, out IntRect overlap))
                 area = overlap;
@@ -47,7 +46,8 @@ public static class ClipArea
                 return null;
 
             element = element.Parent;
-        } while (element is not null);
+        }
+        while (element is not null);
 
         return area.Value;
     }

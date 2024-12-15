@@ -45,15 +45,17 @@ public class AnimationData(float[] startValues, float[] endValues, double time, 
     /// How much the animation has progressed from 0 to 1.
     /// </summary>
     public float Progress { get; private set; }
-
+    
     /// <summary>
-    /// Same as this.Progress, but with eased by this.EasingType.
+    /// Same as this.Progress, but with eased by this.Easing.
     /// </summary>
     public float EasedProgress { get; private set; }
 
     public bool HasFinished => ElapsedTime >= Time;
     public bool HasAborted { get; private set; }
     public bool Paused { get; set; }
+
+    private bool ShouldIgnoreUpdate => HasFinished || HasAborted || Paused;
 
 
     public event EventHandler<AnimationUpdatedEventArgs>? UpdatedEvent;
@@ -66,13 +68,13 @@ public class AnimationData(float[] startValues, float[] endValues, double time, 
     /// </summary>
     public void Update()
     {
-        if (HasFinished || HasAborted || Paused)
+        if (ShouldIgnoreUpdate)
             return;
 
-        OnUpdate(new(CurrentValues));
+        OnUpdated(new(CurrentValues));
 
         if (HasFinished)
-            OnFinish();
+            OnFinished();
     }
     
 
@@ -88,27 +90,31 @@ public class AnimationData(float[] startValues, float[] endValues, double time, 
     public void Abort()
     {
         HasAborted = true;
-        OnAbort();
+        OnAborted();
     }
     
     
-    private void OnUpdate(AnimationUpdatedEventArgs eventArgs)
+    private void OnUpdated(AnimationUpdatedEventArgs eventArgs)
     {
         UpdateProgress();
-
-        for (int i = 0; i < StartValues.Length; i++)
-            CurrentValues[i] = StartValues[i] + (EndValues[i] - StartValues[i]) * EasedProgress;
+        UpdateCurrentValues();
 
         if (HasFinished)
             eventArgs.CurrentValues = CurrentValues = EndValues;
 
         UpdatedEvent?.Invoke(this, eventArgs);
     }
+
+    private void UpdateCurrentValues()
+    {
+        for (uint i = 0; i < StartValues.Length; i++)
+            CurrentValues[i] = StartValues[i] + (EndValues[i] - StartValues[i]) * EasedProgress;
+    }
     
 
-    private void OnFinish()
+    private void OnFinished()
         => FinishedEvent?.Invoke(this, EventArgs.Empty);
     
-    private void OnAbort()
+    private void OnAborted()
         => AbortedEvent?.Invoke(this, EventArgs.Empty);
 }

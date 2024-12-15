@@ -7,9 +7,6 @@ using Latte.Core.Type;
 namespace Latte.Core.Animation;
 
 
-/// <summary>
-/// Creates an AnimationState to animate a specific data strucute.
-/// </summary>
 public static class Animate
 {
     public static AnimationData Value(float from, float to, double time, Easing easing = Easing.Linear) =>

@@ -68,6 +68,8 @@ class Program
             SizePolicy = { Value = SizePolicyType.FitParent }
         };
         
+        App.AddElement(rect);
+        
         
         while (App.Window.IsOpen)
         {

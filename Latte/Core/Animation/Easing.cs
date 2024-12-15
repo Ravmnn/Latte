@@ -38,8 +38,8 @@ public static class EasingFunctions
 
         if (t < 0.5)
             return mult * In(t, pow);
-        else
-            return 1 - MathF.Pow(-2 * t + 2, pow) / 2;
+        
+        return 1 - MathF.Pow(-2 * t + 2, pow) / 2;
     }
 
 
@@ -116,8 +116,8 @@ public static class EasingFunctions
 
         if (t < 0.5f)
             return MathF.Pow(2f, 20f * t - 10f) / 2f;
-        else
-            return (2f - MathF.Pow(2f, -20f * t + 10f)) / 2f;
+        
+        return (2f - MathF.Pow(2f, -20f * t + 10f)) / 2f;
     }
 
 
@@ -127,70 +127,69 @@ public static class EasingFunctions
     {
         if (t < 0.5f)
             return (1f - MathF.Sqrt(1f - MathF.Pow(2f * t, 2f))) / 2f;
-        else
-            return (MathF.Sqrt(1f - MathF.Pow(-2f * t + 2f, 2f)) + 1f) / 2f;
+        
+        return (MathF.Sqrt(1f - MathF.Pow(-2f * t + 2f, 2f)) + 1f) / 2f;
     }
 
 
     public static float InElast(float t)
     {
-        const float c4 = 2f * MathF.PI / 3f;
+        const float C4 = 2f * MathF.PI / 3f;
 
         if (t is 0f or 1f)
             return t;
 
-        return -MathF.Pow(2f, 10f * t - 10f) * MathF.Sin((t * 10f - 10.75f) * c4);
+        return -MathF.Pow(2f, 10f * t - 10f) * MathF.Sin((t * 10f - 10.75f) * C4);
     }
 
     public static float OutElast(float t)
     {
-        const float c4 = 2f * MathF.PI / 3f;
+        const float C4 = 2f * MathF.PI / 3f;
 
         if (t is 0f or 1f)
             return t;
 
-        return MathF.Pow(2f, -10f * t) * MathF.Sin((t * 10f - 0.75f) * c4) + 1f;
+        return MathF.Pow(2f, -10f * t) * MathF.Sin((t * 10f - 0.75f) * C4) + 1f;
     }
 
     public static float InOutElast(float t)
     {
-        const float c5 = 2f * MathF.PI / 4.5f;
+        const float C5 = 2f * MathF.PI / 4.5f;
 
         if (t is 0f or 1f)
             return t;
 
         if (t < 0.5f)
-            return -(MathF.Pow(2f, 20f * t - 10f) * MathF.Sin((20f * t - 11.125f) * c5)) / 2f;
-        else
-            return MathF.Pow(2f, -20f * t + 10f) * MathF.Sin((20f * t - 11.125f) * c5) / 2f + 1f;
+            return -(MathF.Pow(2f, 20f * t - 10f) * MathF.Sin((20f * t - 11.125f) * C5)) / 2f;
+        
+        return MathF.Pow(2f, -20f * t + 10f) * MathF.Sin((20f * t - 11.125f) * C5) / 2f + 1f;
     }
 
 
     public static float InBack(float t)
     {
-        const float c1 = 1.70158f;
-        const float c3 = c1 + 1f;
+        const float C1 = 1.70158f;
+        const float C3 = C1 + 1f;
 
-        return c3 * MathF.Pow(t, 3f) - c1 * MathF.Pow(t, 2f);
+        return C3 * MathF.Pow(t, 3f) - C1 * MathF.Pow(t, 2f);
     }
 
     public static float OutBack(float t)
     {
-        const float c1 = 1.70158f;
-        const float c3 = c1 + 1f;
+        const float C1 = 1.70158f;
+        const float C3 = C1 + 1f;
 
-        return 1f + c3 * MathF.Pow(t - 1f, 3f) + c1 * MathF.Pow(t - 1f, 2f);
+        return 1f + C3 * MathF.Pow(t - 1f, 3f) + C1 * MathF.Pow(t - 1f, 2f);
     }
 
     public static float InOutBack(float t)
     {
-        const float c1 = 1.70158f;
-        const float c2 = c1 * 1.525f;
+        const float C1 = 1.70158f;
+        const float C2 = C1 * 1.525f;
 
         if (t < 0.5f)
-            return MathF.Pow(2f * t, 2f) * ((c2 + 1f) * 2f * t - c2) / 2f;
-        else
-            return (MathF.Pow(2f * t - 2f, 2f) * ((c2 + 1f) * (t * 2f - 2f) + c2) + 2f) / 2f;
+            return MathF.Pow(2f * t, 2f) * ((C2 + 1f) * 2f * t - C2) / 2f;
+        return (MathF.Pow(2f * t - 2f, 2f) * ((C2 + 1f) * (t * 2f - 2f) + C2) + 2f) / 2f;
     }
 
 
@@ -198,19 +197,19 @@ public static class EasingFunctions
 
     public static float OutBounce(float t)
     {
-        const float n1 = 7.5625f;
-        const float d1 = 2.75f;
+        const float N1 = 7.5625f;
+        const float D1 = 2.75f;
 
-        if (t < 1f / d1)
-            return n1 * t * t;
+        if (t < 1f / D1)
+            return N1 * t * t;
         
-        if (t < 2 / d1) 
-            return n1 * (t -= 1.5f / d1) * t + 0.75f;
+        if (t < 2 / D1) 
+            return N1 * (t -= 1.5f / D1) * t + 0.75f;
         
-        if (t < 2.5 / d1) 
-            return n1 * (t -= 2.25f / d1) * t + 0.9375f;
+        if (t < 2.5 / D1) 
+            return N1 * (t -= 2.25f / D1) * t + 0.9375f;
         
-        return n1 * (t -= 2.625f / d1) * t + 0.984375f;
+        return N1 * (t -= 2.625f / D1) * t + 0.984375f;
     }
 
     public static float InOutBounce(float t)

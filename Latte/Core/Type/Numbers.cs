@@ -16,7 +16,6 @@ public struct Float(float value) : IAnimatable<Float>
     public readonly AnimationData AnimateThis(Float to, double time, Easing easing = Easing.Linear)
         => Animate.Value(Value, to, time, easing);
     
-    
     public readonly IAnimatable AnimationValuesToThis(float[] values)
         => (Float)values.ToValue();
     

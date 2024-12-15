@@ -78,14 +78,10 @@ public struct ColorRGBA : IAnimatable<ColorRGBA>,
     }
 
 
-    public AnimationData AnimateThis(ColorRGBA to, double time, Easing easing = Easing.Linear)
-        => Animate.Color(this, to, time, easing);
+    public AnimationData AnimateThis(ColorRGBA to, double time, Easing easing = Easing.Linear) => Animate.Color(this, to, time, easing);
     
-    
-    public readonly IAnimatable AnimationValuesToThis(float[] values)
-        => values.ToColor();
+    public readonly IAnimatable AnimationValuesToThis(float[] values) => values.ToColor();
 
     
-    public readonly override string ToString()
-        => $"rgba({R}, {G}, {B}, {A})";
+    public readonly override string ToString() => $"rgba({R}, {G}, {B}, {A})";
 }
