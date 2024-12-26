@@ -12,7 +12,7 @@ public class CheckBox : ButtonElement
     public bool Selected { get; set; }
 
 
-    public CheckBox(Element? parent, Vec2f position, bool selected = false) : base(parent, position, new(30, 30), null)
+    public CheckBox(Element? parent, Vec2f position, bool selected = false) : base(parent, position, new(20, 20), null)
     {
         SelectedArea = new(this, new(), new())
         {
@@ -30,8 +30,6 @@ public class CheckBox : ButtonElement
         BorderSize.Set(2f);
 
         Down.Set("Scale", new Vec2f(0.9f, 0.9f));
-
-        // TODO: improve animations
 
         UseDefaultAnimation = false;
     }

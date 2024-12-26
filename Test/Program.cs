@@ -28,28 +28,37 @@ class Program
         {
             Title =
             {
-                Color = { Value = new(0, 0, 0, 0)}
+                Color = { Value = new(0, 0, 0)}
             },
-            
+
             Color = { Value = new(255, 255, 255) }
         };
 
-
-        _ = new CheckBox(rect, new())
+        ScrollAreaElement scrollAreaElement = new(rect, new(), new(200, 200))
         {
-            Alignment = { Value = Alignments.Center }
+            Color = { Value = new(200, 100, 100, 40) },
+
+            Alignment = { Value = Alignments.Center}
         };
-        
+
+        GridLayoutElement grid = new(scrollAreaElement, new(), 5, 5, 35, 35)
+        {
+            GrowDirection = GridLayoutGrowDirection.Vertically
+        };
+
+        for (int i = 0; i < 100; i++)
+            AddButtonToLayout(grid);
+
         App.AddElement(rect);
-        
-        
+
+
         while (App.Window.IsOpen)
         {
             App.Window.Clear();
-            
+
             App.Update();
             App.Draw();
-            
+
             App.Window.Display();
         }
     }
