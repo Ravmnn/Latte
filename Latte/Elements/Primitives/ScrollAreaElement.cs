@@ -1,5 +1,9 @@
 using System;
+using System.Linq;
 
+using SFML.Graphics;
+
+using Latte.Core;
 using Latte.Core.Application;
 using Latte.Core.Type;
 
@@ -20,6 +24,7 @@ public enum ScrollDirection
 public class ScrollAreaElement : ButtonElement
 {
     public Vec2f CurrentScrollOffset { get; private set; }
+
     public float ScrollStep { get; set; }
 
     public ScrollDirection Direction { get; set; }
@@ -60,6 +65,19 @@ public class ScrollAreaElement : ButtonElement
         }
     }
 
+    public FloatRect GetChildrenBounds()
+    {
+        FloatRect bounds = (from child in Children select new FloatRect(child.RelativePosition.Value, child.GetBounds().Size)).ToArray().GetBoundsOfRects();
+
+        if (bounds.Width < Size.Value.X)
+            bounds.Width = Size.Value.X;
+
+        if (bounds.Height < Size.Value.Y)
+            bounds.Height = Size.Value.Y;
+
+        return bounds;
+    }
+
 
     public void Scroll(Vec2f offset)
     {
@@ -68,11 +86,24 @@ public class ScrollAreaElement : ButtonElement
         foreach (Element child in Children)
             child.RelativePosition.Value += offset;
 
+        if (IsRelativeBoundsOutsideChildrenBounds())
+            Scroll(-offset);
+
         OnScroll(offset);
     }
 
     public void ScrollVertically(float offset) => Scroll(new(y: offset));
     public void ScrollHorizontally(float offset) => Scroll(new(x: offset));
+
+
+    protected bool IsRelativeBoundsOutsideChildrenBounds()
+    {
+        FloatRect childrenBounds = GetChildrenBounds();
+
+        return childrenBounds.Left > 0 || childrenBounds.Top > 0 ||
+               childrenBounds.Left + childrenBounds.Width < Size.Value.X ||
+               childrenBounds.Top + childrenBounds.Height < Size.Value.Y;
+    }
 
 
     protected virtual void OnScroll(Vec2f offset)

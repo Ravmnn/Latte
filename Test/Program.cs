@@ -1,8 +1,11 @@
-﻿using SFML.Window;
+﻿using System.Drawing;
+using SFML.Window;
 
+using Latte.Core;
 using Latte.Core.Application;
 using Latte.Elements;
 using Latte.Elements.Primitives;
+using SFML.Graphics;
 
 
 namespace Latte.Test;
@@ -58,6 +61,8 @@ class Program
 
             App.Update();
             App.Draw();
+
+            // Debug.DrawLineRect(App.Window, scrollAreaElement.Viewport, SFML.Graphics.Color.Blue);
 
             App.Window.Display();
         }

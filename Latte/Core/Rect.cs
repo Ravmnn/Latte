@@ -13,12 +13,12 @@ namespace Latte.Core;
 public enum Corners
 {
     None,
-    
+
     Top = 1 << 0,
     Left = 1 << 1,
     Right = 1 << 2,
     Bottom = 1 << 3,
-    
+
     TopLeft = Top | Left,
     TopRight = Top | Right,
     BottomLeft = Bottom | Left,
@@ -29,17 +29,17 @@ public enum Corners
 public record struct FloatRectVertices(Vec2f TopLeft, Vec2f TopRight, Vec2f BottomLeft, Vec2f BottomRight)
 {
     public FloatRectVertices(FloatRect rect) : this(
-        rect.Position, 
+        rect.Position,
         new(rect.Left + rect.Width, rect.Top),
-        new(rect.Left, rect.Top + rect.Height), 
+        new(rect.Left, rect.Top + rect.Height),
         rect.Position + rect.Size
     ) {}
-    
-    
+
+
     public FloatRectVertices() : this(new())
     {}
-    
-    
+
+
     public static implicit operator FloatRect(FloatRectVertices vertices) => vertices.VerticesToRect();
     public static implicit operator FloatRectVertices(FloatRect rect) => rect.RectToVertices();
 }
@@ -52,13 +52,13 @@ public static class RectExtensions
 
     public static FloatRectVertices RectToVertices(this FloatRect rect)
         => new(rect);
-    
-    
+
+
     public static IntRect ToWindowCoordinates(this FloatRect rect)
     {
         Vec2i transformedPosition = App.Window.MapCoordsToPixel(rect.Position);
         Vec2i transformedSize = App.Window.MapCoordsToPixel(rect.Position + rect.Size) - transformedPosition;
-        
+
         return new(transformedPosition, transformedSize);
     }
 
@@ -67,7 +67,7 @@ public static class RectExtensions
     {
         Vec2f transformedPosition = App.Window.MapPixelToCoords(rect.Position);
         Vec2f transformedSize = App.Window.MapPixelToCoords(rect.Position + rect.Size) - transformedPosition;
-        
+
         return new(transformedPosition, transformedSize);
     }
 
@@ -81,7 +81,33 @@ public static class RectExtensions
 
         return rect;
     }
-    
-    
-    public static FloatRect ShrinkRect(this FloatRect rect, float amount) => ShrinkRect(rect, new Vec2f(amount, amount));
+
+    public static FloatRect ShrinkRect(this FloatRect rect, float amount)
+        => ShrinkRect(rect, new Vec2f(amount, amount));
+
+
+    public static FloatRect GetBoundsOfRects(this FloatRect[] rects)
+    {
+        if (rects.Length == 0)
+            return new();
+
+        FloatRect bounds = new(rects[0].Position, new());
+
+        foreach (FloatRect rect in rects)
+        {
+            if (rect.Left < bounds.Left)
+                bounds.Left = rect.Left;
+
+            if (rect.Top < bounds.Top)
+                bounds.Top = rect.Top;
+
+            if (rect.Left + rect.Width > bounds.Width)
+                bounds.Width = rect.Left + rect.Width - bounds.Left;
+
+            if (rect.Top + rect.Height > bounds.Height)
+                bounds.Height = rect.Top + rect.Height - bounds.Top;
+        }
+
+        return bounds;
+    }
 }
