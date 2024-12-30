@@ -86,6 +86,13 @@ public static class RectExtensions
         => ShrinkRect(rect, new Vec2f(amount, amount));
 
 
+    public static FloatRect ExpandRect(this FloatRect rect, Vec2f amount)
+        => rect.ShrinkRect(-amount);
+
+    public static FloatRect ExpandRect(this FloatRect rect, float amount)
+        => ExpandRect(rect, new Vec2f(amount, amount));
+
+
     public static FloatRect GetBoundsOfRects(this FloatRect[] rects)
     {
         if (rects.Length == 0)

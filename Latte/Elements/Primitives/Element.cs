@@ -177,6 +177,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
             Setup();
 
         UpdateGeometry();
+
         UpdatePropertyAnimations();
         UpdateSfmlProperties();
 
@@ -234,7 +235,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public IntRect GetFinalClipArea() => ClipArea.OverlapElementClipAreaToParents(this) ?? new();
     public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.Window.WindowRect;
-    public virtual IntRect GetThisClipArea() => GetBounds().ToWindowCoordinates();
+    public virtual IntRect GetThisClipArea() => GetBorderLessBounds().ToWindowCoordinates();
 
     public bool IsInsideClipArea()
         => GetBounds().Intersects((FloatRect)GetFinalClipArea());
@@ -248,13 +249,24 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
 
     public abstract FloatRect GetBounds();
+    public abstract FloatRect GetRelativeBounds();
+    public virtual FloatRect GetBorderLessBounds() => GetBounds();
+    public virtual FloatRect GetBorderLessRelativeBounds() => GetRelativeBounds();
+
     public FloatRect GetParentBounds() => Parent?.GetBounds() ?? (FloatRect)App.Window.WindowRect;
+    public FloatRect GetParentRelativeBounds() => Parent?.GetRelativeBounds() ?? (FloatRect)App.Window.WindowRect;
+    public FloatRect GetParentBorderLessBounds() => Parent?.GetBorderLessBounds() ?? (FloatRect)App.Window.WindowRect;
+    public FloatRect GetParentBorderLessRelativeBounds() => Parent?.GetBorderLessRelativeBounds() ?? (FloatRect)App.Window.WindowRect;
 
 
     public virtual Vec2f GetAlignmentPosition(Alignments alignment)
-        => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), GetParentBounds(), alignment);
+        => AlignmentCalculator.GetAlignedPositionOfChild(GetBorderLessBounds(), GetParentBorderLessBounds(), alignment);
+
+    public virtual Vec2f GetAlignmentRelativePosition(Alignments alignment)
+        => AlignmentCalculator.GetAlignedRelativePositionOfChild(GetBorderLessRelativeBounds(), GetParentBorderLessRelativeBounds(), alignment);
 
     public Vec2f GetAlignmentPosition() => GetAlignmentPosition(Alignment);
+    public Vec2f GetAlignmentRelativePosition() => GetAlignmentRelativePosition(Alignment);
 
     public virtual FloatRect GetSizePolicyRect(SizePolicyType policyType)
         => SizePolicyCalculator.CalculateChildRect(GetBounds(), GetParentBounds(), policyType);
@@ -264,7 +276,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
 
     public virtual void ApplyAlignment()
-        => AbsolutePosition = GetAlignmentPosition(Alignment) + AlignmentMargin;
+        => RelativePosition.Set(GetAlignmentRelativePosition() + AlignmentMargin);
 
     public abstract void ApplySizePolicy();
 

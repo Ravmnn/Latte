@@ -30,7 +30,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     public ButtonElement(Element? parent, Vec2f position, Vec2f size, string? text) : base(parent, position, size)
     {
         if (text is not null)
-            Text = new(this, new(), 32, text)
+            Text = new(this, new(), null, text)
             {
                 Alignment = { Value = Alignments.Center },
 

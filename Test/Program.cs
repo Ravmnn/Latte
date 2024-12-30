@@ -1,11 +1,9 @@
-﻿using System.Drawing;
-using SFML.Window;
+﻿using SFML.Window;
 
 using Latte.Core;
 using Latte.Core.Application;
 using Latte.Elements;
 using Latte.Elements.Primitives;
-using SFML.Graphics;
 
 
 namespace Latte.Test;
@@ -41,7 +39,7 @@ class Program
         {
             Color = { Value = new(200, 100, 100, 40) },
 
-            Alignment = { Value = Alignments.Center}
+            Alignment = { Value = Alignments.Center }
         };
 
         GridLayoutElement grid = new(scrollAreaElement, new(), 5, 5, 35, 35)

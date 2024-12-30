@@ -9,23 +9,23 @@ namespace Latte.Elements;
 
 
 [Flags]
-public enum Alignments 
+public enum Alignments
 {
     None = 0,
-    
+
     Top = 1 << 0,
     Bottom = 1 << 1,
     Left = 1 << 2,
     Right = 1 << 3,
-    
+
     TopLeft = Top | Left,
     TopRight = Top | Right,
     BottomLeft = Bottom | Left,
     BottomRight = Bottom | Right,
-    
+
     HorizontalCenter = 1 << 4,
     VerticalCenter = 1 << 5,
-    
+
     Center = HorizontalCenter | VerticalCenter
 }
 
@@ -44,22 +44,48 @@ public static class AlignmentCalculator
 
         if (alignment.HasFlag(Alignments.Top))
             position.Y = parent.Top;
-        
+
         else if (alignment.HasFlag(Alignments.Bottom))
             position.Y = parent.Top + parent.Height - child.Height;
-        
+
         if (alignment.HasFlag(Alignments.Left))
             position.X = parent.Left;
-        
+
         else if (alignment.HasFlag(Alignments.Right))
             position.X = parent.Left + parent.Width - child.Width;
 
         if (alignment.HasFlag(Alignments.HorizontalCenter))
             position.X = parent.Left + parent.Width / 2f - child.Width / 2f;
-        
+
         if (alignment.HasFlag(Alignments.VerticalCenter))
             position.Y = parent.Top + parent.Height / 2f - child.Height / 2f;
-        
+
+        return position;
+    }
+
+
+    public static Vec2f GetAlignedRelativePositionOfChild(FloatRect child, FloatRect parent, Alignments alignment)
+    {
+        Vec2f position = child.Position;
+
+        if (alignment.HasFlag(Alignments.Top))
+            position.Y = 0;
+
+        else if (alignment.HasFlag(Alignments.Bottom))
+            position.Y = parent.Height - child.Height;
+
+        if (alignment.HasFlag(Alignments.Left))
+            position.X = 0;
+
+        else if (alignment.HasFlag(Alignments.Right))
+            position.X = parent.Width - child.Width;
+
+        if (alignment.HasFlag(Alignments.HorizontalCenter))
+            position.X = parent.Width / 2f - child.Width / 2f;
+
+        if (alignment.HasFlag(Alignments.VerticalCenter))
+            position.Y = parent.Height / 2f - child.Height / 2f;
+
         return position;
     }
 }

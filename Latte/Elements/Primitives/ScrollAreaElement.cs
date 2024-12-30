@@ -17,16 +17,76 @@ public enum ScrollDirection
     Horizontal
 }
 
-
-// TODO: add limits
 // TODO: add graphic scroll handler
+
+
+public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
+{
+    public bool Dragging { get; set; }
+    public bool WasDragging { get; set; }
+
+    public event EventHandler? DragBeginEvent;
+    public event EventHandler? DragEndEvent;
+    public event EventHandler? DraggingEvent;
+
+
+    public ScrollAreaHandleElement(ScrollAreaElement? parent) : base(parent, new(0, 100), new(10, 30), null)
+    {
+        Radius.Set(0f);
+        Alignment.Set(Alignments.Right);
+        Color.Set(SFML.Graphics.Color.Red);
+        BorderSize.Set(0f);
+
+        DisableTruePressOnlyWhenMouseIsUp = true;
+    }
+
+
+    public override void Update()
+    {
+        (this as IDefaultDraggable).ProcessDraggingEvents();
+
+        WasDragging = Dragging;
+
+        base.Update();
+    }
+
+
+    public void ProcessDragging()
+    {
+        RelativePosition.Value.Y += App.ElementViewMousePositionDelta.Y;
+    }
+
+
+    public void OnDragBegin() => DragBeginEvent?.Invoke(this, EventArgs.Empty);
+
+    public void OnDragEnd() => DragEndEvent?.Invoke(this, EventArgs.Empty);
+
+    public void OnDragging()
+    {
+        ProcessDragging();
+        DraggingEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    public override void OnMouseDown()
+    {
+        base.OnMouseDown();
+        Dragging = true;
+    }
+
+    public override void OnMouseUp()
+    {
+        base.OnMouseUp();
+        Dragging = false;
+    }
+}
+
 
 public class ScrollAreaElement : ButtonElement
 {
-    public Vec2f CurrentScrollOffset { get; private set; }
+    public ScrollAreaHandleElement? ScrollHandle { get; set; }
 
     public float ScrollStep { get; set; }
-
     public ScrollDirection Direction { get; set; }
 
     public event EventHandler<Vec2f>? ScrollEvent;
@@ -34,9 +94,9 @@ public class ScrollAreaElement : ButtonElement
 
     public ScrollAreaElement(Element? parent, Vec2f position, Vec2f size) : base(parent, position, size, null)
     {
-        CurrentScrollOffset = new();
-        ScrollStep = 10f;
+        ScrollHandle = new(this);
 
+        ScrollStep = 10f;
         Direction = ScrollDirection.Vertical;
 
         UseDefaultAnimation = false;
@@ -81,8 +141,6 @@ public class ScrollAreaElement : ButtonElement
 
     public void Scroll(Vec2f offset)
     {
-        CurrentScrollOffset += offset;
-
         foreach (Element child in Children)
             child.RelativePosition.Value += offset;
 

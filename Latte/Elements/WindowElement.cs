@@ -16,11 +16,11 @@ namespace Latte.Elements;
 public enum WindowElementStyles
 {
     None = 0,
-    
+
     Closeable = 1 << 0,
     Resizable = 1 << 1,
     Moveable = 1 << 2,
-    
+
     Default = Closeable | Resizable | Moveable
 }
 
@@ -28,27 +28,27 @@ public enum WindowElementStyles
 public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResizable
 {
     public TextElement Title { get; protected set; }
-    
+
     public ButtonElement CloseButton { get; protected set; }
-    
+
     public WindowElementStyles Styles { get; set; }
-    
+
     public event EventHandler? OpenedEvent;
     public event EventHandler? ClosedEvent;
-    
+
     public bool Dragging { get; protected set; }
     public bool WasDragging { get; protected set; }
-    
+
     public bool Resizing { get; protected set; }
     public bool WasResizing { get; protected set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
-    
+
     public Corners CornersToResize { get; set; }
     public FloatRect Rect => new(RelativePosition.Value, Size.Value);
     public float CornerResizeAreaSize { get; protected set; }
-    
+
     public Vec2f? MinSize { get; set; }
     public Vec2f? MaxSize { get; set; }
 
@@ -60,7 +60,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public event EventHandler? DragBeginEvent;
     public event EventHandler? DragEndEvent;
     public event EventHandler? DraggingEvent;
-    
+
     public event EventHandler? ResizeBeginEvent;
     public event EventHandler? ResizeEndEvent;
     public event EventHandler? ResizingEvent;
@@ -72,16 +72,16 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         Title = new(this, new(), 20, title);
         Title.Alignment.Set(Alignments.HorizontalCenter | Alignments.Top);
         Title.AlignmentMargin.Set(new(0, 10));
-        
+
         Color.Set(new(50, 50, 50, 220));
-        
+
         CloseButton = new(this, new(), new(15, 15), "")
         {
             Color = { Value = new(255, 100, 100) },
-            
+
             Alignment = { Value = Alignments.TopRight },
             AlignmentMargin = { Value = new(-7, 8) },
-            
+
             Down =
             {
                 { "Scale", new Vec2f(0.95f, 0.95f) }
@@ -93,57 +93,57 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
         MouseState = new();
         DisableTruePressOnlyWhenMouseIsUp = true;
-        
+
         CornersToResize = new();
         CornerResizeAreaSize = 10f;
-        
+
         MinSize = new(50, 50);
     }
-    
-    
+
+
     public override void Update()
     {
         (this as IDefaultClickable).UpdateMouseState();
         (this as IDefaultClickable).ProcessMouseEvents();
-        
+
         (this as IDefaultResizable).UpdateCornersToResize();
-        
+
         if (Styles.HasFlag(WindowElementStyles.Resizable))
             (this as IDefaultResizable).ProcessResizingEvents();
-            
+
         if (Styles.HasFlag(WindowElementStyles.Moveable))
             (this as IDefaultDraggable).ProcessDraggingEvents();
-        
+
         App.Window.SetMouseCursor(Window.GetCursorTypeFromCorners(CornersToResize));
-        
+
         CloseButton.Visible = Styles.HasFlag(WindowElementStyles.Closeable);
 
         WasDragging = Dragging;
         WasResizing = Resizing;
-        
+
         base.Update();
     }
 
 
     public void ProcessDragging()
     {
-        AbsolutePosition += App.ElementViewMousePositionDelta;
+        RelativePosition.Value += App.ElementViewMousePositionDelta;
     }
 
 
     public void ProcessResizing()
     {
         Vec2f delta = App.ElementViewMousePositionDelta;
-        
+
         if (CornersToResize.HasFlag(Corners.Top))
             ResizeCorners(top: delta.Y, bottom: -delta.Y);
-        
+
         else if (CornersToResize.HasFlag(Corners.Bottom))
             ResizeCorners(bottom: delta.Y);
 
         if (CornersToResize.HasFlag(Corners.Left))
             ResizeCorners(left: delta.X, right: -delta.X);
-        
+
         else if (CornersToResize.HasFlag(Corners.Right))
             ResizeCorners(right: delta.X);
     }
@@ -158,7 +158,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         if (ShouldResizeCornersToMaxSize())
             ResizeCornersToSizeLimit(MaxSize! - Size.Value, left != 0f, top != 0f, right != 0f, bottom != 0f);
     }
-    
+
     private void ResizeCornersBy(float left = 0f, float top = 0f, float right = 0f, float bottom = 0f)
     {
         RelativePosition.Value.X += left;
@@ -175,8 +175,8 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
     private bool ShouldResizeCornersToMaxSize()
         => MaxSize is not null && (Size.Value.X > MaxSize.X || Size.Value.Y > MaxSize.Y);
-    
-    
+
+
     public void Open() => OnOpen();
     public void Close() => OnClose();
 
@@ -185,24 +185,24 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     {
         if (Visible)
             return;
-        
+
         Show();
         OpenedEvent?.Invoke(this, EventArgs.Empty);
     }
-    
+
     protected virtual void OnClose()
     {
         if (!Visible)
             return;
-        
+
         Hide();
         ClosedEvent?.Invoke(this, EventArgs.Empty);
     }
-    
-    
+
+
     public virtual void OnMouseEnter()
         => MouseEnterEvent?.Invoke(this, EventArgs.Empty);
-    
+
     public virtual void OnMouseLeave()
         => MouseLeaveEvent?.Invoke(this, EventArgs.Empty);
 
@@ -210,22 +210,22 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     {
         Resizing = CornersToResize != Corners.None;
         Dragging = !Resizing; // don't drag while resizing
-        
+
         MouseDownEvent?.Invoke(this, EventArgs.Empty);
     }
-    
+
     public virtual void OnMouseUp()
     {
         Dragging = false;
         Resizing = false;
-        
+
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
-    
-    
+
+
     public virtual void OnDragBegin() => DragBeginEvent?.Invoke(this, EventArgs.Empty);
     public virtual void OnDragEnd() => DragEndEvent?.Invoke(this, EventArgs.Empty);
-    
+
     public virtual void OnDragging()
     {
         ProcessDragging();
@@ -235,17 +235,17 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
     public virtual void OnResizeBegin() => ResizeBeginEvent?.Invoke(this, EventArgs.Empty);
     public virtual void OnResizeEnd() => ResizeEndEvent?.Invoke(this, EventArgs.Empty);
-    
+
     public virtual void OnResizing()
     {
         ProcessResizing();
         ResizingEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    
+
     public virtual bool IsPointOver(Vec2f point)
         => IsPointOverClipArea(point) && IsPointOverThis(point);
-    
+
     protected bool IsPointOverThis(Vec2f point)
         => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius.Value);
 }
