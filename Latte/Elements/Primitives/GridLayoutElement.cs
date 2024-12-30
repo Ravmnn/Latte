@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
 
@@ -32,7 +33,7 @@ public class GridLayoutElement : RectangleElement
     private float _cellHeight;
     private float _cellWidth;
 
-    
+
     public GridLayoutCell?[,] Cells { get; private set; }
 
     public uint Rows
@@ -55,15 +56,15 @@ public class GridLayoutElement : RectangleElement
         {
             if (MaxColumns is not null)
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(value, MaxColumns.Value, nameof(value));
-            
+
             _columns = value;
             RecreationRequired = true;
         }
     }
-    
+
     public uint? MaxRows { get; set; }
     public uint? MaxColumns { get; set; }
-    
+
     public float CellWidth
     {
         get => _cellWidth;
@@ -73,7 +74,7 @@ public class GridLayoutElement : RectangleElement
             RecreationRequired = true;
         }
     }
-    
+
     public float CellHeight
     {
         get => _cellHeight;
@@ -83,28 +84,28 @@ public class GridLayoutElement : RectangleElement
             RecreationRequired = true;
         }
     }
-    
+
     public GridLayoutGrowDirection GrowDirection { get; set; }
     public bool Fixed { get; set; }
-    
+
     public bool RecreationRequired { get; set; }
-    
+
 
     public GridLayoutElement(Element? parent, Vec2f position, uint rows, uint columns, float cellWidth, float cellHeight)
         : base(parent, position, new())
     {
         _rows = rows;
         _columns = columns;
-        
+
         _cellWidth = cellWidth;
         _cellHeight = cellHeight;
 
         GrowDirection = GridLayoutGrowDirection.Horizontally;
-        
+
         Cells = new GridLayoutCell[Rows, Columns];
-        
+
         Color.Value = SFML.Graphics.Color.Transparent;
-        
+
         CreateCells();
     }
 
@@ -122,12 +123,32 @@ public class GridLayoutElement : RectangleElement
         => element.Parent = FindAvailableCell();
 
 
+    /* TODO: for each method that removes an element from this container, add a respective delete method which
+             removes the element both from the App and this container, fully freeing the element memory space */
+
+    // TODO: add basic element handling methods, like the one below:
+
+    public Element? FindLastElement()
+    {
+        for (int row = Cells.GetLength(0) - 1; row >= 0; row--)
+        for (int col = Cells.GetLength(1) - 1; col >= 0; col--)
+        {
+            GridLayoutCell? cell = Cells[row, col];
+
+            if (cell is not null && cell.Children.Count > 0)
+                return cell.Children.Last();
+        }
+
+        return null;
+    }
+
+
     protected GridLayoutCell FindAvailableCell()
     {
         foreach (GridLayoutCell? cell in Cells)
             if (cell is not null && cell.Children.Count == 0)
                 return cell;
-        
+
         GrowLayout();
 
         return FindAvailableCell();
@@ -138,28 +159,31 @@ public class GridLayoutElement : RectangleElement
     {
         if (Fixed)
             throw new InvalidOperationException("Layout is fixed and can't be resized.");
-        
+
         switch (GrowDirection)
         {
             case GridLayoutGrowDirection.Horizontally:
                 Columns++;
                 break;
-            
+
             case GridLayoutGrowDirection.Vertically:
                 Rows++;
                 break;
         }
-        
+
         CreateCells();
     }
-    
+
 
     protected void CreateCells()
     {
+        /* TODO: this class uses a nullable matrix due to the following code to avoid intellisense warnings.
+                 try to use an attribute to disable those warnings in a better way */
+
         GridLayoutCell?[,] oldCells = Cells;
-        
+
         Cells = new GridLayoutCell[Rows, Columns];
-        
+
         for (uint row = 0; row < Rows; row++)
         for (uint col = 0; col < Columns; col++)
         {
@@ -170,7 +194,7 @@ public class GridLayoutElement : RectangleElement
         }
 
         Size.Value = new(Columns * CellWidth, Rows * CellHeight);
-        
+
         RecreationRequired = false;
     }
 
@@ -192,7 +216,7 @@ public class GridLayoutElement : RectangleElement
     {
         if (Cells[row, col] is null)
             return;
-        
+
         Cells[row, col]!.RelativePosition.Value = new(col * CellWidth, row * CellHeight);
         Cells[row, col]!.Size.Value = new(CellWidth, CellHeight);
     }

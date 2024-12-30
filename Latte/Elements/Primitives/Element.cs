@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-
+using System.Reflection;
 using SFML.Graphics;
 
 using Latte.Core;
@@ -15,6 +15,24 @@ using Debug = Latte.Core.Debug;
 
 
 namespace Latte.Elements.Primitives;
+
+
+[AttributeUsage(AttributeTargets.Class)]
+public class CanOnlyHaveChildOfTypeAttribute(Type type) : Attribute
+{
+    public Type Type { get; } = type;
+
+
+    public static void Check(Element element)
+    {
+        if (element.GetAttribute<CanOnlyHaveChildOfTypeAttribute>() is not { } attribute)
+            return;
+
+        foreach (Element child in element.Children)
+            if (child.GetType() != attribute.Type)
+                throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have children of type: \"{attribute.Type.Name}\"");
+    }
+}
 
 
 public class ElementEventArgs(Element? element) : EventArgs
@@ -147,6 +165,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
         SizePolicy = new(this, nameof(SizePolicy), SizePolicyType.None);
         SizePolicyMargin = new(this, nameof(SizePolicyMargin), new()) { CanAnimate = false };
+
+        ShouldDrawElementBoundaries = true;
 
         if (Parent is null)
             return;

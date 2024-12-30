@@ -35,6 +35,13 @@ class Program
             Color = { Value = new(255, 255, 255) }
         };
 
+        ButtonElement addButton = new(rect, new(), new(100, 40), "Add")
+        {
+            Alignment = { Value = Alignments.BottomRight },
+            AlignmentMargin = { Value = new(-10, -5) }
+        };
+
+
         ScrollAreaElement scrollAreaElement = new(rect, new(), new(200, 200))
         {
             Color = { Value = new(200, 100, 100, 40) },
@@ -47,8 +54,16 @@ class Program
             GrowDirection = GridLayoutGrowDirection.Vertically
         };
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 10; i++)
             AddButtonToLayout(grid);
+
+        addButton.MouseUpEvent += (_, _) =>
+        {
+            AddButtonToLayout(grid);
+            App.AddElement(grid);
+        };
+
+        // scrollAreaElement.ScrollOffset.Y = scrollAreaElement.GetChildrenBounds().Size.Y / 2f;
 
         App.AddElement(rect);
 
