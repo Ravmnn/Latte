@@ -40,7 +40,7 @@ public class GridLayoutElement : RectangleElement
     private float _cellWidth;
 
 
-    public GridLayoutCell?[,] Cells { get; private set; }
+    public GridLayoutCell[,] Cells { get; private set; }
 
     public uint Rows
     {
@@ -95,6 +95,8 @@ public class GridLayoutElement : RectangleElement
     public bool Fixed { get; set; }
 
     public bool RecreationRequired { get; set; }
+
+    // TODO: add a way to automatically remove empty cells
 
 
     public GridLayoutElement(Element? parent, Vec2f position, uint rows, uint columns, float cellWidth, float cellHeight)
@@ -179,9 +181,9 @@ public class GridLayoutElement : RectangleElement
         for (int row = 0; row < Cells.GetLength(0) - 1; row++)
         for (int col = 0; col < Cells.GetLength(1); col++)
         {
-            GridLayoutCell? cell = Cells[row, col];
+            GridLayoutCell cell = Cells[row, col];
 
-            if (cell is not null && cell.Children.Count > 0)
+            if (cell.Children.Count > 0)
                 return cell.Children.First();
         }
 
@@ -193,9 +195,9 @@ public class GridLayoutElement : RectangleElement
         for (int row = Cells.GetLength(0) - 1; row >= 0; row--)
         for (int col = Cells.GetLength(1) - 1; col >= 0; col--)
         {
-            GridLayoutCell? cell = Cells[row, col];
+            GridLayoutCell cell = Cells[row, col];
 
-            if (cell is not null && cell.Children.Count > 0)
+            if (cell.Children.Count > 0)
                 return cell.Children.Last();
         }
 
@@ -205,8 +207,8 @@ public class GridLayoutElement : RectangleElement
 
     protected GridLayoutCell FindAvailableCell()
     {
-        foreach (GridLayoutCell? cell in Cells)
-            if (cell is not null && cell.Children.Count == 0)
+        foreach (GridLayoutCell cell in Cells)
+            if (cell.Children.Count == 0)
                 return cell;
 
         GrowLayout();
@@ -237,12 +239,9 @@ public class GridLayoutElement : RectangleElement
 
     protected void CreateCells()
     {
-        /* TODO: this class uses a nullable matrix due to the following code to avoid intellisense warnings.
-                 try to use an attribute to disable those warnings in a better way */
+        GridLayoutCell[,] oldCells = Cells;
 
-        GridLayoutCell?[,] oldCells = Cells;
-
-        Cells = new GridLayoutCell?[Rows, Columns];
+        Cells = new GridLayoutCell[Rows, Columns];
 
         for (uint row = 0; row < Rows; row++)
         for (uint col = 0; col < Columns; col++)
@@ -258,11 +257,11 @@ public class GridLayoutElement : RectangleElement
         RecreationRequired = false;
     }
 
-    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCell?[,] oldCells, uint row, uint col, out List<Element> oldCellChildren)
+    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCell[,] oldCells, uint row, uint col, out List<Element> oldCellChildren)
     {
-        if (AreIndicesInsideMatrixBounds(oldCells, row, col) && oldCells[row, col] is not null)
+        if (AreIndicesInsideMatrixBounds(oldCells, row, col))
         {
-            oldCellChildren = oldCells[row, col]!.Children;
+            oldCellChildren = oldCells[row, col].Children;
             Cells[row, col] = oldCells[row, col];
         }
         else
@@ -274,11 +273,8 @@ public class GridLayoutElement : RectangleElement
 
     private void UpdateCellGeometry(uint row, uint col)
     {
-        if (Cells[row, col] is null)
-            return;
-
-        Cells[row, col]!.RelativePosition.Value = new(col * CellWidth, row * CellHeight);
-        Cells[row, col]!.Size.Value = new(CellWidth, CellHeight);
+        Cells[row, col].RelativePosition.Value = new(col * CellWidth, row * CellHeight);
+        Cells[row, col].Size.Value = new(CellWidth, CellHeight);
     }
 
 
