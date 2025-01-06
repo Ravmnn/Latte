@@ -4,6 +4,7 @@ using Latte.Core;
 using Latte.Core.Application;
 using Latte.Elements;
 using Latte.Elements.Primitives;
+using Latte.Elements.Primitives.Shapes;
 
 
 namespace Latte.Test;

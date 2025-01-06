@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+
 using SFML.Graphics;
 
 using Latte.Core;
@@ -31,6 +31,23 @@ public class CanOnlyHaveChildOfTypeAttribute(Type type) : Attribute
         foreach (Element child in element.Children)
             if (child.GetType() != attribute.Type)
                 throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have children of type: \"{attribute.Type.Name}\"");
+    }
+}
+
+
+[AttributeUsage(AttributeTargets.Class)]
+public class ChildrenAmountLimitAttribute(uint amount) : Attribute
+{
+    public uint Amount { get; } = amount;
+
+
+    public static void Check(Element element)
+    {
+        if (element.GetAttribute<ChildrenAmountLimitAttribute>() is not { } attribute)
+            return;
+
+        if (element.Children.Count > attribute.Amount)
+            throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have {attribute.Amount} children.");
     }
 }
 
@@ -190,6 +207,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public virtual void Update()
     {
         CanOnlyHaveChildOfTypeAttribute.Check(this);
+        ChildrenAmountLimitAttribute.Check(this);
 
         RemoveNonChildren();
 

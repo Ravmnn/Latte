@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 using Latte.Core.Application;
 using Latte.Core.Type;
@@ -10,10 +8,22 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
-// TODO: add an attribute that limits the number of children an element can have
+[ChildrenAmountLimit(1)]
 public class GridLayoutCell : RectangleElement
 {
-    // TODO: limit children amount to one
+    public Element? Element
+    {
+        get => Children.Count == 0 ? null : Children[0];
+        set
+        {
+            if (Element is not null)
+                Element.Parent = null;
+
+            if (value is not null)
+                value.Parent = this;
+        }
+    }
+
 
     public GridLayoutCell(GridLayoutElement parent, Vec2f position, Vec2f size) : base(parent, position, size)
     {
@@ -110,9 +120,9 @@ public class GridLayoutElement : RectangleElement
 
         GrowDirection = GridLayoutGrowDirection.Horizontally;
 
-        Cells = new GridLayoutCell[Rows, Columns];
-
         Color.Value = SFML.Graphics.Color.Transparent;
+
+        Cells = new GridLayoutCell[0, 0];
 
         CreateCells();
     }
@@ -128,7 +138,7 @@ public class GridLayoutElement : RectangleElement
 
 
     public void AddElementAtEnd(Element element)
-        => element.Parent = FindAvailableCell();
+        => FindAvailableCell().Element = element;
 
 
     public Element RemoveFirstElement()
@@ -150,13 +160,13 @@ public class GridLayoutElement : RectangleElement
 
     public Element RemoveElementAt(uint row, uint column)
     {
-        GridLayoutCell cell = Cells[row, column] ?? throw new IndexOutOfRangeException("Invalid grid index.");
+        GridLayoutCell cell = Cells[row, column];
 
-        if (cell.Children.Count <= 0)
+        if (cell.Element is null)
             throw new InvalidOperationException($"No element at row {row} and column {column}.");
 
-        Element element = cell.Children.First();
-        element.Parent = null;
+        Element element = cell.Element;
+        cell.Element = null;
 
         return element;
     }
@@ -174,18 +184,12 @@ public class GridLayoutElement : RectangleElement
     }
 
 
-    // TODO: add basic element handling methods, like the one below:
-
     public Element? FindFirstElement()
     {
         for (int row = 0; row < Cells.GetLength(0) - 1; row++)
         for (int col = 0; col < Cells.GetLength(1); col++)
-        {
-            GridLayoutCell cell = Cells[row, col];
-
-            if (cell.Children.Count > 0)
-                return cell.Children.First();
-        }
+            if (Cells[row, col].Element is { } element)
+                return element;
 
         return null;
     }
@@ -194,12 +198,8 @@ public class GridLayoutElement : RectangleElement
     {
         for (int row = Cells.GetLength(0) - 1; row >= 0; row--)
         for (int col = Cells.GetLength(1) - 1; col >= 0; col--)
-        {
-            GridLayoutCell cell = Cells[row, col];
-
-            if (cell.Children.Count > 0)
-                return cell.Children.Last();
-        }
+            if (Cells[row, col].Element is { } element)
+                return element;
 
         return null;
     }
@@ -208,7 +208,7 @@ public class GridLayoutElement : RectangleElement
     protected GridLayoutCell FindAvailableCell()
     {
         foreach (GridLayoutCell cell in Cells)
-            if (cell.Children.Count == 0)
+            if (cell.Element is null)
                 return cell;
 
         GrowLayout();
@@ -246,10 +246,10 @@ public class GridLayoutElement : RectangleElement
         for (uint row = 0; row < Rows; row++)
         for (uint col = 0; col < Columns; col++)
         {
-            InitializeCellBasedOnOldCellMatrix(oldCells, row, col, out List<Element> oldCellChildren);
+            InitializeCellBasedOnOldCellMatrix(oldCells, row, col, out Element? oldCellChild);
             UpdateCellGeometry(row, col);
 
-            oldCellChildren.ForEach(child => child.Parent = Cells[row, col]);
+            Cells[row, col].Element = oldCellChild;
         }
 
         Size.Value = new(Columns * CellWidth, Rows * CellHeight);
@@ -257,16 +257,16 @@ public class GridLayoutElement : RectangleElement
         RecreationRequired = false;
     }
 
-    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCell[,] oldCells, uint row, uint col, out List<Element> oldCellChildren)
+    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCell[,] oldCells, uint row, uint col, out Element? oldCellChild)
     {
         if (AreIndicesInsideMatrixBounds(oldCells, row, col))
         {
-            oldCellChildren = oldCells[row, col].Children;
+            oldCellChild = oldCells[row, col].Element;
             Cells[row, col] = oldCells[row, col];
         }
         else
         {
-            oldCellChildren = [];
+            oldCellChild = null;
             Cells[row, col] = new(this, new(), new());
         }
     }
