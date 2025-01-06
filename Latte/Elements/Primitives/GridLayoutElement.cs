@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
@@ -9,8 +10,11 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
+// TODO: add an attribute that limits the number of children an element can have
 public class GridLayoutCell : RectangleElement
 {
+    // TODO: limit children amount to one
+
     public GridLayoutCell(GridLayoutElement parent, Vec2f position, Vec2f size) : base(parent, position, size)
     {
         Color.Value = SFML.Graphics.Color.Transparent;
@@ -24,6 +28,8 @@ public enum GridLayoutGrowDirection
     Vertically
 }
 
+
+// TODO: implement IEnumerable and IEnumerator
 
 [CanOnlyHaveChildOfType(typeof(GridLayoutCell))]
 public class GridLayoutElement : RectangleElement
@@ -119,14 +125,68 @@ public class GridLayoutElement : RectangleElement
     }
 
 
-    public void AddElement(Element element)
+    public void AddElementAtEnd(Element element)
         => element.Parent = FindAvailableCell();
 
 
-    /* TODO: for each method that removes an element from this container, add a respective delete method which
-             removes the element both from the App and this container, fully freeing the element memory space */
+    public Element RemoveFirstElement()
+    {
+        Element element = FindFirstElement() ?? throw EmptyGridException();
+        element.Parent = null;
+
+        return element;
+    }
+
+    public Element RemoveLastElement()
+    {
+        Element element = FindLastElement() ?? throw EmptyGridException();
+        element.Parent = null;
+
+        return element;
+    }
+
+
+    public Element RemoveElementAt(uint row, uint column)
+    {
+        GridLayoutCell cell = Cells[row, column] ?? throw new IndexOutOfRangeException("Invalid grid index.");
+
+        if (cell.Children.Count <= 0)
+            throw new InvalidOperationException($"No element at row {row} and column {column}.");
+
+        Element element = cell.Children.First();
+        element.Parent = null;
+
+        return element;
+    }
+
+
+    public void DeleteFirstElement() => App.RemoveElement(RemoveFirstElement());
+    public void DeleteLastElement() => App.RemoveElement(RemoveLastElement());
+    public void DeleteElementAt(uint row, uint column) => App.RemoveElement(RemoveElementAt(row, column));
+
+    public void DeleteAll()
+    {
+        for (uint row = 0; row < Rows; row++)
+            for (uint col = 0; col < Columns; col++)
+                DeleteElementAt(row, col);
+    }
+
 
     // TODO: add basic element handling methods, like the one below:
+
+    public Element? FindFirstElement()
+    {
+        for (int row = 0; row < Cells.GetLength(0) - 1; row++)
+        for (int col = 0; col < Cells.GetLength(1); col++)
+        {
+            GridLayoutCell? cell = Cells[row, col];
+
+            if (cell is not null && cell.Children.Count > 0)
+                return cell.Children.First();
+        }
+
+        return null;
+    }
 
     public Element? FindLastElement()
     {
@@ -182,7 +242,7 @@ public class GridLayoutElement : RectangleElement
 
         GridLayoutCell?[,] oldCells = Cells;
 
-        Cells = new GridLayoutCell[Rows, Columns];
+        Cells = new GridLayoutCell?[Rows, Columns];
 
         for (uint row = 0; row < Rows; row++)
         for (uint col = 0; col < Columns; col++)
@@ -224,4 +284,8 @@ public class GridLayoutElement : RectangleElement
 
     private static bool AreIndicesInsideMatrixBounds<T>(T[,] matrix, uint row, uint col)
         => row < matrix.GetLength(0) && col < matrix.GetLength(1);
+
+
+
+    private static InvalidOperationException EmptyGridException() => new("The grid contains no elements.");
 }

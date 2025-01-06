@@ -12,7 +12,7 @@ namespace Latte.Test;
 class Program
 {
     private static void AddButtonToLayout(GridLayoutElement layoutElement)
-        => layoutElement.AddElement(new ButtonElement(null, new(), new(30, 30), "Btn")
+        => layoutElement.AddElementAtEnd(new ButtonElement(null, new(), new(30, 30), "Btn")
         {
             Alignment = { Value = Alignments.Center }
         });
@@ -35,7 +35,7 @@ class Program
             Color = { Value = new(255, 255, 255) }
         };
 
-        ButtonElement addButton = new(rect, new(), new(100, 40), "Add")
+        ButtonElement removeButton = new(rect, new(), new(100, 40), "Add")
         {
             Alignment = { Value = Alignments.BottomRight },
             AlignmentMargin = { Value = new(-10, -5) }
@@ -57,10 +57,9 @@ class Program
         for (int i = 0; i < 10; i++)
             AddButtonToLayout(grid);
 
-        addButton.MouseUpEvent += (_, _) =>
+        removeButton.MouseUpEvent += (_, _) =>
         {
-            AddButtonToLayout(grid);
-            App.AddElement(grid);
+            grid.DeleteLastElement();
         };
 
         // scrollAreaElement.ScrollOffset.Y = scrollAreaElement.GetChildrenBounds().Size.Y / 2f;
