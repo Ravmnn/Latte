@@ -106,8 +106,6 @@ public class GridLayoutElement : RectangleElement
 
     public bool RecreationRequired { get; set; }
 
-    // TODO: add a way to automatically remove empty cells
-
 
     public GridLayoutElement(Element? parent, Vec2f position, uint rows, uint columns, float cellWidth, float cellHeight)
         : base(parent, position, new())
@@ -123,7 +121,6 @@ public class GridLayoutElement : RectangleElement
         Color.Value = SFML.Graphics.Color.Transparent;
 
         Cells = new GridLayoutCell[0, 0];
-
         CreateCells();
     }
 
@@ -246,10 +243,8 @@ public class GridLayoutElement : RectangleElement
         for (uint row = 0; row < Rows; row++)
         for (uint col = 0; col < Columns; col++)
         {
-            InitializeCellBasedOnOldCellMatrix(oldCells, row, col, out Element? oldCellChild);
+            InitializeCellBasedOnOldCellMatrix(oldCells, row, col);
             UpdateCellGeometry(row, col);
-
-            Cells[row, col].Element = oldCellChild;
         }
 
         Size.Value = new(Columns * CellWidth, Rows * CellHeight);
@@ -257,18 +252,12 @@ public class GridLayoutElement : RectangleElement
         RecreationRequired = false;
     }
 
-    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCell[,] oldCells, uint row, uint col, out Element? oldCellChild)
+    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCell[,] oldCells, uint row, uint col)
     {
         if (AreIndicesInsideMatrixBounds(oldCells, row, col))
-        {
-            oldCellChild = oldCells[row, col].Element;
             Cells[row, col] = oldCells[row, col];
-        }
         else
-        {
-            oldCellChild = null;
             Cells[row, col] = new(this, new(), new());
-        }
     }
 
     private void UpdateCellGeometry(uint row, uint col)

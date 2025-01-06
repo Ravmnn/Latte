@@ -4,7 +4,6 @@ using Latte.Core;
 using Latte.Core.Application;
 using Latte.Elements;
 using Latte.Elements.Primitives;
-using Latte.Elements.Primitives.Shapes;
 
 
 namespace Latte.Test;
@@ -12,8 +11,11 @@ namespace Latte.Test;
 
 class Program
 {
+    static int counter;
+
+
     private static void AddButtonToLayout(GridLayoutElement layoutElement)
-        => layoutElement.AddElementAtEnd(new ButtonElement(null, new(), new(30, 30), "Btn")
+        => layoutElement.AddElementAtEnd(new ButtonElement(null, new(), new(30, 30), $"{counter++}")
         {
             Alignment = { Value = Alignments.Center }
         });
@@ -36,7 +38,7 @@ class Program
             Color = { Value = new(255, 255, 255) }
         };
 
-        ButtonElement removeButton = new(rect, new(), new(100, 40), "Add")
+        ButtonElement addButton = new(rect, new(), new(100, 40), "Add")
         {
             Alignment = { Value = Alignments.BottomRight },
             AlignmentMargin = { Value = new(-10, -5) }
@@ -58,9 +60,10 @@ class Program
         for (int i = 0; i < 10; i++)
             AddButtonToLayout(grid);
 
-        removeButton.MouseUpEvent += (_, _) =>
+        addButton.MouseUpEvent += (_, _) =>
         {
-            grid.DeleteLastElement();
+            AddButtonToLayout(grid);
+            App.AddElement(grid);
         };
 
         // scrollAreaElement.ScrollOffset.Y = scrollAreaElement.GetChildrenBounds().Size.Y / 2f;

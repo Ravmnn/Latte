@@ -98,7 +98,7 @@ public static class RectExtensions
         if (rects.Length == 0)
             return new();
 
-        FloatRect bounds = new(rects[0].Position, new());
+        FloatRect bounds = rects[0];
 
         foreach (FloatRect rect in rects)
         {

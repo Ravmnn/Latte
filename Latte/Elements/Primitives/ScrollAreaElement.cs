@@ -202,7 +202,8 @@ public class ScrollAreaElement : ButtonElement
 
     public FloatRect GetChildrenBounds()
     {
-        FloatRect bounds = (from child in Children select new FloatRect(child.RelativePosition.Value, child.GetBounds().Size)).ToArray().GetBoundsOfRects();
+        FloatRect bounds = (from child in Children where !child.HasAttribute<IgnoreScrollAttribute>()
+            select new FloatRect(child.RelativePosition.Value, child.GetBounds().Size)).ToArray().GetBoundsOfRects();
 
         if (bounds.Width < Size.Value.X)
             bounds.Width = Size.Value.X;
@@ -220,7 +221,7 @@ public class ScrollAreaElement : ButtonElement
             if (!child.HasAttribute<IgnoreScrollAttribute>())
                 child.RelativePosition.Value += offset;
 
-        if (IsRelativeBoundsOutsideChildrenBounds())
+        if (AreRelativeBoundsOutsideChildrenBounds())
             Scroll(-offset);
 
         OnScroll(offset);
@@ -230,7 +231,7 @@ public class ScrollAreaElement : ButtonElement
     protected void ScrollHorizontally(float offset) => Scroll(new(x: offset));
 
 
-    protected bool IsRelativeBoundsOutsideChildrenBounds()
+    protected bool AreRelativeBoundsOutsideChildrenBounds()
     {
         FloatRect childrenBounds = GetChildrenBounds();
 

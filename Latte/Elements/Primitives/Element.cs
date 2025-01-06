@@ -206,10 +206,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public virtual void Update()
     {
+        RemoveNonChildren();
+
         CanOnlyHaveChildOfTypeAttribute.Check(this);
         ChildrenAmountLimitAttribute.Check(this);
-
-        RemoveNonChildren();
 
         if (!Initialized)
             Setup();
