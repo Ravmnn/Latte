@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 using Latte.Core.Application;
 using Latte.Core.Type;
@@ -42,7 +44,7 @@ public enum GridLayoutGrowDirection
 // TODO: implement IEnumerable and IEnumerator
 
 [CanOnlyHaveChildOfType(typeof(GridLayoutCell))]
-public class GridLayoutElement : RectangleElement
+public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 {
     private uint _rows;
     private uint _columns;
@@ -181,6 +183,11 @@ public class GridLayoutElement : RectangleElement
     }
 
 
+    public Element? GetElementAt(uint row, uint col) => Cells[row, col].Element;
+
+    public Element? this[uint row, uint col] => GetElementAt(row, col);
+
+
     public Element? FindFirstElement()
     {
         for (int row = 0; row < Cells.GetLength(0) - 1; row++)
@@ -200,6 +207,10 @@ public class GridLayoutElement : RectangleElement
 
         return null;
     }
+
+
+    public IEnumerator<Element?> GetEnumerator() => new GridLayoutEnumerator(this);
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
     protected GridLayoutCell FindAvailableCell()
@@ -271,6 +282,70 @@ public class GridLayoutElement : RectangleElement
         => row < matrix.GetLength(0) && col < matrix.GetLength(1);
 
 
-
     private static InvalidOperationException EmptyGridException() => new("The grid contains no elements.");
+}
+
+
+public class GridLayoutEnumerator : IEnumerator<Element?>
+{
+    private readonly GridLayoutElement _gridLayout;
+    private uint _row, _col;
+
+    public Element? Current => _gridLayout[_row, _col];
+    object? IEnumerator.Current => Current;
+
+    private bool _disposed;
+
+
+    public GridLayoutEnumerator(GridLayoutElement gridLayout)
+    {
+        _gridLayout = gridLayout;
+        _row = _col = 0;
+
+        _disposed = false;
+    }
+
+
+    public bool MoveNext()
+    {
+        _col++;
+
+        if (_col < _gridLayout.Columns)
+            return true;
+
+        _col = 0;
+        _row++;
+
+        return _row < _gridLayout.Rows;
+    }
+
+    public void Reset()
+    {
+        _row = _col = 0;
+    }
+
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        // nothing to dispose...
+
+        if (_disposed)
+            return;
+
+        if (disposing) {}
+
+        _disposed = true;
+    }
+
+
+    ~GridLayoutEnumerator()
+    {
+        Dispose(false);
+    }
 }

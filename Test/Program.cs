@@ -70,6 +70,10 @@ class Program
 
         App.AddElement(rect);
 
+        foreach (Element? element in grid)
+        {
+            Console.WriteLine($"grid element: {(element as ButtonElement)?.Text?.Text.Value ?? "null"}");
+        }
 
         while (App.Window.IsOpen)
         {
