@@ -45,7 +45,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
 
-    public Corners CornersToResize { get; set; }
+    public Corner CornerToResize { get; set; }
     public FloatRect Rect => new(RelativePosition.Value, Size.Value);
     public float CornerResizeAreaSize { get; protected set; }
 
@@ -94,7 +94,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         MouseState = new();
         DisableTruePressOnlyWhenMouseIsUp = true;
 
-        CornersToResize = new();
+        CornerToResize = new();
         CornerResizeAreaSize = 10f;
 
         MinSize = new(50, 50);
@@ -114,7 +114,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         if (Styles.HasFlag(WindowElementStyles.Moveable))
             (this as IDefaultDraggable).ProcessDraggingEvents();
 
-        App.Window.SetMouseCursor(Window.GetCursorTypeFromCorners(CornersToResize));
+        App.Window.Cursor = Window.GetCursorTypeFromCorners(CornerToResize);
 
         CloseButton.Visible = Styles.HasFlag(WindowElementStyles.Closeable);
 
@@ -135,16 +135,16 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     {
         Vec2f delta = App.ElementViewMousePositionDelta;
 
-        if (CornersToResize.HasFlag(Corners.Top))
+        if (CornerToResize.HasFlag(Corner.Top))
             ResizeCorners(top: delta.Y, bottom: -delta.Y);
 
-        else if (CornersToResize.HasFlag(Corners.Bottom))
+        else if (CornerToResize.HasFlag(Corner.Bottom))
             ResizeCorners(bottom: delta.Y);
 
-        if (CornersToResize.HasFlag(Corners.Left))
+        if (CornerToResize.HasFlag(Corner.Left))
             ResizeCorners(left: delta.X, right: -delta.X);
 
-        else if (CornersToResize.HasFlag(Corners.Right))
+        else if (CornerToResize.HasFlag(Corner.Right))
             ResizeCorners(right: delta.X);
     }
 
@@ -208,7 +208,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
     public virtual void OnMouseDown()
     {
-        Resizing = CornersToResize != Corners.None;
+        Resizing = CornerToResize != Corner.None;
         Dragging = !Resizing; // don't drag while resizing
 
         MouseDownEvent?.Invoke(this, EventArgs.Empty);

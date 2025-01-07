@@ -15,7 +15,7 @@ public interface IResizable
     FloatRect Rect { get; }
     float CornerResizeAreaSize { get; }
     
-    Corners CornersToResize { get; set; }
+    Corner CornerToResize { get; set; }
     
     Vec2f? MinSize { get; }
     Vec2f? MaxSize { get; }
@@ -52,12 +52,12 @@ public interface IDefaultResizable : IResizable
         FloatRect top = Rect with { Height = CornerResizeAreaSize };
         FloatRect bottom = Rect with { Top = Rect.Top + Rect.Height - CornerResizeAreaSize, Height = CornerResizeAreaSize };
 
-        CornersToResize = Corners.None;
+        CornerToResize = Corner.None;
         
-        CornersToResize |= point.IsPointOverRect(left) ? Corners.Left : Corners.None;
-        CornersToResize |= point.IsPointOverRect(right) ? Corners.Right : Corners.None;
-        CornersToResize |= point.IsPointOverRect(top) ? Corners.Top : Corners.None;
-        CornersToResize |= point.IsPointOverRect(bottom) ? Corners.Bottom : Corners.None;
+        CornerToResize |= point.IsPointOverRect(left) ? Corner.Left : Corner.None;
+        CornerToResize |= point.IsPointOverRect(right) ? Corner.Right : Corner.None;
+        CornerToResize |= point.IsPointOverRect(top) ? Corner.Top : Corner.None;
+        CornerToResize |= point.IsPointOverRect(bottom) ? Corner.Bottom : Corner.None;
     }
 
 

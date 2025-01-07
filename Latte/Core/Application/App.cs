@@ -45,6 +45,8 @@ public static class App
         private set => s_window = value;
     }
 
+    public static bool ShouldQuit { get; private set; }
+
     public static View MainView
     {
         get => s_mainView ?? throw AppNotInitializedException();
@@ -137,12 +139,16 @@ public static class App
     public static void InitWindow(Window window)
     {
         Window = window;
+        Window.Closed += (_, _) => Quit();
         Window.Resized += (_, args) => OnWindowResize(new(args.Width, args.Height));
         Window.MouseWheelScrolled += (_, args) => MouseScrollDelta = args.Delta;
 
         MainView = new(Window.GetView());
         ElementView = new(MainView);
     }
+
+
+    public static void Quit() => ShouldQuit = true;
 
 
     public static void Update()

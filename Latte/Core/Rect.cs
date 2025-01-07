@@ -10,7 +10,7 @@ namespace Latte.Core;
 
 
 [Flags]
-public enum Corners
+public enum Corner
 {
     None,
 

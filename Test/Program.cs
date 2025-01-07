@@ -1,6 +1,5 @@
 ﻿using SFML.Window;
 
-using Latte.Core;
 using Latte.Core.Application;
 using Latte.Elements;
 using Latte.Elements.Primitives;
@@ -25,7 +24,9 @@ class Program
     {
         App.Init(VideoMode.DesktopMode, "Latte Test", new("../../../resources/Itim-Regular.ttf"), settings: new()
         {
-            AntialiasingLevel = 16
+            AntialiasingLevel = 16,
+            DepthBits = 24,
+            StencilBits = 8
         });
 
         WindowElement rect = new("this is a text", new(), new(600, 400))
@@ -66,24 +67,14 @@ class Program
             App.AddElement(grid);
         };
 
-        // scrollAreaElement.ScrollOffset.Y = scrollAreaElement.GetChildrenBounds().Size.Y / 2f;
-
         App.AddElement(rect);
 
-        foreach (Element? element in grid)
+        while (!App.ShouldQuit)
         {
-            Console.WriteLine($"grid element: {(element as ButtonElement)?.Text?.Text.Value ?? "null"}");
-        }
-
-        while (App.Window.IsOpen)
-        {
-            App.Window.Clear();
-
             App.Update();
+
+            App.Window.Clear();
             App.Draw();
-
-            // Debug.DrawLineRect(App.Window, scrollAreaElement.Viewport, SFML.Graphics.Color.Blue);
-
             App.Window.Display();
         }
     }

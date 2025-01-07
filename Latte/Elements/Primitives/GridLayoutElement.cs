@@ -41,8 +41,6 @@ public enum GridLayoutGrowDirection
 }
 
 
-// TODO: implement IEnumerable and IEnumerator
-
 [CanOnlyHaveChildOfType(typeof(GridLayoutCell))]
 public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 {
