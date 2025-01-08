@@ -74,6 +74,8 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
     {
         (this as IDefaultDraggable).ProcessDraggingEvents();
 
+        RaiseToParentTop();
+
         UpdateSize();
 
         ClampPosition();

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-
+using System.Runtime.InteropServices.JavaScript;
 using SFML.Graphics;
 
 using Latte.Core;
@@ -130,6 +130,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     }
 
     protected int LastPriority { get; private set; }
+
+
 
     public event EventHandler? PriorityChangedEvent;
 
@@ -340,6 +342,32 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public void FullRaise() => Priority = App.Elements.Last().Priority + 1;
     public void FullLower() => Priority = App.Elements.First().Priority - 1;
 
+    public void RaiseToParentTop()
+    {
+        int higherPriority = Priority;
+
+        Parent?.Children.ForeachElement(element =>
+        {
+            if (element != this && element.Priority > higherPriority)
+                higherPriority = element.Priority;
+        });
+
+        Priority = higherPriority + 1;
+    }
+
+    public void RaiseToParentBottom()
+    {
+        int lowerPriority = Priority;
+
+        Parent?.Children.ForeachElement(element =>
+        {
+            if (element != this && element.Priority < lowerPriority)
+                lowerPriority = element.Priority;
+        });
+
+        Priority = lowerPriority - 1;
+    }
+
 
     private void AddParentPriorityDeltaToThis()
     {
@@ -400,4 +428,17 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     protected virtual void OnPriorityChange()
         => PriorityChangedEvent?.Invoke(this, EventArgs.Empty);
+}
+
+
+public static class ElementExtensions
+{
+    public static void ForeachElement(this IEnumerable<Element> elements, Action<Element> action)
+    {
+        foreach (Element element in elements)
+        {
+            action(element);
+            ForeachElement(element.Children, action);
+        }
+    }
 }

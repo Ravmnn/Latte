@@ -69,9 +69,6 @@ class Program
 
         App.AddElement(rect);
 
-        scrollAreaElement.VerticalScrollHandle.FullRaise();
-        scrollAreaElement.HorizontalScrollHandle.FullRaise();
-
         while (!App.ShouldQuit)
         {
             App.Update();

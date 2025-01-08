@@ -53,31 +53,28 @@ public class Section : IUpdateable, IDrawable
     }
 
     private void AddElementsHierarchy(List<Element> elements)
-    {
-        AddSingleElements(elements);
-
-        foreach (Element element in elements)
-            AddElementsHierarchy(element.Children);
-    }
+        => elements.ForeachElement(AddSingleElement);
 
     private void AddSingleElement(Element element)
     {
         if (HasElement(element))
             return;
 
-        if (_elements.Count > 0)
-            element.Priority = _elements.Last().Priority + 1;
+        // TODO: probably this is not wanted.
+
+        // if (_elements.Count > 0)
+        //     element.Priority = _elements.Last().Priority + 1;
 
         _elements.Add(element);
 
         ElementAddedEvent?.Invoke(null, new(element));
     }
 
-    private void AddSingleElements(IEnumerable<Element> elements)
-    {
-        foreach (Element element in elements)
-            AddSingleElement(element);
-    }
+    // private void AddSingleElements(IEnumerable<Element> elements)
+    // {
+    //     foreach (Element element in elements)
+    //         AddSingleElement(element);
+    // }
 
 
     public bool RemoveElement(Element element)
