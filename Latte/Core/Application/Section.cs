@@ -60,7 +60,7 @@ public class Section : IUpdateable, IDrawable
         if (HasElement(element))
             return;
 
-        // TODO: probably this is not wanted.
+        // TODO: probably this is not wanted. priority is set in Element.OnParentChange
 
         // if (_elements.Count > 0)
         //     element.Priority = _elements.Last().Priority + 1;

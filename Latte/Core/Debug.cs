@@ -5,6 +5,10 @@ namespace Latte.Core;
 
 
 // TODO: add a debug mode for only showing the priority of elements
+/* TODO: move debug stuff to here...
+        render bounds: render element bounds and dimensions
+        render clip bounds: only bounds, no dimensions
+ */
 
 public static class Debug
 {
