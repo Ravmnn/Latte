@@ -183,8 +183,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         SizePolicy = new(this, nameof(SizePolicy), SizePolicyType.None);
         SizePolicyMargin = new(this, nameof(SizePolicyMargin), new()) { CanAnimate = false };
 
-        ShouldDrawElementBoundaries = true;
-
         if (Parent is null)
             return;
 
@@ -335,8 +333,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     }
 
 
-    public void Raise() => Priority++;
-    public void Lower() => Priority--;
+
+    public void Raise(uint amount = 1) => Priority += (int)amount;
+    public void Lower(uint amount = 1) => Priority -= (int)amount;
 
     public void FullRaise() => Priority = App.Elements.Last().Priority + 1;
     public void FullLower() => Priority = App.Elements.First().Priority - 1;

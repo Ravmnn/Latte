@@ -1,5 +1,3 @@
-using System;
-using Latte.Core.Application;
 using SFML.System;
 using SFML.Window;
 using SFML.Graphics;
@@ -41,12 +39,11 @@ public class Window : RenderWindow, IUpdateable, IDrawable
 
     public IntRect WindowRect => new(new(0, 0), (Vector2i)Size);
 
-    public event EventHandler? ClosedEvent;
 
-
-    public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings settings = new()) : base(mode, title, style, settings)
+    public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings settings = new()) : base(mode, title, style,
+        settings)
     {
-        Closed += (_, _) => Close();
+        _cursor = new(Cursor.CursorType.Arrow);
     }
 
 
@@ -60,13 +57,6 @@ public class Window : RenderWindow, IUpdateable, IDrawable
 
     public virtual void Draw(RenderTarget target)
     {}
-
-
-    public override void Close()
-    {
-        ClosedEvent?.Invoke(this, EventArgs.Empty);
-        base.Close();
-    }
 
 
     public static Cursor GetCursorTypeFromCorners(Corner corner)

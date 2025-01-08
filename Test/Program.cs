@@ -46,19 +46,19 @@ class Program
         };
 
 
-        ScrollAreaElement scrollAreaElement = new(rect, new(), new(200, 200))
+        ScrollAreaElement scrollAreaElement = new(rect, new(), new(200, 200), true, true)
         {
             Color = { Value = new(200, 100, 100, 40) },
 
             Alignment = { Value = Alignments.Center }
         };
 
-        GridLayoutElement grid = new(scrollAreaElement, new(), 5, 5, 35, 35)
+        GridLayoutElement grid = new(scrollAreaElement, new(), 5, 10, 35, 35)
         {
             GrowDirection = GridLayoutGrowDirection.Vertically
         };
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 300; i++)
             AddButtonToLayout(grid);
 
         addButton.MouseUpEvent += (_, _) =>
@@ -68,6 +68,9 @@ class Program
         };
 
         App.AddElement(rect);
+
+        scrollAreaElement.VerticalScrollHandle.FullRaise();
+        scrollAreaElement.HorizontalScrollHandle.FullRaise();
 
         while (!App.ShouldQuit)
         {

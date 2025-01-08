@@ -8,6 +8,8 @@ using Latte.Core.Type;
 namespace Latte.Elements;
 
 
+// TODO: rename to "Alignment"
+
 [Flags]
 public enum Alignments
 {
