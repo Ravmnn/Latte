@@ -16,7 +16,7 @@ class Program
     private static void AddButtonToLayout(GridLayoutElement layoutElement)
         => layoutElement.AddElementAtEnd(new ButtonElement(null, new(), new(30, 30), $"{counter++}")
         {
-            Alignment = { Value = Alignments.Center }
+            Alignment = { Value = Alignment.Center }
         });
 
 
@@ -41,7 +41,7 @@ class Program
 
         ButtonElement addButton = new(rect, new(), new(100, 40), "Add")
         {
-            Alignment = { Value = Alignments.BottomRight },
+            Alignment = { Value = Alignment.BottomRight },
             AlignmentMargin = { Value = new(-10, -5) }
         };
 
@@ -50,7 +50,7 @@ class Program
         {
             Color = { Value = new(200, 100, 100, 40) },
 
-            Alignment = { Value = Alignments.Center }
+            Alignment = { Value = Alignment.Center }
         };
 
         GridLayoutElement grid = new(scrollAreaElement, new(), 5, 10, 35, 35)

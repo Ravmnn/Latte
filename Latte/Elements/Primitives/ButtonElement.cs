@@ -32,7 +32,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         if (text is not null)
             Text = new(this, new(), null, text)
             {
-                Alignment = { Value = Alignments.Center },
+                Alignment = { Value = Elements.Alignment.Center },
 
                 Color = { Value = SFML.Graphics.Color.Black }
             };

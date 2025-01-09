@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 
 using Latte.Core.Animation;
@@ -10,53 +9,26 @@ using Latte.Elements.Primitives;
 namespace Latte.Elements;
 
 
-public class Keyframe() : IEnumerable
+public class Keyframe() : Dictionary<string, IAnimatable>
 {
-    public Dictionary<string, IAnimatable> Properties { get; } = [];
-
-
     public Keyframe(AnimatableProperty[] properties) : this()
     {
-        Properties = ElementPropertiesToKeyframeProperties(properties);
+        foreach (var (name, value) in ElementPropertiesToKeyframeProperties(properties))
+            this[name] = value;
     }
 
 
-    // must implement for using collection initialization list
-    public void Add(string name, IAnimatable value) => Set(name, value);
-    public bool Remove(string name) => Properties.Remove(name);
-
-
-    public bool Exists(string name) => Properties.ContainsKey(name);
-
-
-    public void Set(string name, IAnimatable value) => Properties[name] = value;
-
     public void SetIfNotDefined(string name, IAnimatable value)
     {
-        if (!Exists(name))
-            Set(name, value);
+        if (!ContainsKey(name))
+            this[name] = value;
     }
 
     public void SetIfDefined(string name, IAnimatable value)
     {
-        if (Exists(name))
-            Set(name, value);
+        if (ContainsKey(name))
+            this[name] = value;
     }
-
-
-    public IAnimatable Get(string name) => Properties[name];
-    public bool TryGet(string name, out IAnimatable? value) => Properties.TryGetValue(name, out value);
-
-
-    public IAnimatable this[string name]
-    {
-        get => Properties[name];
-        set => Properties[name] = value;
-    }
-
-
-    public IEnumerator GetEnumerator()
-        => Properties.GetEnumerator();
 
 
     private static Dictionary<string, IAnimatable> ElementPropertiesToKeyframeProperties(AnimatableProperty[] properties)
@@ -73,12 +45,12 @@ public class ElementKeyframeAnimator(Element element, double time, Easing easing
     public Easing Easing { get; set; } = easing;
 
 
-    public void Animate(Keyframe to)
+    public void Animate(Keyframe to, double? time = null, Easing? easing = null)
     {
         if (DefaultProperties is not null)
-            Animate(Element, DefaultProperties, Time, Easing);
+            Animate(Element, DefaultProperties, time ?? Time, easing ?? Easing);
 
-        Animate(Element, to, Time, Easing);
+        Animate(Element, to, time ?? Time, easing ?? Easing);
     }
 
 
@@ -86,7 +58,7 @@ public class ElementKeyframeAnimator(Element element, double time, Easing easing
     {
         foreach (Property elementProperty in element.Properties)
         {
-            bool keyframePropertyExists = to.TryGet(elementProperty.Name, out IAnimatable? targetPropertyValue);
+            bool keyframePropertyExists = to.TryGetValue(elementProperty.Name, out IAnimatable? targetPropertyValue);
 
             if (!keyframePropertyExists)
                 continue;

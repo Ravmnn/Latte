@@ -8,10 +8,8 @@ using Latte.Core.Type;
 namespace Latte.Elements;
 
 
-// TODO: rename to "Alignment"
-
 [Flags]
-public enum Alignments
+public enum Alignment
 {
     None = 0,
 
@@ -34,58 +32,58 @@ public enum Alignments
 
 public interface IAlignable
 {
-    Vec2f GetAlignmentPosition(Alignments alignment);
+    Vec2f GetAlignmentPosition(Alignment alignment);
 }
 
 
 public static class AlignmentCalculator
 {
-    public static Vec2f GetAlignedPositionOfChild(FloatRect child, FloatRect parent, Alignments alignment)
+    public static Vec2f GetAlignedPositionOfChild(FloatRect child, FloatRect parent, Alignment alignment)
     {
         Vec2f position = child.Position;
 
-        if (alignment.HasFlag(Alignments.Top))
+        if (alignment.HasFlag(Alignment.Top))
             position.Y = parent.Top;
 
-        else if (alignment.HasFlag(Alignments.Bottom))
+        else if (alignment.HasFlag(Alignment.Bottom))
             position.Y = parent.Top + parent.Height - child.Height;
 
-        if (alignment.HasFlag(Alignments.Left))
+        if (alignment.HasFlag(Alignment.Left))
             position.X = parent.Left;
 
-        else if (alignment.HasFlag(Alignments.Right))
+        else if (alignment.HasFlag(Alignment.Right))
             position.X = parent.Left + parent.Width - child.Width;
 
-        if (alignment.HasFlag(Alignments.HorizontalCenter))
+        if (alignment.HasFlag(Alignment.HorizontalCenter))
             position.X = parent.Left + parent.Width / 2f - child.Width / 2f;
 
-        if (alignment.HasFlag(Alignments.VerticalCenter))
+        if (alignment.HasFlag(Alignment.VerticalCenter))
             position.Y = parent.Top + parent.Height / 2f - child.Height / 2f;
 
         return position;
     }
 
 
-    public static Vec2f GetAlignedRelativePositionOfChild(FloatRect child, FloatRect parent, Alignments alignment)
+    public static Vec2f GetAlignedRelativePositionOfChild(FloatRect child, FloatRect parent, Alignment alignment)
     {
         Vec2f position = child.Position;
 
-        if (alignment.HasFlag(Alignments.Top))
+        if (alignment.HasFlag(Alignment.Top))
             position.Y = 0;
 
-        else if (alignment.HasFlag(Alignments.Bottom))
+        else if (alignment.HasFlag(Alignment.Bottom))
             position.Y = parent.Height - child.Height;
 
-        if (alignment.HasFlag(Alignments.Left))
+        if (alignment.HasFlag(Alignment.Left))
             position.X = 0;
 
-        else if (alignment.HasFlag(Alignments.Right))
+        else if (alignment.HasFlag(Alignment.Right))
             position.X = parent.Width - child.Width;
 
-        if (alignment.HasFlag(Alignments.HorizontalCenter))
+        if (alignment.HasFlag(Alignment.HorizontalCenter))
             position.X = parent.Width / 2f - child.Width / 2f;
 
-        if (alignment.HasFlag(Alignments.VerticalCenter))
+        if (alignment.HasFlag(Alignment.VerticalCenter))
             position.Y = parent.Height / 2f - child.Height / 2f;
 
         return position;

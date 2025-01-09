@@ -8,7 +8,6 @@ using Latte.Core.Type;
 namespace Latte.Core;
 
 
-// TODO: add scrollable areas
 // TODO: add text inputs
 
 

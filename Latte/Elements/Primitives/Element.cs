@@ -150,7 +150,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public AnimatableProperty<Vec2f> Scale { get; }
 
-    public Property<Alignments> Alignment { get; }
+    public Property<Alignment> Alignment { get; }
     public AnimatableProperty<Vec2f> AlignmentMargin { get; }
 
     public Property<SizePolicyType> SizePolicy { get; }
@@ -179,7 +179,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Rotation = new(this, nameof(Rotation), 0f);
         Scale = new(this, nameof(Scale), new(1f, 1f));
 
-        Alignment = new(this, nameof(Alignment), Alignments.None);
+        Alignment = new(this, nameof(Alignment), Elements.Alignment.None);
         AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { CanAnimate = false };
 
         SizePolicy = new(this, nameof(SizePolicy), SizePolicyType.None);
@@ -229,7 +229,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         if (SizePolicy.Value != SizePolicyType.None)
             ApplySizePolicy();
 
-        if (Alignment.Value != Alignments.None)
+        if (Alignment.Value != Elements.Alignment.None)
             ApplyAlignment();
     }
 
@@ -297,10 +297,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public FloatRect GetParentBorderLessRelativeBounds() => Parent?.GetBorderLessRelativeBounds() ?? (FloatRect)App.Window.WindowRect;
 
 
-    public virtual Vec2f GetAlignmentPosition(Alignments alignment)
+    public virtual Vec2f GetAlignmentPosition(Alignment alignment)
         => AlignmentCalculator.GetAlignedPositionOfChild(GetBorderLessBounds(), GetParentBorderLessBounds(), alignment);
 
-    public virtual Vec2f GetAlignmentRelativePosition(Alignments alignment)
+    public virtual Vec2f GetAlignmentRelativePosition(Alignment alignment)
         => AlignmentCalculator.GetAlignedRelativePositionOfChild(GetBorderLessRelativeBounds(), GetParentBorderLessRelativeBounds(), alignment);
 
     public Vec2f GetAlignmentPosition() => GetAlignmentPosition(Alignment);

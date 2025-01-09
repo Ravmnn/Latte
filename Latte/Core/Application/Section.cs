@@ -60,21 +60,10 @@ public class Section : IUpdateable, IDrawable
         if (HasElement(element))
             return;
 
-        // TODO: probably this is not wanted. priority is set in Element.OnParentChange
-
-        // if (_elements.Count > 0)
-        //     element.Priority = _elements.Last().Priority + 1;
-
         _elements.Add(element);
 
         ElementAddedEvent?.Invoke(null, new(element));
     }
-
-    // private void AddSingleElements(IEnumerable<Element> elements)
-    // {
-    //     foreach (Element element in elements)
-    //         AddSingleElement(element);
-    // }
 
 
     public bool RemoveElement(Element element)

@@ -58,12 +58,12 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
         switch (orientation)
         {
             case ScrollDirection.Vertical:
-                Alignment.Set(Alignments.Right);
+                Alignment.Set(Elements.Alignment.Right);
                 Size.Value.X = 10;
                 break;
 
             case ScrollDirection.Horizontal:
-                Alignment.Set(Alignments.Bottom);
+                Alignment.Set(Elements.Alignment.Bottom);
                 Size.Value.Y = 10;
                 break;
         }

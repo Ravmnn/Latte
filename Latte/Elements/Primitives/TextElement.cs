@@ -115,7 +115,7 @@ public class TextElement : Element
         => GetRelativeBounds().ShrinkRect(BorderSize.Value);
 
 
-    public override Vec2f GetAlignmentPosition(Alignments alignment)
+    public override Vec2f GetAlignmentPosition(Alignment alignment)
     {
         // text local bounds work quite different
         // https://learnsfml.com/basics/graphics/how-to-center-text/#set-a-string
@@ -123,7 +123,7 @@ public class TextElement : Element
         return base.GetAlignmentPosition(alignment) - GetRelativeBounds().Position;
     }
 
-    public override Vec2f GetAlignmentRelativePosition(Alignments alignment)
+    public override Vec2f GetAlignmentRelativePosition(Alignment alignment)
     {
         return base.GetAlignmentRelativePosition(alignment) - GetRelativeBounds().Position;
     }

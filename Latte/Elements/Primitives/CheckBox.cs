@@ -16,7 +16,7 @@ public class CheckBox : ButtonElement
     {
         SelectedArea = new(this, new(), new())
         {
-            Alignment = { Value = Alignments.Center },
+            Alignment = { Value = Elements.Alignment.Center },
             SizePolicy = { Value = SizePolicyType.FitParent },
             SizePolicyMargin = { Value = new(5f, 5f) },
             Color = { Value = new(50, 50, 50) },
@@ -29,7 +29,7 @@ public class CheckBox : ButtonElement
         Radius.Set(5f);
         BorderSize.Set(2f);
 
-        Down.Set("Scale", new Vec2f(0.9f, 0.9f));
+        Down["Scale"] = new Vec2f(0.9f, 0.9f);
 
         UseDefaultAnimation = false;
     }

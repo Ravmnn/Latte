@@ -70,7 +70,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         : base(null, position, size)
     {
         Title = new(this, new(), 20, title);
-        Title.Alignment.Set(Alignments.HorizontalCenter | Alignments.Top);
+        Title.Alignment.Set(Elements.Alignment.HorizontalCenter | Elements.Alignment.Top);
         Title.AlignmentMargin.Set(new(0, 10));
 
         Color.Set(new(50, 50, 50, 220));
@@ -79,7 +79,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         {
             Color = { Value = new(255, 100, 100) },
 
-            Alignment = { Value = Alignments.TopRight },
+            Alignment = { Value = Elements.Alignment.TopRight },
             AlignmentMargin = { Value = new(-7, 8) },
 
             Down =
