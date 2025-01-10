@@ -31,7 +31,7 @@ class Program
         });
 
         //App.DebugOptions = DebugOption.RenderBounds | DebugOption.RenderBoundsDimensions | DebugOption.OnlyTrueHoveredElement;
-        App.EnableDebugShortcuts = true;
+        App.Debugger.EnableKeyShortcuts = true;
 
         WindowElement rect = new("this is a text", new(), new(600, 400))
         {

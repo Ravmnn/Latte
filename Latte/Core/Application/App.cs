@@ -12,6 +12,9 @@ using Latte.Elements;
 using Latte.Elements.Primitives;
 
 
+using Debugger = Latte.Core.Application.Debugging.Debugger;
+
+
 namespace Latte.Core.Application;
 
 
@@ -43,8 +46,7 @@ public static class App
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
 
-    public static DebugOption DebugOptions { get; set; }
-    public static bool EnableDebugShortcuts { get; set; }
+    public static Debugger Debugger { get; private set; }
 
     public static Font DefaultFont
     {
@@ -114,7 +116,7 @@ public static class App
 
         s_deltaTimeStopwatch = new();
 
-        DebugOptions = DebugOption.None;
+        Debugger = new();
 
         RenderMode = RenderMode.Pinned;
 
@@ -186,9 +188,10 @@ public static class App
 
         Section.Update();
 
-        ProcessDebugShortcuts();
         UpdateElementsMouseInputCatch();
         UpdateElements();
+
+        Debugger.Update();
 
         UnsetElementRenderView();
 
@@ -196,52 +199,6 @@ public static class App
 
         PressedKey = null;
         ReleasedKey = null;
-    }
-
-    private static void ProcessDebugShortcuts()
-    {
-        if (!EnableDebugShortcuts || PressedKey is null)
-            return;
-
-        switch (PressedKey.Scancode)
-        {
-            case Keyboard.Scancode.F1:
-                ToggleDebugOption(DebugOption.Clip);
-                break;
-
-            case Keyboard.Scancode.F2:
-                ToggleDebugOption(DebugOption.OnlyHoveredElement);
-                break;
-
-            case Keyboard.Scancode.F3:
-                ToggleDebugOption(DebugOption.OnlyTrueHoveredElement);
-                break;
-
-
-            case Keyboard.Scancode.F4:
-                ToggleDebugOption(DebugOption.RenderBounds);
-                break;
-
-            case Keyboard.Scancode.F5:
-                ToggleDebugOption(DebugOption.RenderBoundsDimensions);
-                break;
-
-            case Keyboard.Scancode.F6:
-                ToggleDebugOption(DebugOption.RenderClipBounds);
-                break;
-
-            case Keyboard.Scancode.F7:
-                ToggleDebugOption(DebugOption.RenderPriority);
-                break;
-        }
-    }
-
-    private static void ToggleDebugOption(DebugOption option)
-    {
-        if (DebugOptions.HasFlag(option))
-            DebugOptions &= ~option;
-        else
-            DebugOptions |= option;
     }
 
     private static void UpdateMouseProperties()
@@ -308,6 +265,8 @@ public static class App
         Section.Draw(Window);
         DrawElements();
 
+        Debugger.Draw(Window);
+
         UnsetElementRenderView();
     }
 
@@ -316,31 +275,6 @@ public static class App
         foreach (Element element in Elements)
             if (element.CanDraw)
                 element.Draw(Window);
-
-        if (DebugOptions == DebugOption.None)
-            return;
-
-        foreach (Element element in Elements)
-            DrawElementDebug(element);
-    }
-
-    private static void DrawElementDebug(Element element)
-    {
-        if (DebugOptions.HasFlag(DebugOption.OnlyHoveredElement) && element != ElementWhichCaughtMouseInput)
-            return;
-
-        if (DebugOptions.HasFlag(DebugOption.OnlyTrueHoveredElement) && element != TrueElementWhichCaughtMouseInput)
-            return;
-
-        bool clip = DebugOptions.HasFlag(DebugOption.Clip);
-
-        if (clip)
-            ClipArea.BeginClip(element.GetFinalClipArea());
-
-        Debug.DebugElement(Window, element, DebugOptions);
-
-        if (clip)
-            ClipArea.EndClip();
     }
 
     private static void SetElementRenderView()
