@@ -54,6 +54,17 @@ public class ElementEventArgs(Element? element) : EventArgs
 }
 
 
+public enum PrioritySnap
+{
+    None,
+
+    AlwaysOnTop,
+    AlwaysOnBottom,
+    AlwaysOnParentTop,
+    AlwaysOnParentBottom
+}
+
+
 public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePoliciable
 {
     private Element? _parent;
@@ -124,7 +135,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     protected int LastPriority { get; private set; }
 
-
+    public PrioritySnap PrioritySnap { get; set; }
+    public int PrioritySnapOffset { get; set; }
 
     public event EventHandler? PriorityChangedEvent;
 
@@ -164,6 +176,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Animator = new(this, 0.07);
 
         Visible = true;
+
+        PrioritySnap = PrioritySnap.None;
+        PrioritySnapOffset = 1;
 
         BlocksMouseInput = true;
 
@@ -207,6 +222,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         if (!Initialized)
             Setup();
 
+        UpdatePriority();
         UpdateGeometry();
 
         UpdatePropertyAnimations();
@@ -215,6 +231,28 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         LastPriority = Priority;
 
         UpdateEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void UpdatePriority()
+    {
+        switch (PrioritySnap)
+        {
+            case PrioritySnap.AlwaysOnTop:
+                RaiseToTop();
+                break;
+
+            case PrioritySnap.AlwaysOnBottom:
+                LowerToBottom();
+                break;
+
+            case PrioritySnap.AlwaysOnParentTop:
+                RaiseToParentTop();
+                break;
+
+            case PrioritySnap.AlwaysOnParentBottom:
+                LowerToParentBottom();
+                break;
+        }
     }
 
     private void UpdateGeometry()
@@ -323,33 +361,42 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public void Raise(uint amount = 1) => Priority += (int)amount;
     public void Lower(uint amount = 1) => Priority -= (int)amount;
 
-    public void FullRaise() => Priority = App.Elements.Last().Priority + 1;
-    public void FullLower() => Priority = App.Elements.First().Priority - 1;
+    public void RaiseToTop()
+    {
+        Element element = App.Elements.Last(element => element != this && element.PrioritySnap == PrioritySnap.None);
+        Priority = element.Priority + PrioritySnapOffset;
+    }
+
+    public void LowerToBottom()
+    {
+        Element element = App.Elements.First(element => element != this && element.PrioritySnap == PrioritySnap.None);
+        Priority = element.Priority - PrioritySnapOffset;
+    }
 
     public void RaiseToParentTop()
     {
-        int higherPriority = Priority;
+        int higherPriority = int.MinValue;
 
         Parent?.Children.ForeachElement(element =>
         {
-            if (element != this && element.Priority > higherPriority)
+            if (element != this && element.PrioritySnap == PrioritySnap.None && element.Priority > higherPriority)
                 higherPriority = element.Priority;
         });
 
-        Priority = higherPriority + 1;
+        Priority = higherPriority == int.MinValue ? Priority : higherPriority + PrioritySnapOffset;
     }
 
-    public void RaiseToParentBottom()
+    public void LowerToParentBottom()
     {
-        int lowerPriority = Priority;
+        int lowerPriority = int.MaxValue;
 
         Parent?.Children.ForeachElement(element =>
         {
-            if (element != this && element.Priority < lowerPriority)
+            if (element != this && element.PrioritySnap == PrioritySnap.None && element.Priority < lowerPriority)
                 lowerPriority = element.Priority;
         });
 
-        Priority = lowerPriority - 1;
+        Priority = lowerPriority == int.MaxValue ? Priority : lowerPriority - PrioritySnapOffset;
     }
 
 

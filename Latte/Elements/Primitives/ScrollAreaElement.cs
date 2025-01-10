@@ -44,6 +44,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
     {
         Orientation = orientation;
 
+        PrioritySnap = PrioritySnap.AlwaysOnParentTop;
         Radius.Set(2f);
         BorderSize.Set(0f);
 
@@ -73,8 +74,6 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
     public override void Update()
     {
         (this as IDefaultDraggable).ProcessDraggingEvents();
-
-        RaiseToParentTop();
 
         UpdateSize();
 

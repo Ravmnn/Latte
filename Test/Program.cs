@@ -30,7 +30,7 @@ class Program
             StencilBits = 8
         });
 
-        App.DebugOptions = DebugOptions.RenderPriority | DebugOptions.Clip;
+        //App.DebugOptions = DebugOptions.RenderPriority | DebugOptions.Clip;
 
         WindowElement rect = new("this is a text", new(), new(600, 400))
         {
@@ -61,7 +61,7 @@ class Program
             GrowDirection = GridLayoutGrowDirection.Vertically
         };
 
-        for (int i = 0; i < 300; i++)
+        for (int i = 0; i < 100; i++)
             AddButtonToLayout(grid);
 
         addButton.MouseUpEvent += (_, _) =>

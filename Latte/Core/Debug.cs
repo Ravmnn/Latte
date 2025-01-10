@@ -10,7 +10,8 @@ using Latte.Elements.Primitives;
 namespace Latte.Core;
 
 
-// TODO: add a debug mode for only showing the priority of elements
+// TODO: add debug option for rendering the bounds dimensions
+// TODO: add a way of changing these options in runtime
 
 
 [Flags]
