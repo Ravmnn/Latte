@@ -18,9 +18,11 @@ public enum DebugOptions
 {
     None,
 
-    RenderBounds = 1 << 0,
-    RenderClipBounds = 1 << 1,
-    RenderPriority = 1 << 2
+    Clip = 1 << 0,
+
+    RenderBounds = 1 << 1,
+    RenderClipBounds = 1 << 2,
+    RenderPriority = 1 << 3
 }
 
 
@@ -72,7 +74,8 @@ public static class Debug
 
     public static void DrawElementPriority(RenderTarget target, Element element)
     {
-        DrawRect(target, element.GetBounds(), new(255, 255, 255, 50));
-        DrawCenteredText(target, element.GetBorderLessBounds(), element.Priority.ToString());
+        uint absolutePriority = (uint)System.Math.Abs(element.Priority);
+
+        DrawRect(target, element.GetBounds(), ColorGenerator.FromIndex(absolutePriority, 50));
     }
 }

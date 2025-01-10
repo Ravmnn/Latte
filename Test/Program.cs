@@ -30,7 +30,7 @@ class Program
             StencilBits = 8
         });
 
-        App.DebugOptions = DebugOptions.RenderPriority;
+        App.DebugOptions = DebugOptions.RenderPriority | DebugOptions.Clip;
 
         WindowElement rect = new("this is a text", new(), new(600, 400))
         {

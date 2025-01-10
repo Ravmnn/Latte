@@ -255,6 +255,11 @@ public static class App
 
     private static void DebugDrawElement(Element element)
     {
+        bool clip = DebugOptions.HasFlag(DebugOptions.Clip);
+
+        if (clip)
+            ClipArea.BeginClip(element.GetFinalClipArea());
+
         if (DebugOptions.HasFlag(DebugOptions.RenderBounds))
             Debug.DrawElementBounds(Window, element);
 
@@ -263,6 +268,9 @@ public static class App
 
         if (DebugOptions.HasFlag(DebugOptions.RenderPriority))
             Debug.DrawElementPriority(Window, element);
+
+        if (clip)
+            ClipArea.EndClip();
     }
 
     private static void SetElementRenderView()
