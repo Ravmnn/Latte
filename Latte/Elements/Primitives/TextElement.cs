@@ -65,7 +65,7 @@ public class TextElement : Element
         base.UpdateSfmlProperties();
 
         // round to avoid blurry text
-        Transformable.Position = new(MathF.Round(AbsolutePosition.X), MathF.Round(AbsolutePosition.Y));
+        Transformable.Position = AbsolutePosition.Round();
         Transformable.Origin = new(MathF.Round(Origin.Value.X), MathF.Round(Origin.Value.Y));
 
         SfmlText.DisplayedString = Text;

@@ -140,6 +140,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public event EventHandler? PriorityChangedEvent;
 
+    // TODO: having this directly inside Element doesn't feels good... try to find a better way of expressing this
     public bool BlocksMouseInput { get; set; }
 
     public AnimatableProperty<Vec2f> RelativePosition { get; }

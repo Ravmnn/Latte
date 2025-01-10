@@ -36,13 +36,13 @@ public static class App
 
     private static bool s_initialized;
 
+    private static Element? s_trueElementWhichCaughtMouseInput;
+
     private static Vec2i s_lastMousePosition;
     private static Vec2f s_lastElementViewMousePosition;
     private static Vec2f s_lastMainViewMousePosition;
 
     private static readonly Stopwatch s_deltaTimeStopwatch;
-
-    private static bool s_mouseInputWasCaught;
 
 
     public static DebugOptions DebugOptions { get; set; }
@@ -85,6 +85,9 @@ public static class App
     public static Section Section { get; set; }
     public static Element[] Elements => Section.Elements;
 
+    public static Element? ElementWhichCaughtMouseInput { get; private set; }
+
+
     public static Vec2i MousePosition { get; private set; }
     public static Vec2i MousePositionDelta => MousePosition - s_lastMousePosition;
     public static Vec2f ElementViewMousePosition { get; private set; }
@@ -108,8 +111,6 @@ public static class App
         s_lastMainViewMousePosition = new();
 
         s_deltaTimeStopwatch = new();
-
-        s_mouseInputWasCaught = false;
 
         DebugOptions = DebugOptions.None;
 
@@ -201,7 +202,7 @@ public static class App
 
     private static void UpdateElementsMouseInputCatch()
     {
-        s_mouseInputWasCaught = false;
+        ElementWhichCaughtMouseInput = s_trueElementWhichCaughtMouseInput = null;
 
         for (int i = Elements.Length - 1; i >= 0; i--)
         {
@@ -211,10 +212,15 @@ public static class App
             bool isMouseOver = clickable?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
 
             if (clickable is not null)
-                clickable.MouseState.IsMouseInputCaught = !s_mouseInputWasCaught && isMouseOver;
+                clickable.MouseState.IsMouseInputCaught = ElementWhichCaughtMouseInput is null && isMouseOver;
 
-            if (element.Visible && element.BlocksMouseInput && isMouseOver && !s_mouseInputWasCaught)
-                s_mouseInputWasCaught = true;
+            if (!element.Visible || !isMouseOver || ElementWhichCaughtMouseInput is not null)
+                continue;
+
+            if (element.BlocksMouseInput)
+                ElementWhichCaughtMouseInput = element;
+
+            s_trueElementWhichCaughtMouseInput ??= element;
         }
     }
 
@@ -253,16 +259,24 @@ public static class App
     private static void DrawElements()
     {
         foreach (Element element in Elements)
-        {
             if (element.CanDraw)
                 element.Draw(Window);
 
+        if (DebugOptions == DebugOptions.None)
+            return;
+
+        foreach (Element element in Elements)
             DebugDrawElement(element);
-        }
     }
 
     private static void DebugDrawElement(Element element)
     {
+        if (DebugOptions.HasFlag(DebugOptions.OnlyHoveredElement) && element != ElementWhichCaughtMouseInput)
+            return;
+
+        if (DebugOptions.HasFlag(DebugOptions.OnlyTrueHoveredElement) && element != s_trueElementWhichCaughtMouseInput)
+            return;
+
         bool clip = DebugOptions.HasFlag(DebugOptions.Clip);
 
         if (clip)
@@ -270,6 +284,9 @@ public static class App
 
         if (DebugOptions.HasFlag(DebugOptions.RenderBounds))
             Debug.DrawElementBounds(Window, element);
+
+        if (DebugOptions.HasFlag(DebugOptions.RenderBoundsDimensions))
+            Debug.DrawElementBoundsDimensions(Window, element);
 
         if (DebugOptions.HasFlag(DebugOptions.RenderClipBounds))
             Debug.DrawElementClipBounds(Window, element);
@@ -293,7 +310,7 @@ public static class App
     public static bool HasElement(Element element) => Section.HasElement(element);
 
 
-    public static bool IsMouseOverAnyElement() => s_mouseInputWasCaught;
+    public static bool IsMouseOverAnyElement() => ElementWhichCaughtMouseInput is not null;
 
 
     private static void OnWindowResize(Vec2u newSize)
