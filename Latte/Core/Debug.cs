@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using System.Net.Mime;
+
 using SFML.Graphics;
 
 using Latte.Core.Application;
@@ -12,12 +12,11 @@ using Latte.Elements.Primitives;
 namespace Latte.Core;
 
 
-// TODO: add debug option for rendering the bounds dimensions
 // TODO: add a way of changing these options in runtime
 
 
 [Flags]
-public enum DebugOptions
+public enum DebugOption
 {
     None,
 
@@ -34,6 +33,22 @@ public enum DebugOptions
 
 public static class Debug
 {
+    public static void DebugElement(RenderTarget target, Element element, DebugOption option)
+    {
+        if (option.HasFlag(DebugOption.RenderBounds))
+            DrawElementBounds(target, element);
+
+        if (option.HasFlag(DebugOption.RenderBoundsDimensions))
+            DrawElementBoundsDimensions(target, element);
+
+        if (option.HasFlag(DebugOption.RenderClipBounds))
+            DrawElementClipBounds(target, element);
+
+        if (option.HasFlag(DebugOption.RenderPriority))
+            DrawElementPriority(target, element);
+    }
+
+
     public static void DrawRect(RenderTarget target, FloatRect rect, Color color)
         => target.Draw(new RectangleShape(rect.Size)
         {

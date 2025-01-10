@@ -30,7 +30,8 @@ class Program
             StencilBits = 8
         });
 
-        App.DebugOptions = DebugOptions.RenderBounds | DebugOptions.RenderBoundsDimensions | DebugOptions.OnlyTrueHoveredElement;
+        //App.DebugOptions = DebugOption.RenderBounds | DebugOption.RenderBoundsDimensions | DebugOption.OnlyTrueHoveredElement;
+        App.EnableDebugShortcuts = true;
 
         WindowElement rect = new("this is a text", new(), new(600, 400))
         {

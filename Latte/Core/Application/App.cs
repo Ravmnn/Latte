@@ -36,8 +36,6 @@ public static class App
 
     private static bool s_initialized;
 
-    private static Element? s_trueElementWhichCaughtMouseInput;
-
     private static Vec2i s_lastMousePosition;
     private static Vec2f s_lastElementViewMousePosition;
     private static Vec2f s_lastMainViewMousePosition;
@@ -45,7 +43,8 @@ public static class App
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
 
-    public static DebugOptions DebugOptions { get; set; }
+    public static DebugOption DebugOptions { get; set; }
+    public static bool EnableDebugShortcuts { get; set; }
 
     public static Font DefaultFont
     {
@@ -86,7 +85,10 @@ public static class App
     public static Element[] Elements => Section.Elements;
 
     public static Element? ElementWhichCaughtMouseInput { get; private set; }
+    public static Element? TrueElementWhichCaughtMouseInput { get; private set; }
 
+    public static KeyEventArgs? PressedKey { get; private set; }
+    public static KeyEventArgs? ReleasedKey { get; private set; }
 
     public static Vec2i MousePosition { get; private set; }
     public static Vec2i MousePositionDelta => MousePosition - s_lastMousePosition;
@@ -112,7 +114,7 @@ public static class App
 
         s_deltaTimeStopwatch = new();
 
-        DebugOptions = DebugOptions.None;
+        DebugOptions = DebugOption.None;
 
         RenderMode = RenderMode.Pinned;
 
@@ -160,6 +162,9 @@ public static class App
         Window.Resized += (_, args) => OnWindowResize(new(args.Width, args.Height));
         Window.MouseWheelScrolled += (_, args) => MouseScrollDelta = args.Delta;
 
+        Window.KeyPressed += (_, args) => PressedKey = args;
+        Window.KeyReleased += (_, args) => ReleasedKey = args;
+
         MainView = new(Window.GetView());
         ElementView = new(MainView);
     }
@@ -181,47 +186,62 @@ public static class App
 
         Section.Update();
 
+        ProcessDebugShortcuts();
         UpdateElementsMouseInputCatch();
         UpdateElements();
 
         UnsetElementRenderView();
 
         MouseScrollDelta = 0f;
+
+        PressedKey = null;
+        ReleasedKey = null;
     }
 
-    private static void UpdateElements()
+    private static void ProcessDebugShortcuts()
     {
-        // use ToList() to avoid: InvalidOperationException "Collection was modified".
-        // don't need to use it with DrawElements(), since it SHOULD not modify the element list
-        // and SHOULD be used only for drawing stuff
+        if (!EnableDebugShortcuts || PressedKey is null)
+            return;
 
-        foreach (Element element in Elements)
-            if (element.Visible)
-                element.Update();
-    }
-
-    private static void UpdateElementsMouseInputCatch()
-    {
-        ElementWhichCaughtMouseInput = s_trueElementWhichCaughtMouseInput = null;
-
-        for (int i = Elements.Length - 1; i >= 0; i--)
+        switch (PressedKey.Scancode)
         {
-            Element element = Elements[i];
-            IClickable? clickable = element as IClickable;
+            case Keyboard.Scancode.F1:
+                ToggleDebugOption(DebugOption.Clip);
+                break;
 
-            bool isMouseOver = clickable?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
+            case Keyboard.Scancode.F2:
+                ToggleDebugOption(DebugOption.OnlyHoveredElement);
+                break;
 
-            if (clickable is not null)
-                clickable.MouseState.IsMouseInputCaught = ElementWhichCaughtMouseInput is null && isMouseOver;
+            case Keyboard.Scancode.F3:
+                ToggleDebugOption(DebugOption.OnlyTrueHoveredElement);
+                break;
 
-            if (!element.Visible || !isMouseOver || ElementWhichCaughtMouseInput is not null)
-                continue;
 
-            if (element.BlocksMouseInput)
-                ElementWhichCaughtMouseInput = element;
+            case Keyboard.Scancode.F4:
+                ToggleDebugOption(DebugOption.RenderBounds);
+                break;
 
-            s_trueElementWhichCaughtMouseInput ??= element;
+            case Keyboard.Scancode.F5:
+                ToggleDebugOption(DebugOption.RenderBoundsDimensions);
+                break;
+
+            case Keyboard.Scancode.F6:
+                ToggleDebugOption(DebugOption.RenderClipBounds);
+                break;
+
+            case Keyboard.Scancode.F7:
+                ToggleDebugOption(DebugOption.RenderPriority);
+                break;
         }
+    }
+
+    private static void ToggleDebugOption(DebugOption option)
+    {
+        if (DebugOptions.HasFlag(option))
+            DebugOptions &= ~option;
+        else
+            DebugOptions |= option;
     }
 
     private static void UpdateMouseProperties()
@@ -239,6 +259,41 @@ public static class App
     {
         DeltaTime = s_deltaTimeStopwatch.Elapsed;
         s_deltaTimeStopwatch.Restart();
+    }
+
+    private static void UpdateElementsMouseInputCatch()
+    {
+        ElementWhichCaughtMouseInput = TrueElementWhichCaughtMouseInput = null;
+
+        for (int i = Elements.Length - 1; i >= 0; i--)
+        {
+            Element element = Elements[i];
+            IClickable? clickable = element as IClickable;
+
+            bool isMouseOver = clickable?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
+
+            if (clickable is not null)
+                clickable.MouseState.IsMouseInputCaught = ElementWhichCaughtMouseInput is null && isMouseOver;
+
+            if (!element.Visible || !isMouseOver || ElementWhichCaughtMouseInput is not null)
+                continue;
+
+            if (element.BlocksMouseInput)
+                ElementWhichCaughtMouseInput = element;
+
+            TrueElementWhichCaughtMouseInput ??= element;
+        }
+    }
+
+    private static void UpdateElements()
+    {
+        // use ToList() to avoid: InvalidOperationException "Collection was modified".
+        // don't need to use it with DrawElements(), since it SHOULD not modify the element list
+        // and SHOULD be used only for drawing stuff
+
+        foreach (Element element in Elements)
+            if (element.Visible)
+                element.Update();
     }
 
 
@@ -262,37 +317,27 @@ public static class App
             if (element.CanDraw)
                 element.Draw(Window);
 
-        if (DebugOptions == DebugOptions.None)
+        if (DebugOptions == DebugOption.None)
             return;
 
         foreach (Element element in Elements)
-            DebugDrawElement(element);
+            DrawElementDebug(element);
     }
 
-    private static void DebugDrawElement(Element element)
+    private static void DrawElementDebug(Element element)
     {
-        if (DebugOptions.HasFlag(DebugOptions.OnlyHoveredElement) && element != ElementWhichCaughtMouseInput)
+        if (DebugOptions.HasFlag(DebugOption.OnlyHoveredElement) && element != ElementWhichCaughtMouseInput)
             return;
 
-        if (DebugOptions.HasFlag(DebugOptions.OnlyTrueHoveredElement) && element != s_trueElementWhichCaughtMouseInput)
+        if (DebugOptions.HasFlag(DebugOption.OnlyTrueHoveredElement) && element != TrueElementWhichCaughtMouseInput)
             return;
 
-        bool clip = DebugOptions.HasFlag(DebugOptions.Clip);
+        bool clip = DebugOptions.HasFlag(DebugOption.Clip);
 
         if (clip)
             ClipArea.BeginClip(element.GetFinalClipArea());
 
-        if (DebugOptions.HasFlag(DebugOptions.RenderBounds))
-            Debug.DrawElementBounds(Window, element);
-
-        if (DebugOptions.HasFlag(DebugOptions.RenderBoundsDimensions))
-            Debug.DrawElementBoundsDimensions(Window, element);
-
-        if (DebugOptions.HasFlag(DebugOptions.RenderClipBounds))
-            Debug.DrawElementClipBounds(Window, element);
-
-        if (DebugOptions.HasFlag(DebugOptions.RenderPriority))
-            Debug.DrawElementPriority(Window, element);
+        Debug.DebugElement(Window, element, DebugOptions);
 
         if (clip)
             ClipArea.EndClip();
