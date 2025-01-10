@@ -30,7 +30,6 @@ public enum Alignment
 }
 
 
-// TODO: add GetAlignmentRelativePosition
 public interface IAlignable
 {
     Vec2f GetAlignmentPosition(Alignment alignment);

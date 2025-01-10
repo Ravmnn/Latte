@@ -2,6 +2,7 @@ using System;
 
 using SFML.Graphics;
 
+using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
@@ -48,7 +49,7 @@ public static class Debug
 
     public static void DrawText(RenderTarget target, Vec2f position, string text, uint size = 5, Color? color = null)
     {
-        target.Draw(new Text(text, TextElement.DefaultTextFont, size)
+        target.Draw(new Text(text, App.DefaultFont, size)
         {
             Position = position,
             FillColor = color ?? Color.Black
@@ -57,7 +58,7 @@ public static class Debug
 
     public static void DrawCenteredText(RenderTarget target, FloatRect parent, string text, uint size = 10, Color? color = null)
     {
-        Text textObject = new(text, TextElement.DefaultTextFont, size)
+        Text textObject = new(text, App.DefaultFont, size)
         {
             FillColor = color ?? Color.Black
         };

@@ -3,6 +3,7 @@ using System;
 using SFML.Graphics;
 
 using Latte.Core;
+using Latte.Core.Application;
 using Latte.Core.Type;
 
 
@@ -14,18 +15,7 @@ namespace Latte.Elements.Primitives;
 
 public class TextElement : Element
 {
-    private static Font? s_defaultFont;
-
-
     private float _lastFitTargetWidth;
-
-
-    // TODO: move this to App
-    public static Font DefaultTextFont
-    {
-        get => s_defaultFont ?? throw new InvalidOperationException("Default font is not defined.");
-        set => s_defaultFont = value;
-    }
 
 
     public override Transformable Transformable => SfmlText;
@@ -49,7 +39,7 @@ public class TextElement : Element
     {
         BlocksMouseInput = false;
 
-        SfmlText = new(text, font ?? DefaultTextFont);
+        SfmlText = new(text, font ?? App.DefaultFont);
 
         RelativePosition.Set(position);
 

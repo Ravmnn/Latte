@@ -28,6 +28,8 @@ public enum RenderMode
 
 public static class App
 {
+    private static Font? s_defaultFont;
+
     private static Window? s_window;
     private static View? s_mainView;
     private static View? s_elementView;
@@ -44,6 +46,12 @@ public static class App
 
 
     public static DebugOptions DebugOptions { get; set; }
+
+    public static Font DefaultFont
+    {
+        get => s_defaultFont ?? throw new InvalidOperationException("Default font is not defined.");
+        set => s_defaultFont = value;
+    }
 
     public static Window Window
     {
@@ -129,7 +137,7 @@ public static class App
             return;
         }
 
-        TextElement.DefaultTextFont = defaultFont;
+        DefaultFont = defaultFont;
 
         s_deltaTimeStopwatch.Start();
 
