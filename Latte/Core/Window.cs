@@ -8,9 +8,6 @@ using Latte.Core.Type;
 namespace Latte.Core;
 
 
-// TODO: add text inputs
-
-
 public class Window : RenderWindow, IUpdateable, IDrawable
 {
     // Usually, an error message "X Error of failed request:  BadCursor (invalid Cursor parameter)"

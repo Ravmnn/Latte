@@ -30,6 +30,7 @@ public enum Alignment
 }
 
 
+// TODO: add GetAlignmentRelativePosition
 public interface IAlignable
 {
     Vec2f GetAlignmentPosition(Alignment alignment);
@@ -88,4 +89,14 @@ public static class AlignmentCalculator
 
         return position;
     }
+
+
+    // text local bounds work quite different
+    // https://learnsfml.com/basics/graphics/how-to-center-text/#set-a-string
+
+    public static Vec2f GetTextAlignedPositionOfChild(Text text, FloatRect parent, Alignment alignment)
+        => GetAlignedPositionOfChild(text.GetGlobalBounds(), parent, alignment) - text.GetLocalBounds().Position;
+
+    public static Vec2f GetTextAlignedRelativePositionOfChild(Text text, FloatRect parent, Alignment alignment)
+        => GetAlignedRelativePositionOfChild(text.GetGlobalBounds(), parent, alignment) - text.GetLocalBounds().Position;
 }

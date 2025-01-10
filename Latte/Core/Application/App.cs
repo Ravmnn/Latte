@@ -15,6 +15,10 @@ using Latte.Elements.Primitives;
 namespace Latte.Core.Application;
 
 
+// TODO: add text inputs
+// TODO: add effects, which includes blur (a shader maybe), shadow and gradient (shader)
+
+
 public enum RenderMode
 {
     Pinned,
@@ -38,6 +42,8 @@ public static class App
 
     private static bool s_mouseInputWasCaught;
 
+
+    public static DebugOptions DebugOptions { get; set; }
 
     public static Window Window
     {
@@ -96,6 +102,8 @@ public static class App
         s_deltaTimeStopwatch = new();
 
         s_mouseInputWasCaught = false;
+
+        DebugOptions = DebugOptions.None;
 
         RenderMode = RenderMode.Pinned;
 
@@ -241,8 +249,20 @@ public static class App
             if (element.CanDraw)
                 element.Draw(Window);
 
-            element.DrawDebug(Window);
+            DebugDrawElement(element);
         }
+    }
+
+    private static void DebugDrawElement(Element element)
+    {
+        if (DebugOptions.HasFlag(DebugOptions.RenderBounds))
+            Debug.DrawElementBounds(Window, element);
+
+        if (DebugOptions.HasFlag(DebugOptions.RenderClipBounds))
+            Debug.DrawElementClipBounds(Window, element);
+
+        if (DebugOptions.HasFlag(DebugOptions.RenderPriority))
+            Debug.DrawElementPriority(Window, element);
     }
 
     private static void SetElementRenderView()

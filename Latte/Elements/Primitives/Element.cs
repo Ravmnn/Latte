@@ -10,10 +10,6 @@ using Latte.Core.Type;
 using Latte.Core.Application;
 
 
-using Color = SFML.Graphics.Color;
-using Debug = Latte.Core.Debug;
-
-
 namespace Latte.Elements.Primitives;
 
 
@@ -110,9 +106,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public event EventHandler? VisibilityChangedEvent;
 
     public bool Initialized { get; private set; }
-
-    public bool ShouldDrawElementBoundaries { get; set; }
-    public bool ShouldDrawClipArea { get; set; }
 
     public bool CanDraw => Initialized && Visible && IsInsideClipArea();
 
@@ -256,15 +249,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public virtual void Draw(RenderTarget target)
     {
         DrawEvent?.Invoke(this, EventArgs.Empty);
-    }
-
-    public virtual void DrawDebug(RenderTarget target)
-    {
-        if (ShouldDrawElementBoundaries)
-            Debug.DrawLineRect(target, GetBounds(), Color.Red);
-
-        if (ShouldDrawClipArea)
-            Debug.DrawLineRect(target, (FloatRect)GetClipArea(), Color.Magenta);
     }
 
     protected virtual void BeginDraw() => ClipArea.BeginClip(GetFinalClipArea());

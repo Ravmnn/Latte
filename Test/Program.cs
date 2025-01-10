@@ -1,4 +1,5 @@
-﻿using SFML.Window;
+﻿using Latte.Core;
+using SFML.Window;
 
 using Latte.Core.Application;
 using Latte.Elements;
@@ -24,10 +25,12 @@ class Program
     {
         App.Init(VideoMode.DesktopMode, "Latte Test", new("../../../resources/Itim-Regular.ttf"), settings: new()
         {
-            AntialiasingLevel = 16,
+            AntialiasingLevel = 8,
             DepthBits = 24,
             StencilBits = 8
         });
+
+        App.DebugOptions = DebugOptions.RenderPriority;
 
         WindowElement rect = new("this is a text", new(), new(600, 400))
         {

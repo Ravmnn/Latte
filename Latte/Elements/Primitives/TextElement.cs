@@ -20,6 +20,7 @@ public class TextElement : Element
     private float _lastFitTargetWidth;
 
 
+    // TODO: move this to App
     public static Font DefaultTextFont
     {
         get => s_defaultFont ?? throw new InvalidOperationException("Default font is not defined.");
@@ -116,17 +117,10 @@ public class TextElement : Element
 
 
     public override Vec2f GetAlignmentPosition(Alignment alignment)
-    {
-        // text local bounds work quite different
-        // https://learnsfml.com/basics/graphics/how-to-center-text/#set-a-string
-
-        return base.GetAlignmentPosition(alignment) - GetRelativeBounds().Position;
-    }
+        => AlignmentCalculator.GetTextAlignedPositionOfChild(SfmlText, GetParentBorderLessBounds(), alignment);
 
     public override Vec2f GetAlignmentRelativePosition(Alignment alignment)
-    {
-        return base.GetAlignmentRelativePosition(alignment) - GetRelativeBounds().Position;
-    }
+        => AlignmentCalculator.GetTextAlignedRelativePositionOfChild(SfmlText, GetParentBorderLessBounds(), alignment);
 
 
     public override void ApplySizePolicy()
