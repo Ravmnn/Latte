@@ -23,6 +23,7 @@ public class MouseClickState
     public bool WasTruePressed { get; set; }
 }
 
+// TODO: if mouse is "holding" another element, ignore input while mouse is down
 
 public interface IClickable : IMouseInputTarget
 {

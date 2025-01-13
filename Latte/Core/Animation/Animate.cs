@@ -9,36 +9,36 @@ namespace Latte.Core.Animation;
 
 public static class Animate
 {
-    public static AnimationData Value(float from, float to, double time, Easing easing = Easing.Linear) =>
+    public static FloatAnimation Value(float from, float to, double time, Easing easing = Easing.Linear) =>
         new([from], [to], time, easing);
     
     
-    public static AnimationData Vec2f(Vec2f from, Vec2f to, double time, Easing easing = Easing.Linear)
+    public static FloatAnimation Vec2f(Vec2f from, Vec2f to, double time, Easing easing = Easing.Linear)
         => new([from.X, from.Y], [to.X, to.Y], time, easing);
     
-    public static AnimationData Vec2i(Vec2i from, Vec2i to, double time, Easing easing = Easing.Linear)
+    public static FloatAnimation Vec2i(Vec2i from, Vec2i to, double time, Easing easing = Easing.Linear)
         => new([from.X, from.Y], [to.X, to.Y], time, easing);
     
-    public static AnimationData Vec2u(Vec2u from, Vec2u to, double time, Easing easing = Easing.Linear)
+    public static FloatAnimation Vec2u(Vec2u from, Vec2u to, double time, Easing easing = Easing.Linear)
         => new([from.X, from.Y], [to.X, to.Y], time, easing);
 
     
-    public static AnimationData Color(ColorRGBA from, ColorRGBA to, double time, Easing easing = Easing.Linear)
+    public static FloatAnimation Color(ColorRGBA from, ColorRGBA to, double time, Easing easing = Easing.Linear)
         => new([from.R, from.G, from.B, from.A], [to.R, to.G, to.B, to.A], time, easing);
     
     
 
-    public static AnimationData Vector2f(Vector2f from, Vector2f to, double time, Easing easing = Easing.Linear)
+    public static FloatAnimation Vector2f(Vector2f from, Vector2f to, double time, Easing easing = Easing.Linear)
         => Vec2f(from, to, time, easing);
 
-    public static AnimationData Vector2i(Vector2i from, Vector2i to, double time, Easing easing = Easing.Linear)
+    public static FloatAnimation Vector2i(Vector2i from, Vector2i to, double time, Easing easing = Easing.Linear)
         => Vec2i(from, to, time, easing);
 
-    public static AnimationData Vector2u(Vector2u from, Vector2u to, double time, Easing easing = Easing.Linear)
+    public static FloatAnimation Vector2u(Vector2u from, Vector2u to, double time, Easing easing = Easing.Linear)
         => Vec2u(from, to, time, easing);
 
 
-    public static AnimationData SFColor(Color from, Color to, double time, Easing easing = Easing.Linear)
+    public static FloatAnimation SFColor(Color from, Color to, double time, Easing easing = Easing.Linear)
         => Color(from, to, time, easing);
 }
 

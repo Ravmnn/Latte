@@ -18,6 +18,15 @@ public class Keyframe() : Dictionary<string, IAnimatable>
     }
 
 
+    public void From(Keyframe keyframe)
+    {
+        Clear();
+
+        foreach (var (key, value) in keyframe)
+            this[key] = value;
+    }
+
+
     public void SetIfNotDefined(string name, IAnimatable value)
     {
         if (!ContainsKey(name))
@@ -37,25 +46,63 @@ public class Keyframe() : Dictionary<string, IAnimatable>
 
 
 public class ElementKeyframeAnimator(Element element, double time, Easing easing = Easing.Linear)
+    : AnimationData(time, easing, false)
 {
     public Element Element { get; set; } = element;
-    public Keyframe? DefaultProperties { get; set; } // TODO: improve this
 
-    public double Time { get; set; } = time;
-    public Easing Easing { get; set; } = easing;
+    public Keyframe? CurrentKeyframe { get; private set; }
+    public Keyframe? BaseKeyframe { get; set; }
+    protected IEnumerable<AnimationData> Animations { get; private set; } = [];
+
+
+    public new void Abort()
+    {
+        base.Abort();
+
+        foreach (AnimationData animation in Animations)
+            animation.Abort();
+    }
+
+    public new void Start()
+    {
+        base.Start();
+
+        foreach (AnimationData animation in Animations)
+            animation.Start();
+    }
+
+    public new void Stop()
+    {
+        base.Stop();
+
+        foreach (AnimationData animation in Animations)
+            animation.Stop();
+    }
 
 
     public void Animate(Keyframe to, double? time = null, Easing? easing = null)
     {
-        if (DefaultProperties is not null)
-            Animate(Element, DefaultProperties, time ?? Time, easing ?? Easing);
+        Animations = [];
 
-        Animate(Element, to, time ?? Time, easing ?? Easing);
+        Reset();
+        Start();
+
+        CurrentKeyframe = to;
+
+        if (BaseKeyframe is not null)
+            Animate(Element, BaseKeyframe, time ?? Time, easing ?? Easing);
+
+        if (BaseKeyframe != to)
+            Animations = Animate(Element, to, time ?? Time, easing ?? Easing);
     }
 
 
-    public static void Animate(Element element, Keyframe to, double time, Easing easing = Easing.Linear)
+    // TODO: return IEnumerable or IList
+
+    public static IEnumerable<AnimationData> Animate(Element element, Keyframe to, double time, Easing easing = Easing.Linear)
     {
+        List<AnimationData> animations = [];
+
         foreach (Property elementProperty in element.Properties)
         {
             bool keyframePropertyExists = to.TryGetValue(elementProperty.Name, out IAnimatable? targetPropertyValue);
@@ -66,7 +113,10 @@ public class ElementKeyframeAnimator(Element element, double time, Easing easing
             if (elementProperty is not AnimatableProperty animatableElementProperty)
                 throw new InvalidOperationException($"Property \"{elementProperty.Name}\" is not an AnimatableProperty.");
 
-            animatableElementProperty.Animate(targetPropertyValue!, time, easing);
+            if (animatableElementProperty.Animate(targetPropertyValue!, time, easing) is AnimationData animation)
+                animations.Add(animation);
         }
+
+        return animations;
     }
 }

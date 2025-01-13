@@ -1,7 +1,7 @@
-﻿using Latte.Core;
-using SFML.Window;
+﻿using SFML.Window;
 
 using Latte.Core.Application;
+using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
 
@@ -43,10 +43,21 @@ class Program
             Color = { Value = new(255, 255, 255) }
         };
 
-        ButtonElement addButton = new(rect, new(), new(100, 40), "Add")
+        ButtonElement addButton = new(rect, new(), new(100, 20), "Add")
         {
-            Alignment = { Value = Alignment.BottomRight },
-            AlignmentMargin = { Value = new(-10, -5) }
+            Alignment = { Value = Alignment.HorizontalCenter | Alignment.Bottom },
+
+            // TODO: globally setting the origin to the center of the element may improve animations that change size and scale
+
+            Hover =
+            {
+                {"Size", new Vec2f(110f, 20f)}
+            },
+
+            Down =
+            {
+                {"Size", new Vec2f(150f, 20f)}
+            }
         };
 
 

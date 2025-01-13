@@ -78,7 +78,7 @@ public struct ColorRGBA : IAnimatable<ColorRGBA>,
     }
 
 
-    public AnimationData AnimateThis(ColorRGBA to, double time, Easing easing = Easing.Linear) => Animate.Color(this, to, time, easing);
+    public FloatAnimation AnimateThis(ColorRGBA to, double time, Easing easing = Easing.Linear) => Animate.Color(this, to, time, easing);
 
     public readonly IAnimatable AnimationValuesToThis(float[] values) => values.ToColor();
 

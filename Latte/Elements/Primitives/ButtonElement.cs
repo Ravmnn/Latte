@@ -20,9 +20,8 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     public event EventHandler? MouseDownEvent;
     public event EventHandler? MouseUpEvent;
 
-    public Keyframe Normal { get; set; }
-    public Keyframe Hover { get; set; }
-    public Keyframe Down { get; set; }
+    public Keyframe Hover { get; }
+    public Keyframe Down { get; }
 
     public bool UseDefaultAnimation { get; set; }
 
@@ -43,7 +42,6 @@ public class ButtonElement : RectangleElement, IDefaultClickable
 
         MouseState = new();
 
-        Normal = new();
         Hover = new();
         Down = new();
 
@@ -75,7 +73,6 @@ public class ButtonElement : RectangleElement, IDefaultClickable
 
         ColorRGBA color = Color;
 
-        Normal.SetIfNotDefined("Color", color);
         Hover.SetIfNotDefined("Color", color -= ColorDecreaseAmount);
         Down.SetIfNotDefined("Color", color - ColorDecreaseAmount);
     }

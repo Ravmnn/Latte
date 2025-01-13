@@ -68,7 +68,7 @@ public class Vec2f(float x = default, float y = default) : Vec2<float>(x, y), IA
     public static implicit operator Vec2f(Vector2f vec2) => new(vec2.X, vec2.Y);
 
 
-    public AnimationData AnimateThis(Vec2f to, double time, Easing easing = Easing.Linear)
+    public FloatAnimation AnimateThis(Vec2f to, double time, Easing easing = Easing.Linear)
         => Animate.Vec2f(this, to, time, easing);
 
 
@@ -82,7 +82,7 @@ public class Vec2i(int x = default, int y = default) : Vec2<int>(x, y), IAnimata
     public static implicit operator Vec2i(Vector2i vec2) => new(vec2.X, vec2.Y);
 
 
-    public AnimationData AnimateThis(Vec2i to, double time, Easing easing = Easing.Linear)
+    public FloatAnimation AnimateThis(Vec2i to, double time, Easing easing = Easing.Linear)
         => Animate.Vec2i(this, to, time, easing);
 
 
@@ -96,7 +96,7 @@ public class Vec2u(uint x = default, uint y = default) : Vec2<uint>(x, y), IAnim
     public static implicit operator Vec2u(Vector2u vec2) => new(vec2.X, vec2.Y);
 
 
-    public AnimationData AnimateThis(Vec2u to, double time, Easing easing = Easing.Linear)
+    public FloatAnimation AnimateThis(Vec2u to, double time, Easing easing = Easing.Linear)
         => Animate.Vec2u(this, to, time, easing);
 
 

@@ -96,6 +96,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public event EventHandler<ElementEventArgs>? ChildAddedEvent;
 
     public ElementKeyframeAnimator Animator { get; set; }
+    public Keyframe Normal { get; }
 
     public abstract Transformable Transformable { get; }
 
@@ -174,23 +175,28 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Parent = parent;
         Children = [];
 
-        Animator = new(this, 0.07);
+        Normal = new();
+        Animator = new(this, 0.07)
+        {
+            BaseKeyframe = Normal
+        };
+
 
         Visible = true;
 
         PrioritySnap = PrioritySnap.None;
         PrioritySnapOffset = 1;
 
-        RelativePosition = new(this, nameof(RelativePosition), new()) { CanAnimate = false };
-        Origin = new(this, nameof(Origin), new()) { CanAnimate = false };
+        RelativePosition = new(this, nameof(RelativePosition), new());
+        Origin = new(this, nameof(Origin), new());
         Rotation = new(this, nameof(Rotation), 0f);
         Scale = new(this, nameof(Scale), new(1f, 1f));
 
         Alignment = new(this, nameof(Alignment), Elements.Alignment.None);
-        AlignmentMargin = new(this, nameof(AlignmentMargin), new()) { CanAnimate = false };
+        AlignmentMargin = new(this, nameof(AlignmentMargin), new());
 
         SizePolicy = new(this, nameof(SizePolicy), SizePolicyType.None);
-        SizePolicyMargin = new(this, nameof(SizePolicyMargin), new()) { CanAnimate = false };
+        SizePolicyMargin = new(this, nameof(SizePolicyMargin), new());
 
         if (Parent is null)
             return;
@@ -201,7 +207,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     protected virtual void Setup()
     {
-        Animator.DefaultProperties = ToKeyframe();
+        Normal.From(ToKeyframe());
 
         UpdateSfmlProperties();
 
@@ -225,6 +231,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         UpdateGeometry();
 
         UpdatePropertyAnimations();
+        UpdateAnimator();
+
         UpdateSfmlProperties();
 
         LastPriority = Priority;
@@ -268,6 +276,14 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         foreach (Property property in Properties)
             if (property is AnimatableProperty { Animation: not null } animatableProperty)
                 animatableProperty.Animation.Update();
+    }
+
+    private void UpdateAnimator()
+    {
+        if (Animator.HasFinished && Animator.CurrentKeyframe == Normal)
+            Normal.From(ToKeyframe());
+
+        Animator.Update();
     }
 
     protected virtual void UpdateSfmlProperties()

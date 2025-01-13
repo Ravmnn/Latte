@@ -7,7 +7,7 @@ namespace Latte.Core.Animation;
 /// </summary>
 public interface IAnimatable
 {
-    AnimationData AnimateThis(object to, double time, Easing easing = Easing.Linear);
+    FloatAnimation AnimateThis(object to, double time, Easing easing = Easing.Linear);
 
     
     /// <summary>
@@ -23,9 +23,9 @@ public interface IAnimatable
 /// </summary>
 public interface IAnimatable<T> : IAnimatable where T : notnull
 {
-    AnimationData AnimateThis(T to, double time, Easing easing = Easing.Linear);
+    FloatAnimation AnimateThis(T to, double time, Easing easing = Easing.Linear);
     
-    AnimationData IAnimatable.AnimateThis(object to, double time, Easing easing)
+    FloatAnimation IAnimatable.AnimateThis(object to, double time, Easing easing)
         => AnimateThis((T)to, time, easing);
     
     

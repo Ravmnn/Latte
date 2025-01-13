@@ -25,7 +25,7 @@ public class RectangleElement : ShapeElement
     {
         RelativePosition.Set(position);
 
-        Size = new(this, nameof(Size), size) { CanAnimate = false };
+        Size = new(this, nameof(Size), size);
         Radius = new(this, nameof(Radius), radius);
     }
 
