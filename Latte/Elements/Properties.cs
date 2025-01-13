@@ -1,3 +1,5 @@
+using System;
+
 using Latte.Core.Animation;
 using Latte.Elements.Primitives;
 
@@ -7,10 +9,24 @@ namespace Latte.Elements;
 
 public abstract class Property
 {
+    private object _value;
+
+
     public Element Owner { get; }
 
     public string Name { get; }
-    public object Value { get; set; }
+
+    public object Value
+    {
+        get => _value;
+        set
+        {
+            _value = value;
+            OnValueChanged();
+        }
+    }
+
+    public EventHandler? ValueChangedEvent;
 
 
     public Property(Element owner, string name, object value)
@@ -25,6 +41,10 @@ public abstract class Property
 
     public void Set(object value) => Value = value;
     public object Get() => Value;
+
+
+    protected virtual void OnValueChanged()
+        => ValueChangedEvent?.Invoke(this, EventArgs.Empty);
 }
 
 

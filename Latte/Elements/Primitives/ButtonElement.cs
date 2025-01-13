@@ -1,6 +1,7 @@
 using System;
 
 using Latte.Core;
+using Latte.Core.Animation;
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
 
@@ -46,14 +47,17 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         Down = new();
 
         UseDefaultAnimation = true;
+
+        Color.ValueChangedEvent += (_, _) =>
+        {
+            if (UseDefaultAnimation)
+                SetDefaultKeyframeAnimation();
+        };
     }
 
 
     protected override void Setup()
     {
-        if (UseDefaultAnimation)
-            SetDefaultKeyframeAnimation();
-
         base.Setup();
     }
 
@@ -71,10 +75,11 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     {
         const byte ColorDecreaseAmount = 25;
 
-        ColorRGBA color = Color;
+        if (!Normal.TryGetValue("Color", out IAnimatable? value) || value is not IAnimatable<ColorRGBA> color)
+            return;
 
-        Hover.SetIfNotDefined("Color", color -= ColorDecreaseAmount);
-        Down.SetIfNotDefined("Color", color - ColorDecreaseAmount);
+        Hover["Color"] = color.Get() - ColorDecreaseAmount;
+        Down["Color"] = color.Get() - ColorDecreaseAmount * 2;
     }
 
 

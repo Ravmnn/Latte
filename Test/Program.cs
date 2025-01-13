@@ -46,20 +46,15 @@ class Program
         ButtonElement addButton = new(rect, new(), new(100, 20), "Add")
         {
             Alignment = { Value = Alignment.HorizontalCenter | Alignment.Bottom },
+            AlignmentMargin = { Value = new(0, -10f) },
 
             // TODO: globally setting the origin to the center of the element may improve animations that change size and scale
 
-            Hover =
-            {
-                {"Size", new Vec2f(110f, 20f)}
-            },
-
-            Down =
-            {
-                {"Size", new Vec2f(150f, 20f)}
-            }
+            Color = { Value = new(150, 150, 255) }
         };
 
+        // TODO: changing after Setup doesn't work; fix
+        addButton.Color.Set(new(255, 150, 150));
 
         ScrollAreaElement scrollAreaElement = new(rect, new(), new(200, 200), true, true)
         {
@@ -72,6 +67,7 @@ class Program
         {
             GrowDirection = GridLayoutGrowDirection.Vertically
         };
+
 
         for (int i = 0; i < 100; i++)
             AddButtonToLayout(grid);

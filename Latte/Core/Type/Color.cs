@@ -55,6 +55,9 @@ public struct ColorRGBA : IAnimatable<ColorRGBA>,
     }
 
 
+    public ColorRGBA Get() => this;
+
+
     public static implicit operator Color(ColorRGBA color) => new(color.R, color.G, color.B, color.A);
     public static implicit operator ColorRGBA(Color color) => new(color.R, color.G, color.B, color.A);
 

@@ -12,8 +12,8 @@ public interface IDraggable : IDefaultClickable
     event EventHandler? DragBeginEvent;
     event EventHandler? DragEndEvent;
     event EventHandler? DraggingEvent;
-    
-    
+
+
     void OnDragBegin();
     void OnDragEnd();
     void OnDragging();
@@ -22,6 +22,8 @@ public interface IDraggable : IDefaultClickable
     void ProcessDragging();
 }
 
+// TODO: animations aren't working very well with draggables
+
 
 public interface IDefaultDraggable : IDraggable
 {
@@ -29,10 +31,10 @@ public interface IDefaultDraggable : IDraggable
     {
         if (Dragging && !WasDragging)
             OnDragBegin();
-        
+
         if (!Dragging && WasDragging)
             OnDragEnd();
-        
+
         if (Dragging)
             OnDragging();
     }
