@@ -230,12 +230,12 @@ public static class App
             bool isMouseOver = clickable?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
 
             if (clickable is not null)
-                clickable.MouseState.IsMouseInputCaught = ElementWhichCaughtMouseInput is null && isMouseOver;
+                clickable.CaughtMouseInput = ElementWhichCaughtMouseInput is null && isMouseOver;
 
             if (!element.Visible || !isMouseOver || ElementWhichCaughtMouseInput is not null)
                 continue;
 
-            if (element.BlocksMouseInput)
+            if (!element.IgnoreMouseInput)
                 ElementWhichCaughtMouseInput = element;
 
             TrueElementWhichCaughtMouseInput ??= element;

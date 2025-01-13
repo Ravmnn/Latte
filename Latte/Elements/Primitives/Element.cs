@@ -65,7 +65,7 @@ public enum PrioritySnap
 }
 
 
-public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePoliciable
+public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePoliciable, IMouseInputTarget
 {
     private Element? _parent;
     private readonly List<Property> _properties;
@@ -140,8 +140,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public event EventHandler? PriorityChangedEvent;
 
-    // TODO: having this directly inside Element doesn't feels good... try to find a better way of expressing this
-    public bool BlocksMouseInput { get; set; }
+    public bool IgnoreMouseInput { get; set; }
+    public bool CaughtMouseInput { get; set; }
 
     public AnimatableProperty<Vec2f> RelativePosition { get; }
     public Vec2f AbsolutePosition
@@ -180,8 +180,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
         PrioritySnap = PrioritySnap.None;
         PrioritySnapOffset = 1;
-
-        BlocksMouseInput = true;
 
         RelativePosition = new(this, nameof(RelativePosition), new()) { CanAnimate = false };
         Origin = new(this, nameof(Origin), new()) { CanAnimate = false };

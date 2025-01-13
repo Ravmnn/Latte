@@ -21,7 +21,7 @@ public class CheckBox : ButtonElement
             SizePolicyMargin = { Value = new(5f, 5f) },
             Color = { Value = new(50, 50, 50) },
 
-            BlocksMouseInput = false
+            IgnoreMouseInput = true
         };
 
         Selected = selected;

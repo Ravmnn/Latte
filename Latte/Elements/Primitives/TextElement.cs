@@ -37,7 +37,7 @@ public class TextElement : Element
 
     public TextElement(Element? parent, Vec2f position, uint? size, string text, Font? font = null) : base(parent)
     {
-        BlocksMouseInput = false;
+        IgnoreMouseInput = true;
 
         SfmlText = new(text, font ?? App.DefaultFont);
 

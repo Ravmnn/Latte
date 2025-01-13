@@ -21,14 +21,10 @@ public class MouseClickState
     public bool WasMouseDown { get; set; }
     public bool WasPressed { get; set; }
     public bool WasTruePressed { get; set; }
-
-
-    public bool IsMouseInputCaught { get; set; }
-    public bool WasMouseInputCaught { get; set; }
 }
 
 
-public interface IClickable
+public interface IClickable : IMouseInputTarget
 {
     MouseClickState MouseState { get; }
     bool DisableTruePressOnlyWhenMouseIsUp { get; }
@@ -58,10 +54,9 @@ public interface IDefaultClickable : IClickable
         MouseState.WasMouseDown = MouseState.IsMouseDown;
         MouseState.WasPressed = MouseState.IsPressed;
         MouseState.WasTruePressed = MouseState.IsTruePressed;
-        MouseState.WasMouseInputCaught = MouseState.IsMouseInputCaught;
 
         MouseState.IsMouseOver = IsPointOver(App.ElementViewMousePosition);
-        MouseState.IsMouseHover = MouseState.IsMouseInputCaught;
+        MouseState.IsMouseHover = CaughtMouseInput;
         MouseState.IsMouseDown = Mouse.IsButtonPressed(Mouse.Button.Left);
         MouseState.IsPressed = MouseState.IsMouseHover && MouseState.IsMouseDown;
 
@@ -89,4 +84,11 @@ public interface IDefaultClickable : IClickable
         else if (leaved)
             OnMouseLeave();
     }
+}
+
+
+public interface IMouseInputTarget
+{
+    bool IgnoreMouseInput { get; set; }
+    bool CaughtMouseInput { get; set; }
 }

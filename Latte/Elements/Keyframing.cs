@@ -39,7 +39,7 @@ public class Keyframe() : Dictionary<string, IAnimatable>
 public class ElementKeyframeAnimator(Element element, double time, Easing easing = Easing.Linear)
 {
     public Element Element { get; set; } = element;
-    public Keyframe? DefaultProperties { get; set; }
+    public Keyframe? DefaultProperties { get; set; } // TODO: improve this
 
     public double Time { get; set; } = time;
     public Easing Easing { get; set; } = easing;
