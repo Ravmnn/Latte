@@ -21,17 +21,48 @@ public enum DebugOption
     OnlyHoveredElement = 1 << 1,
     OnlyTrueHoveredElement = 1 << 2,
 
-    RenderBounds = 1 << 3,
-    RenderBoundsDimensions = 1 << 4,
-    RenderClipArea = 1 << 5,
-    RenderPriority = 1 << 6
+    ShowBounds = 1 << 3,
+    ShowBoundsDimensions = 1 << 4,
+    ShowClipArea = 1 << 5,
+    ShowPriority = 1 << 6
 }
+
+
+[AttributeUsage(AttributeTargets.Class)]
+public class DebuggerIgnoreShowBoundsAttribute(bool inherit = true) : ElementAttribute(inherit);
+
+
+[AttributeUsage(AttributeTargets.Class)]
+public class DebuggerIgnoreShowBoundsDimensionsAttribute(bool inherit = true) : ElementAttribute(inherit);
+
+
+[AttributeUsage(AttributeTargets.Class)]
+public class DebuggerIgnoreShowClipAreaAttribute(bool inherit = true) : ElementAttribute(inherit);
+
+
+[AttributeUsage(AttributeTargets.Class)]
+public class DebuggerIgnoreShowPriorityAttribute(bool inherit = true) : ElementAttribute(inherit);
 
 
 public class Debugger : IUpdateable, IDrawable
 {
-    public DebugOption Options { get; set; } = DebugOption.None;
+    public InspectorWindow Inspector { get; private set; }
+
+    public DebugOption Options { get; set; }
     public bool EnableKeyShortcuts { get; set; }
+
+
+    public Debugger()
+    {
+        Inspector = new()
+        {
+            Visible = false
+        };
+
+        App.AddElement(Inspector);
+
+        Options = DebugOption.None;
+    }
 
 
     public void Update() => ProcessDebugShortcuts();
@@ -61,19 +92,24 @@ public class Debugger : IUpdateable, IDrawable
 
 
             case Keyboard.Scancode.F4:
-                ToggleDebugOption(DebugOption.RenderBounds);
+                ToggleDebugOption(DebugOption.ShowBounds);
                 break;
 
             case Keyboard.Scancode.F5:
-                ToggleDebugOption(DebugOption.RenderBoundsDimensions);
+                ToggleDebugOption(DebugOption.ShowBoundsDimensions);
                 break;
 
             case Keyboard.Scancode.F6:
-                ToggleDebugOption(DebugOption.RenderClipArea);
+                ToggleDebugOption(DebugOption.ShowClipArea);
                 break;
 
             case Keyboard.Scancode.F7:
-                ToggleDebugOption(DebugOption.RenderPriority);
+                ToggleDebugOption(DebugOption.ShowPriority);
+                break;
+
+
+            case Keyboard.Scancode.F12:
+                Inspector.Visible = !Inspector.Visible;
                 break;
         }
     }
@@ -109,16 +145,16 @@ public class Debugger : IUpdateable, IDrawable
         if (clip)
             ClipArea.BeginClip(element.GetFinalClipArea());
 
-        if (Options.HasFlag(DebugOption.RenderBounds))
+        if (Options.HasFlag(DebugOption.ShowBounds) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsAttribute>())
             DrawElementBounds(target, element);
 
-        if (Options.HasFlag(DebugOption.RenderBoundsDimensions))
+        if (Options.HasFlag(DebugOption.ShowBoundsDimensions) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsDimensionsAttribute>())
             DrawElementBoundsDimensions(target, element);
 
-        if (Options.HasFlag(DebugOption.RenderClipArea))
+        if (Options.HasFlag(DebugOption.ShowClipArea) && !element.HasCachedElementAttribute<DebuggerIgnoreShowClipAreaAttribute>())
             DrawElementClipArea(target, element);
 
-        if (Options.HasFlag(DebugOption.RenderPriority))
+        if (Options.HasFlag(DebugOption.ShowPriority) && !element.HasCachedElementAttribute<DebuggerIgnoreShowPriorityAttribute>())
             DrawElementPriority(target, element);
 
         if (clip)

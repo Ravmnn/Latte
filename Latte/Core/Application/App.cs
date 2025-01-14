@@ -46,7 +46,7 @@ public static class App
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
 
-    public static Debugger Debugger { get; private set; }
+    public static Debugger? Debugger { get; private set; }
 
     public static Font DefaultFont
     {
@@ -89,6 +89,8 @@ public static class App
     public static Element? ElementWhichCaughtMouseInput { get; private set; }
     public static Element? TrueElementWhichCaughtMouseInput { get; private set; }
 
+    // public static Element? ElementWhichIsHoldingMouseInput { get; private set; }
+
     public static KeyEventArgs? PressedKey { get; private set; }
     public static KeyEventArgs? ReleasedKey { get; private set; }
 
@@ -116,8 +118,6 @@ public static class App
 
         s_deltaTimeStopwatch = new();
 
-        Debugger = new();
-
         RenderMode = RenderMode.Pinned;
 
         Section = new();
@@ -143,6 +143,8 @@ public static class App
         }
 
         DefaultFont = defaultFont;
+
+        Debugger = new();
 
         s_deltaTimeStopwatch.Start();
 
@@ -189,9 +191,9 @@ public static class App
         Section.Update();
 
         UpdateElementsMouseInputCatch();
-        UpdateElements();
+        Debugger?.Update(); // update before elements
 
-        Debugger.Update();
+        UpdateElements();
 
         UnsetElementRenderView();
 
@@ -249,8 +251,12 @@ public static class App
         // and SHOULD be used only for drawing stuff
 
         foreach (Element element in Elements)
+        {
             if (element.Visible)
                 element.Update();
+
+            element.ConstantUpdate();
+        }
     }
 
 
@@ -265,7 +271,7 @@ public static class App
         Section.Draw(Window);
         DrawElements();
 
-        Debugger.Draw(Window);
+        Debugger?.Draw(Window); // draw after elements
 
         UnsetElementRenderView();
     }
