@@ -208,6 +208,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     protected virtual void Setup()
     {
         Normal.From(ToKeyframe());
+        Animator.Animate(Normal);
 
         UpdateSfmlProperties();
 
@@ -280,10 +281,23 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     private void UpdateAnimator()
     {
+        UpdateNormalKeyframe();
+        Animator.Update();
+    }
+
+    private void UpdateNormalKeyframe()
+    {
         if (Animator.HasFinished && Animator.CurrentKeyframe == Normal)
             Normal.From(ToKeyframe());
 
-        Animator.Update();
+        else if (Animator.CurrentKeyframe is not null)
+        {
+            Keyframe currentProperties = ToKeyframe();
+
+            foreach (var (key, value) in currentProperties)
+                if (!Animator.CurrentKeyframe.ContainsKey(key))
+                    Normal[key] = value;
+        }
     }
 
     protected virtual void UpdateSfmlProperties()

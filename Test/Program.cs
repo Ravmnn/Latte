@@ -1,7 +1,6 @@
 ﻿using SFML.Window;
 
 using Latte.Core.Application;
-using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
 
@@ -11,17 +10,17 @@ namespace Latte.Test;
 
 class Program
 {
-    static int counter;
+    private static int s_counter;
 
 
     private static void AddButtonToLayout(GridLayoutElement layoutElement)
-        => layoutElement.AddElementAtEnd(new ButtonElement(null, new(), new(30, 30), $"{counter++}")
+        => layoutElement.AddElementAtEnd(new ButtonElement(null, new(), new(30, 30), $"{s_counter++}")
         {
             Alignment = { Value = Alignment.Center }
         });
 
 
-    static void Main()
+    private static void Main()
     {
         App.Init(VideoMode.DesktopMode, "Latte Test", new("../../../resources/Itim-Regular.ttf"), settings: new()
         {
@@ -53,7 +52,6 @@ class Program
             Color = { Value = new(150, 150, 255) }
         };
 
-        // TODO: changing after Setup doesn't work; fix
         addButton.Color.Set(new(255, 150, 150));
 
         ScrollAreaElement scrollAreaElement = new(rect, new(), new(200, 200), true, true)

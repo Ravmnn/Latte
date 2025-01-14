@@ -22,8 +22,6 @@ public interface IDraggable : IDefaultClickable
     void ProcessDragging();
 }
 
-// TODO: animations aren't working very well with draggables
-
 
 public interface IDefaultDraggable : IDraggable
 {
