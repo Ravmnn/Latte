@@ -25,17 +25,37 @@ public enum WindowElementStyles
 }
 
 
+public class WindowCloseButtonElement : ButtonElement
+{
+    public new WindowElement Parent => (base.Parent as WindowElement)!;
+
+
+    public WindowCloseButtonElement(WindowElement parent) : base(parent, new(), new(15, 15), null)
+    {
+        Color.Set(new(255, 100, 100));
+
+        Alignment.Set(Elements.Alignment.TopRight);
+        AlignmentMargin.Set(new(-7, 8));
+
+        Down["Scale"] = new Vec2f(0.95f, 0.95f);
+    }
+
+
+    public override void OnMouseUp()
+    {
+        Parent.Close();
+        base.OnMouseUp();
+    }
+}
+
+
 public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResizable
 {
     public TextElement Title { get; protected set; }
 
-    // TODO: make nullable and create (or destruct) based on Styles
-    public ButtonElement CloseButton { get; protected set; }
+    public WindowCloseButtonElement CloseButton { get; protected set; }
 
     public WindowElementStyles Styles { get; set; }
-
-    public event EventHandler? OpenedEvent;
-    public event EventHandler? ClosedEvent;
 
     public bool Dragging { get; protected set; }
     public bool WasDragging { get; protected set; }
@@ -52,6 +72,13 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
     public Vec2f? MinSize { get; set; }
     public Vec2f? MaxSize { get; set; }
+
+    public bool IsCloseable => Styles.HasFlag(WindowElementStyles.Closeable);
+    public bool IsResizable => Styles.HasFlag(WindowElementStyles.Resizable);
+    public bool IsMoveable => Styles.HasFlag(WindowElementStyles.Moveable);
+
+    public event EventHandler? OpenedEvent;
+    public event EventHandler? ClosedEvent;
 
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
@@ -76,19 +103,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
         Color.Set(new(50, 50, 50, 220));
 
-        CloseButton = new(this, new(), new(15, 15), "")
-        {
-            Color = { Value = new(255, 100, 100) },
-
-            Alignment = { Value = Elements.Alignment.TopRight },
-            AlignmentMargin = { Value = new(-7, 8) },
-
-            Down =
-            {
-                { "Scale", new Vec2f(0.95f, 0.95f) }
-            }
-        };
-        CloseButton.MouseUpEvent += (_, _) => Close();
+        CloseButton = new(this);
 
         Styles = styles;
 
@@ -107,17 +122,17 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         (this as IDefaultClickable).UpdateMouseState();
         (this as IDefaultClickable).ProcessMouseEvents();
 
-        (this as IDefaultResizable).UpdateCornersToResize();
-
-        if (Styles.HasFlag(WindowElementStyles.Resizable))
+        if (IsResizable)
+        {
+            (this as IDefaultResizable).UpdateCornersToResize();
             (this as IDefaultResizable).ProcessResizingEvents();
+            App.Window.Cursor = Window.GetCursorTypeFromCorners(CornerToResize);
+        }
 
-        if (Styles.HasFlag(WindowElementStyles.Moveable))
+        if (IsMoveable)
             (this as IDefaultDraggable).ProcessDraggingEvents();
 
-        App.Window.Cursor = Window.GetCursorTypeFromCorners(CornerToResize);
-
-        CloseButton.Visible = Styles.HasFlag(WindowElementStyles.Closeable);
+        CloseButton.Visible = IsCloseable;
 
         WasDragging = Dragging;
         WasResizing = Resizing;

@@ -34,11 +34,11 @@ public class SpriteElement : Element
     }
 
 
-    public override void Update()
+    public override void ConstantUpdate()
     {
         Scale.Set(CalculateScaleBasedOnSize(Size));
 
-        base.Update();
+        base.ConstantUpdate();
     }
 
 

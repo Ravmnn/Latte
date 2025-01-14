@@ -170,6 +170,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public event EventHandler? PriorityChangedEvent;
 
     public event EventHandler? SetupEvent;
+    public event EventHandler? ConstantUpdateEvent;
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;
 
@@ -212,12 +213,12 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     }
 
 
-    protected virtual void Setup()
+
+    // called once after object construction
+    public virtual void Setup()
     {
         Normal.From(ToKeyframe());
         Animator.Animate(Normal);
-
-        UpdateSfmlProperties();
 
         Initialized = true;
 
@@ -225,27 +226,67 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     }
 
 
+
+    // called each frame, only if Visible is true
     public virtual void Update()
     {
+        UpdatePropertyAnimations();
+        UpdateAnimator();
+
+        UpdateEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void UpdatePropertyAnimations()
+    {
+        foreach (Property property in Properties)
+            if (property is AnimatableProperty { Animation: not null } animatableProperty)
+                animatableProperty.Animation.Update();
+    }
+
+    private void UpdateAnimator()
+    {
+        UpdateNormalKeyframe();
+        Animator.Update();
+    }
+
+    private void UpdateNormalKeyframe()
+    {
+        if (Animator.HasFinished && Animator.CurrentKeyframe == Normal)
+            Normal.From(ToKeyframe());
+
+        else if (Animator.CurrentKeyframe is not null)
+        {
+            Keyframe currentProperties = ToKeyframe();
+
+            foreach (var (key, value) in currentProperties)
+                if (!Animator.CurrentKeyframe.ContainsKey(key))
+                    Normal[key] = value;
+        }
+    }
+
+
+
+    // always called each frame
+    public virtual void ConstantUpdate()
+    {
+        if (!Initialized)
+            Setup();
+
         RemoveNonChildren();
 
         Attributes.ProcessAttributes();
 
-        if (!Initialized)
-            Setup();
-
         UpdatePriority();
         UpdateGeometry();
-
-        UpdatePropertyAnimations();
-        UpdateAnimator();
-
         UpdateSfmlProperties();
 
         LastPriority = Priority;
 
-        UpdateEvent?.Invoke(this, EventArgs.Empty);
+        ConstantUpdateEvent?.Invoke(this, EventArgs.Empty);
     }
+
+    protected void RemoveNonChildren()
+        => Children.RemoveAll(element => element.Parent != this);
 
     private void UpdatePriority()
     {
@@ -278,34 +319,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
             ApplyAlignment();
     }
 
-    private void UpdatePropertyAnimations()
-    {
-        foreach (Property property in Properties)
-            if (property is AnimatableProperty { Animation: not null } animatableProperty)
-                animatableProperty.Animation.Update();
-    }
-
-    private void UpdateAnimator()
-    {
-        UpdateNormalKeyframe();
-        Animator.Update();
-    }
-
-    private void UpdateNormalKeyframe()
-    {
-        if (Animator.HasFinished && Animator.CurrentKeyframe == Normal)
-            Normal.From(ToKeyframe());
-
-        else if (Animator.CurrentKeyframe is not null)
-        {
-            Keyframe currentProperties = ToKeyframe();
-
-            foreach (var (key, value) in currentProperties)
-                if (!Animator.CurrentKeyframe.ContainsKey(key))
-                    Normal[key] = value;
-        }
-    }
-
     protected virtual void UpdateSfmlProperties()
     {
         Transformable.Position = AbsolutePosition;
@@ -314,11 +327,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Transformable.Scale = Scale.Value;
     }
 
-    protected void RemoveNonChildren()
-        => Children.RemoveAll(element => element.Parent != this);
 
 
-
+    // same as Update, but should be used to drawings
     public virtual void Draw(RenderTarget target)
     {
         DrawEvent?.Invoke(this, EventArgs.Empty);
@@ -360,11 +371,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public virtual Vec2f GetAlignmentRelativePosition(Alignment alignment)
         => AlignmentCalculator.GetAlignedRelativePositionOfChild(GetBorderLessRelativeBounds(), GetParentBorderLessRelativeBounds(), alignment);
 
+
     public Vec2f GetAlignmentPosition() => GetAlignmentPosition(Alignment);
     public Vec2f GetAlignmentRelativePosition() => GetAlignmentRelativePosition(Alignment);
 
+
     public virtual FloatRect GetSizePolicyRect(SizePolicyType policyType)
-        => SizePolicyCalculator.CalculateChildRect(GetBounds(), GetParentBounds(), policyType);
+        => SizePolicyCalculator.CalculateChildRect(GetBorderLessBounds(), GetParentBorderLessBounds(), policyType);
 
     public FloatRect GetSizePolicyRect()
         => GetSizePolicyRect(SizePolicy).ShrinkRect(SizePolicyMargin);

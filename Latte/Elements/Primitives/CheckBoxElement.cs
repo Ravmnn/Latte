@@ -14,6 +14,7 @@ public class CheckBoxElement : ButtonElement
 
     public CheckBoxElement(Element? parent, Vec2f position, bool selected = false) : base(parent, position, new(20, 20), null)
     {
+        // TODO: move to own class
         SelectedArea = new(this, new(), new())
         {
             Alignment = { Value = Elements.Alignment.Center },
@@ -37,10 +38,10 @@ public class CheckBoxElement : ButtonElement
 
     public override void Update()
     {
-        base.Update();
-
         SelectedArea.Visible = Selected;
         SelectedArea.Radius.Set(Radius);
+
+        base.Update();
     }
 
 

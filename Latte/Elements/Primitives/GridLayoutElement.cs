@@ -125,12 +125,12 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     }
 
 
-    public override void Update()
+    public override void ConstantUpdate()
     {
         if (RecreationRequired)
             CreateCells();
 
-        base.Update();
+        base.ConstantUpdate();
     }
 
 

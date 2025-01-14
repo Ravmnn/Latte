@@ -21,11 +21,11 @@ public class ProgressBarElement : Element
 
     public AnimatableProperty<Float> Progress { get; }
 
-    public Property<Float> MinValue { get; }
-    public Property<Float> MaxValue { get; }
-
     public bool IsAtMax => Progress.Value >= MaxValue.Value;
     public bool IsAtMin => Progress.Value <= MinValue.Value;
+
+    public Property<Float> MinValue { get; }
+    public Property<Float> MaxValue { get; }
 
     public bool Completed => IsAtMax;
 
@@ -49,7 +49,7 @@ public class ProgressBarElement : Element
     }
 
 
-    public override void Update()
+    public override void ConstantUpdate()
     {
         KeepProgressBetweenLimits();
         UpdateSizeBasedOnProgress();
@@ -59,7 +59,7 @@ public class ProgressBarElement : Element
 
         _wasCompleted = Completed;
 
-        base.Update();
+        base.ConstantUpdate();
     }
 
     private void UpdateSizeBasedOnProgress()

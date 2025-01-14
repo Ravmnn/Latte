@@ -56,12 +56,6 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     }
 
 
-    protected override void Setup()
-    {
-        base.Setup();
-    }
-
-
     public override void Update()
     {
         (this as IDefaultClickable).UpdateMouseState();
