@@ -1,5 +1,3 @@
-using System;
-
 using SFML.Graphics;
 
 using Latte.Core;
@@ -15,7 +13,7 @@ namespace Latte.Elements.Primitives;
 
 public class TextElement : Element
 {
-    private float _lastFitTargetWidth;
+    private uint _lastFitSize;
 
 
     public override Transformable Transformable => SfmlText;
@@ -49,7 +47,7 @@ public class TextElement : Element
         Text = new(this, nameof(Text), text);
         Style = new(this, nameof(Style), SFML.Graphics.Text.Styles.Regular);
 
-        Size = new(this, nameof(Size), size ?? 1);
+        Size = new(this, nameof(Size), size ?? 7);
         LetterSpacing = new(this, nameof(LetterSpacing), 1f);
         LineSpacing = new(this, nameof(LineSpacing), 1f);
 
@@ -66,7 +64,7 @@ public class TextElement : Element
 
         // round to avoid blurry text
         Transformable.Position = AbsolutePosition.Round();
-        Transformable.Origin = new(MathF.Round(Origin.Value.X), MathF.Round(Origin.Value.Y));
+        Transformable.Origin = new Vec2f(Origin.Value.X, Origin.Value.Y).Round();
 
         SfmlText.DisplayedString = Text;
         SfmlText.Style = Style.Value;
@@ -115,23 +113,33 @@ public class TextElement : Element
 
     public override void ApplySizePolicy()
     {
-        FloatRect rect = GetSizePolicyRect();
+        FloatRect targetRect = GetSizePolicyRect();
+        FloatRect bounds = GetBounds();
 
-        if (Text.Value.Length == 0 || Math.Abs(_lastFitTargetWidth - rect.Width) < 0.1f)
-            return;
+        uint size = CalculateSizePolicyTextSize(targetRect.Height, bounds.Height);
 
-        uint size = (uint)Math.Floor(Size.Value * rect.Size.X / GetBounds().Width);
+        if (CalculateBoundsOfTextWithSize(SfmlText, size).Width > targetRect.Width)
+            size = CalculateSizePolicyTextSize(targetRect.Width, bounds.Width);
 
-        // ignore Y axis
-        AbsolutePosition.X = rect.Position.X;
-        Size.Set(size);
+        if (Math.Abs((int)_lastFitSize - size) > 2)
+            Size.Set(size);
 
-        _lastFitTargetWidth = rect.Width;
+        _lastFitSize = size;
+    }
 
-        // currentCharacterSize = currentWidth
-        // targetCharacterSize  = targetWidth
+    // https://math.stackexchange.com/questions/857073/formula-for-adjusting-font-height
+    private uint CalculateSizePolicyTextSize(float targetSize, float currentSize)
+        => (uint)Math.Round(targetSize * (Size.Value / currentSize));
 
-        // targetCharacterSize * currentWidth = currentCharacterSize * targetWidth
-        // targetCharacterSize = (currentCharacterSize * targetWidth) / currentWidth
+
+    private static FloatRect CalculateBoundsOfTextWithSize(Text text, uint size)
+    {
+        uint oldSize = text.CharacterSize;
+        text.CharacterSize = size;
+
+        FloatRect bounds = text.GetGlobalBounds();
+        text.CharacterSize = oldSize;
+
+        return bounds;
     }
 }
