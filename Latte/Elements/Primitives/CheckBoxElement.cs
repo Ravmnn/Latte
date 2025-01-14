@@ -5,14 +5,14 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
-public class CheckBox : ButtonElement
+public class CheckBoxElement : ButtonElement
 {
     protected RectangleElement SelectedArea { get; set; }
 
     public bool Selected { get; set; }
 
 
-    public CheckBox(Element? parent, Vec2f position, bool selected = false) : base(parent, position, new(20, 20), null)
+    public CheckBoxElement(Element? parent, Vec2f position, bool selected = false) : base(parent, position, new(20, 20), null)
     {
         SelectedArea = new(this, new(), new())
         {

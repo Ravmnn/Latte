@@ -29,6 +29,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 {
     public TextElement Title { get; protected set; }
 
+    // TODO: make nullable and create (or destruct) based on Styles
     public ButtonElement CloseButton { get; protected set; }
 
     public WindowElementStyles Styles { get; set; }

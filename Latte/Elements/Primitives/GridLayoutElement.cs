@@ -10,7 +10,7 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
-[ChildrenAmountLimit(1)]
+[ChildrenAmount(1)]
 public class GridLayoutCell : RectangleElement
 {
     public Element? Element
@@ -41,7 +41,7 @@ public enum GridLayoutGrowDirection
 }
 
 
-[CanOnlyHaveChildOfType(typeof(GridLayoutCell))]
+[ChildrenType(typeof(GridLayoutCell))]
 public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 {
     private uint _rows;

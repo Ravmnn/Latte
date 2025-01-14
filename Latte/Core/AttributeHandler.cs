@@ -1,5 +1,5 @@
-using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 
 namespace Latte.Core;
@@ -7,9 +7,12 @@ namespace Latte.Core;
 
 public static class AttributeHandler
 {
-    public static T? GetAttribute<T>(this object obj) where T : Attribute
+    public static T? GetAttribute<T>(this object obj) where T : System.Attribute
         => obj.GetType().GetCustomAttribute<T>();
 
-    public static bool HasAttribute<T>(this object obj) where T : Attribute
+    public static IEnumerable<object> GetAttributes(this object obj, bool inherit = true)
+        => obj.GetType().GetCustomAttributes(inherit);
+
+    public static bool HasAttribute<T>(this object obj) where T : System.Attribute
         => obj.GetAttribute<T>() is not null;
 }

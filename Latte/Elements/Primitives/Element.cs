@@ -13,39 +13,45 @@ using Latte.Core.Application;
 namespace Latte.Elements.Primitives;
 
 
+public abstract class ElementAttribute(bool inherit = false) : Attribute
+{
+    public bool Inherit { get; } = inherit;
+
+
+    public virtual void Process(Element element) {}
+}
+
+
 [AttributeUsage(AttributeTargets.Class)]
-public class CanOnlyHaveChildOfTypeAttribute(Type type) : Attribute
+public class ChildrenTypeAttribute(Type type) : ElementAttribute
 {
     public Type Type { get; } = type;
 
 
-    public static void Check(Element element)
+    public override void Process(Element element)
     {
-        if (element.GetAttribute<CanOnlyHaveChildOfTypeAttribute>() is not { } attribute)
-            return;
-
         foreach (Element child in element.Children)
-            if (child.GetType() != attribute.Type)
-                throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have children of type: \"{attribute.Type.Name}\"");
+            if (child.GetType() != Type)
+                throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have children of type: \"{Type.Name}\"");
     }
 }
 
 
 [AttributeUsage(AttributeTargets.Class)]
-public class ChildrenAmountLimitAttribute(uint amount) : Attribute
+public class ChildrenAmountAttribute(uint amount) : ElementAttribute
 {
     public uint Amount { get; } = amount;
 
 
-    public static void Check(Element element)
+    public override void Process(Element element)
     {
-        if (element.GetAttribute<ChildrenAmountLimitAttribute>() is not { } attribute)
-            return;
-
-        if (element.Children.Count > attribute.Amount)
-            throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have {attribute.Amount} children.");
+        if (element.Children.Count > Amount)
+            throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have {Amount} children.");
     }
 }
+
+
+
 
 
 public class ElementEventArgs(Element? element) : EventArgs
@@ -75,6 +81,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     private int _priority;
 
 
+    public abstract Transformable Transformable { get; }
+
+    public bool Initialized { get; private set; }
+
     public Element? Parent
     {
         get => _parent;
@@ -88,19 +98,14 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         }
     }
 
-    public event EventHandler<ElementEventArgs>? ParentChangedEvent;
+    public List<Element> Children { get; }
 
     public Property[] Properties => _properties.ToArray();
-
-    public List<Element> Children { get; }
-    public event EventHandler<ElementEventArgs>? ChildAddedEvent;
 
     public ElementKeyframeAnimator Animator { get; set; }
     public Keyframe Normal { get; }
 
-    public abstract Transformable Transformable { get; }
-
-    protected bool ParentVisible => Parent?.Visible ?? true;
+    public ElementAttributeManager Attributes { get; private set; }
 
     public bool Visible
     {
@@ -115,9 +120,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         }
     }
 
-    public event EventHandler? VisibilityChangedEvent;
-
-    public bool Initialized { get; private set; }
+    protected bool ParentVisible => Parent?.Visible ?? true;
 
     public bool CanDraw => Initialized && Visible && IsInsideClipArea();
 
@@ -138,8 +141,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public PrioritySnap PrioritySnap { get; set; }
     public int PrioritySnapOffset { get; set; }
-
-    public event EventHandler? PriorityChangedEvent;
 
     public bool IgnoreMouseInput { get; set; }
     public bool CaughtMouseInput { get; set; }
@@ -163,6 +164,11 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public Property<SizePolicyType> SizePolicy { get; }
     public AnimatableProperty<Vec2f> SizePolicyMargin { get; }
 
+    public event EventHandler<ElementEventArgs>? ParentChangedEvent;
+    public event EventHandler<ElementEventArgs>? ChildAddedEvent;
+    public event EventHandler? VisibilityChangedEvent;
+    public event EventHandler? PriorityChangedEvent;
+
     public event EventHandler? SetupEvent;
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;
@@ -181,6 +187,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
             BaseKeyframe = Normal
         };
 
+        Attributes = new(this);
 
         Visible = true;
 
@@ -222,8 +229,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     {
         RemoveNonChildren();
 
-        CanOnlyHaveChildOfTypeAttribute.Check(this);
-        ChildrenAmountLimitAttribute.Check(this);
+        Attributes.ProcessAttributes();
 
         if (!Initialized)
             Setup();
