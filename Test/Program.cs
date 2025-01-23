@@ -61,20 +61,20 @@ class Program
             Alignment = { Value = Alignment.Center }
         };
 
-        GridLayoutElement grid = new(scrollAreaElement, new(), 5, 10, 35, 35)
-        {
-            GrowDirection = GridLayoutGrowDirection.Vertically
-        };
+        // GridLayoutElement grid = new(scrollAreaElement, new(), 5, 10, 35, 35)
+        // {
+        //     GrowDirection = GridLayoutGrowDirection.Vertical
+        // };
 
 
-        for (int i = 0; i < 100; i++)
-            AddButtonToLayout(grid);
+        // for (int i = 0; i < 100; i++)
+        //     AddButtonToLayout(grid);
 
-        addButton.MouseUpEvent += (_, _) =>
-        {
-            AddButtonToLayout(grid);
-            App.AddElement(grid);
-        };
+        // addButton.MouseUpEvent += (_, _) =>
+        // {
+        //     AddButtonToLayout(grid);
+        //     App.AddElement(grid);
+        // };
 
         App.AddElement(rect);
 

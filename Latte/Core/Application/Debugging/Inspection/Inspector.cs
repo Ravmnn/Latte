@@ -1,0 +1,106 @@
+using System.Text;
+using System.Collections.Generic;
+
+using Latte.Elements;
+using Latte.Elements.Primitives;
+
+
+namespace Latte.Core.Application.Debugging.Inspection;
+
+
+public record InspectionData(string Name, string Data);
+
+
+
+public interface IInspector
+{
+    InspectionData Inspect(object value);
+
+    bool CanInspect(object value);
+}
+
+
+public interface IInspector<T> : IInspector
+{
+    InspectionData Inspect(T value);
+
+
+    InspectionData IInspector.Inspect(object value)
+        => Inspect((T)value);
+
+    bool IInspector.CanInspect(object value)
+        => value is T;
+}
+
+
+public sealed class Inspectors : List<IInspector>
+{
+    public IEnumerable<InspectionData> InspectAll(object value)
+    {
+        List<InspectionData> inspectionDataList = [];
+
+        foreach (IInspector inspector in this)
+        {
+            if (!inspector.CanInspect(value))
+                continue;
+
+            inspectionDataList.Add(inspector.Inspect(value));
+        }
+
+        return inspectionDataList;
+    }
+
+
+    public InspectionData? InspectOnly<T>(object value)
+    {
+        foreach (IInspector inspector in this)
+            if (value is T && inspector.CanInspect(value))
+                return inspector.Inspect(value);
+
+        return null;
+    }
+}
+
+
+
+
+
+public sealed class ElementInspector : IInspector<Element>
+{
+    public InspectionData Inspect(Element element)
+    {
+        StringBuilder data = new();
+
+        foreach (Property property in element.Properties)
+            data.AppendLine($"{property.Name}: {property.Value}");
+
+        return new("Element", data.ToString());
+    }
+}
+
+
+public sealed class ClickableInspector : IInspector<IClickable>
+{
+    public InspectionData Inspect(IClickable clickable)
+    {
+        MouseClickState ms = clickable.MouseState;
+        StringBuilder data = new();
+
+        data.AppendLine($"Ignore mouse input: {clickable.IgnoreMouseInput}");
+        data.AppendLine($"Caught mouse input: {clickable.CaughtMouseInput}");
+
+        data.AppendLine($"Mouse over: {ms.IsMouseOver}");
+        data.AppendLine($"Mouse hover: {ms.IsMouseHover}");
+        data.AppendLine($"Mouse down: {ms.IsMouseDown}");
+        data.AppendLine($"Pressed: {ms.IsPressed}");
+        data.AppendLine($"True pressed: {ms.IsTruePressed}");
+
+        data.AppendLine($"Was mouse over: {ms.WasMouseOver}");
+        data.AppendLine($"Was mouse hover: {ms.WasMouseHover}");
+        data.AppendLine($"Was mouse down: {ms.WasMouseDown}");
+        data.AppendLine($"Was pressed: {ms.WasPressed}");
+        data.AppendLine($"Was true pressed: {ms.WasTruePressed}");
+
+        return new("Clickable", data.ToString());
+    }
+}

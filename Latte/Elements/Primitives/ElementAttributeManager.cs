@@ -26,7 +26,7 @@ public class ElementAttributeManager
         CacheAttributes();
     }
 
-    private void CacheAttributes()
+    public void CacheAttributes()
         => _cachedAttributes = GetElementAttributes();
 
 

@@ -409,16 +409,35 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public void Raise(uint amount = 1) => Priority += (int)amount;
     public void Lower(uint amount = 1) => Priority -= (int)amount;
 
+
+    private bool ParentHierarchyHasPrioritySnap()
+    {
+        bool result = PrioritySnap != PrioritySnap.None;
+
+        this.ForeachParent(element =>
+        {
+            if (element.PrioritySnap != PrioritySnap.None)
+                result = true;
+        });
+
+        return result;
+    }
+
+
     public void RaiseToTop()
     {
-        Element element = App.Elements.Last(element => element != this && element.PrioritySnap == PrioritySnap.None);
-        Priority = element.Priority + PrioritySnapOffset;
+        Element? element = App.Elements.LastOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
+
+        if (element is not null)
+            Priority = element.Priority + PrioritySnapOffset;
     }
 
     public void LowerToBottom()
     {
-        Element element = App.Elements.First(element => element != this && element.PrioritySnap == PrioritySnap.None);
-        Priority = element.Priority - PrioritySnapOffset;
+        Element? element = App.Elements.FirstOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
+
+        if (element is not null)
+            Priority = element.Priority - PrioritySnapOffset;
     }
 
     public void RaiseToParentTop()
@@ -427,7 +446,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
         Parent?.Children.ForeachElement(element =>
         {
-            if (element != this && element.PrioritySnap == PrioritySnap.None && element.Priority > higherPriority)
+            if (element != this && !element.ParentHierarchyHasPrioritySnap() && element.Priority > higherPriority)
                 higherPriority = element.Priority;
         });
 
@@ -440,7 +459,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
         Parent?.Children.ForeachElement(element =>
         {
-            if (element != this && element.PrioritySnap == PrioritySnap.None && element.Priority < lowerPriority)
+            if (element != this && !element.ParentHierarchyHasPrioritySnap() && element.Priority < lowerPriority)
                 lowerPriority = element.Priority;
         });
 
@@ -450,10 +469,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     private void AddParentPriorityDeltaToThis()
     {
-        if (Parent is null)
-            return;
-
-        Priority += Parent.Priority - Parent.LastPriority;
+        if (Parent is not null)
+            Priority += Parent.Priority - Parent.LastPriority;
     }
 
 
@@ -519,5 +536,15 @@ public static class ElementExtensions
             action(element);
             ForeachElement(element.Children, action);
         }
+    }
+
+
+    public static void ForeachParent(this Element element, Action<Element> action)
+    {
+        if (element.Parent is null)
+            return;
+
+        action(element.Parent);
+        ForeachParent(element.Parent, action);
     }
 }

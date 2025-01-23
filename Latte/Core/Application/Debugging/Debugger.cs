@@ -5,6 +5,7 @@ using SFML.Window;
 using SFML.Graphics;
 
 using Latte.Core.Type;
+using Latte.Core.Application.Debugging.Inspection;
 using Latte.Elements;
 using Latte.Elements.Primitives;
 
@@ -44,9 +45,14 @@ public class DebuggerIgnoreShowClipAreaAttribute(bool inherit = true) : ElementA
 public class DebuggerIgnoreShowPriorityAttribute(bool inherit = true) : ElementAttribute(inherit);
 
 
+[AttributeUsage(AttributeTargets.Class)]
+public class DebuggerIgnoreInspection(bool inherit = true) : ElementAttribute(inherit);
+
+
 public class Debugger : IUpdateable, IDrawable
 {
-    public InspectorWindow Inspector { get; private set; }
+    public InspectionWindow InspectionWindow { get; }
+    public Inspectors Inspectors { get; }
 
     public DebugOption Options { get; set; }
     public bool EnableKeyShortcuts { get; set; }
@@ -54,12 +60,14 @@ public class Debugger : IUpdateable, IDrawable
 
     public Debugger()
     {
-        Inspector = new()
+        InspectionWindow = new()
         {
             Visible = false
         };
 
-        App.AddElement(Inspector);
+        Inspectors = [new ElementInspector(), new ClickableInspector()];
+
+        App.AddElement(InspectionWindow);
 
         Options = DebugOption.None;
     }
@@ -109,7 +117,7 @@ public class Debugger : IUpdateable, IDrawable
 
 
             case Keyboard.Scancode.F12:
-                Inspector.Visible = !Inspector.Visible;
+                InspectionWindow.Visible = !InspectionWindow.Visible;
                 break;
         }
     }

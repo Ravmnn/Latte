@@ -36,8 +36,8 @@ public class GridLayoutCell : RectangleElement
 
 public enum GridLayoutGrowDirection
 {
-    Horizontally,
-    Vertically
+    Horizontal,
+    Vertical
 }
 
 
@@ -60,6 +60,9 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
             if (MaxRows is not null)
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(value, MaxRows.Value, nameof(value));
 
+            if (MinRows is not null)
+                ArgumentOutOfRangeException.ThrowIfLessThan(value, MinRows.Value, nameof(value));
+
             _rows = value;
             RecreationRequired = true;
         }
@@ -73,6 +76,9 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
             if (MaxColumns is not null)
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(value, MaxColumns.Value, nameof(value));
 
+            if (MinColumns is not null)
+                ArgumentOutOfRangeException.ThrowIfLessThan(value, MinColumns.Value, nameof(value));
+
             _columns = value;
             RecreationRequired = true;
         }
@@ -80,6 +86,9 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     public uint? MaxRows { get; set; }
     public uint? MaxColumns { get; set; }
+
+    public uint? MinRows { get; set; }
+    public uint? MinColumns { get; set; }
 
     public float CellWidth
     {
@@ -116,7 +125,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         _cellWidth = cellWidth;
         _cellHeight = cellHeight;
 
-        GrowDirection = GridLayoutGrowDirection.Horizontally;
+        GrowDirection = GridLayoutGrowDirection.Horizontal;
 
         Color.Value = SFML.Graphics.Color.Transparent;
 
@@ -173,11 +182,17 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     public void DeleteLastElement() => App.RemoveElement(RemoveLastElement());
     public void DeleteElementAt(uint row, uint column) => App.RemoveElement(RemoveElementAt(row, column));
 
-    public void DeleteAll()
+
+    public void Clear()
     {
         for (uint row = 0; row < Rows; row++)
             for (uint col = 0; col < Columns; col++)
                 DeleteElementAt(row, col);
+
+        Rows = MinRows ?? 0;
+        Columns = MinColumns ?? 0;
+
+        CreateCells();
     }
 
 
@@ -230,11 +245,11 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
         switch (GrowDirection)
         {
-            case GridLayoutGrowDirection.Horizontally:
+            case GridLayoutGrowDirection.Horizontal:
                 Columns++;
                 break;
 
-            case GridLayoutGrowDirection.Vertically:
+            case GridLayoutGrowDirection.Vertical:
                 Rows++;
                 break;
         }
@@ -266,7 +281,12 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         if (AreIndicesInsideMatrixBounds(oldCells, row, col))
             Cells[row, col] = oldCells[row, col];
         else
+        {
             Cells[row, col] = new(this, new(), new());
+
+            // TODO: please, add a way to track element creation automatically
+            App.AddElement(Cells[row, col]);
+        }
     }
 
     private void UpdateCellGeometry(uint row, uint col)
@@ -322,6 +342,8 @@ public class GridLayoutEnumerator : IEnumerator<Element?>
         _row = _col = 0;
     }
 
+
+    // an IEnumerator should implement the dispose pattern
 
     public void Dispose()
     {
