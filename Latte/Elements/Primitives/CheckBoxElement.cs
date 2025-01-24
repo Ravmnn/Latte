@@ -5,25 +5,43 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
+public class CheckBoxSelectedIndicatorElement : RectangleElement
+{
+    public new CheckBoxElement Parent => (base.Parent as CheckBoxElement)!;
+
+
+    public CheckBoxSelectedIndicatorElement(CheckBoxElement parent) : base(parent, new(), new())
+    {
+        IgnoreMouseInput = true;
+
+        Alignment.Set(Elements.Alignment.Center);
+        SizePolicy.Set(SizePolicyType.FitParent);
+        SizePolicyMargin.Set(new(5f, 5f));
+
+        Color.Set(new(50, 50, 50));
+    }
+
+
+    public override void Update()
+    {
+        Visible = Parent.Selected;
+        Radius.Set(Radius);
+
+        base.Update();
+    }
+}
+
+
 public class CheckBoxElement : ButtonElement
 {
-    protected RectangleElement SelectedArea { get; set; }
+    protected RectangleElement SelectedIndicator { get; set; }
 
     public bool Selected { get; set; }
 
 
     public CheckBoxElement(Element? parent, Vec2f position, bool selected = false) : base(parent, position, new(20, 20), null)
     {
-        // TODO: move to own class
-        SelectedArea = new(this, new(), new())
-        {
-            Alignment = { Value = Elements.Alignment.Center },
-            SizePolicy = { Value = SizePolicyType.FitParent },
-            SizePolicyMargin = { Value = new(5f, 5f) },
-            Color = { Value = new(50, 50, 50) },
-
-            IgnoreMouseInput = true
-        };
+        SelectedIndicator = new CheckBoxSelectedIndicatorElement(this);
 
         Selected = selected;
 
@@ -33,15 +51,6 @@ public class CheckBoxElement : ButtonElement
         Down["Scale"] = new Vec2f(0.9f, 0.9f);
 
         UseDefaultAnimation = false;
-    }
-
-
-    public override void Update()
-    {
-        SelectedArea.Visible = Selected;
-        SelectedArea.Radius.Set(Radius);
-
-        base.Update();
     }
 
 

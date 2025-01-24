@@ -1,8 +1,9 @@
 using System;
-using Latte.Core.Application;
+
 using SFML.Window;
 
 using Latte.Core.Type;
+using Latte.Core.Application;
 
 
 namespace Latte.Elements;

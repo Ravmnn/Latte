@@ -49,7 +49,7 @@ public class DebuggerIgnoreShowPriorityAttribute(bool inherit = true) : ElementA
 public class DebuggerIgnoreInspection(bool inherit = true) : ElementAttribute(inherit);
 
 
-public class Debugger : IUpdateable, IDrawable
+public sealed class Debugger : IUpdateable, IDrawable
 {
     public InspectionWindow InspectionWindow { get; }
     public Inspectors Inspectors { get; }
