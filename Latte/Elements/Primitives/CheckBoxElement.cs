@@ -54,9 +54,9 @@ public class CheckBoxElement : ButtonElement
     }
 
 
-    public override void OnMouseUp()
+    public override void OnMouseClick()
     {
-        base.OnMouseUp();
+        base.OnMouseClick();
         Selected = !Selected;
     }
 }

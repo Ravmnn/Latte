@@ -15,7 +15,7 @@ public class MouseClickState
     public bool IsMouseHover { get; set; }
     public bool IsMouseDown { get; set; }
     public bool IsPressed { get; set; }
-    public bool IsTruePressed { get; set; }
+    public bool IsTruePressed { get; set; } // TODO: change name
 
     public bool WasMouseOver { get; set; }
     public bool WasMouseHover { get; set; }
@@ -24,7 +24,6 @@ public class MouseClickState
     public bool WasTruePressed { get; set; }
 }
 
-// TODO: if mouse is "holding" another element, ignore input while mouse is down
 
 public interface IClickable : IMouseInputTarget
 {
@@ -36,11 +35,15 @@ public interface IClickable : IMouseInputTarget
     event EventHandler? MouseDownEvent;
     event EventHandler? MouseUpEvent;
 
+    event EventHandler? MouseClickEvent;
+
 
     void OnMouseEnter();
     void OnMouseLeave();
     void OnMouseDown();
     void OnMouseUp();
+
+    void OnMouseClick();
 
 
     bool IsPointOver(Vec2f point);
@@ -74,11 +77,19 @@ public interface IDefaultClickable : IClickable
         bool entered = MouseState.IsMouseHover && !MouseState.WasMouseHover;
         bool leaved = !MouseState.IsMouseHover && MouseState.WasMouseHover;
 
-        if (MouseState.IsTruePressed && !MouseState.WasTruePressed)
+        bool pressed = MouseState.IsTruePressed && !MouseState.WasTruePressed;
+        bool unpressed = !MouseState.IsTruePressed && MouseState.WasTruePressed;
+
+        if (pressed)
             OnMouseDown();
 
-        else if (!MouseState.IsTruePressed && MouseState.WasTruePressed && !MouseState.IsMouseDown)
+        else if (unpressed)
+        {
             OnMouseUp();
+
+            if (MouseState.IsMouseOver)
+                OnMouseClick();
+        }
 
         if (entered)
             OnMouseEnter();

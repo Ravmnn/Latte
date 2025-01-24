@@ -41,10 +41,10 @@ public class WindowCloseButtonElement : ButtonElement
     }
 
 
-    public override void OnMouseUp()
+    public override void OnMouseClick()
     {
-        Parent.Close();
         base.OnMouseUp();
+        Parent.Close();
     }
 }
 
@@ -84,6 +84,8 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public event EventHandler? MouseLeaveEvent;
     public event EventHandler? MouseDownEvent;
     public event EventHandler? MouseUpEvent;
+
+    public event EventHandler? MouseClickEvent;
 
     public event EventHandler? DragBeginEvent;
     public event EventHandler? DragEndEvent;
@@ -237,6 +239,10 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
+
+
+    public virtual void OnMouseClick()
+        => MouseClickEvent?.Invoke(this, EventArgs.Empty);
 
 
     public virtual void OnDragBegin() => DragBeginEvent?.Invoke(this, EventArgs.Empty);

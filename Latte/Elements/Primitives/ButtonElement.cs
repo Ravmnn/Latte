@@ -21,6 +21,8 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     public event EventHandler? MouseDownEvent;
     public event EventHandler? MouseUpEvent;
 
+    public event EventHandler? MouseClickEvent;
+
     public Keyframe Hover { get; }
     public Keyframe Down { get; }
 
@@ -100,6 +102,10 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         Animator.Animate(MouseState.IsMouseHover ? Hover : Normal);
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
     }
+
+
+    public virtual void OnMouseClick()
+        => MouseClickEvent?.Invoke(this, EventArgs.Empty);
 
 
     public virtual bool IsPointOver(Vec2f point)

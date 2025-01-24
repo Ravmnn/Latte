@@ -70,7 +70,7 @@ class Program
         for (int i = 0; i < 100; i++)
             AddButtonToLayout(grid);
 
-        addButton.MouseUpEvent += (_, _) => AddButtonToLayout(grid);
+        addButton.MouseClickEvent += (_, _) => AddButtonToLayout(grid);
 
         App.AddElement(rect);
 

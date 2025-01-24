@@ -93,7 +93,7 @@ public static class App
     public static Element? ElementWhichCaughtMouseInput { get; private set; }
     public static Element? TrueElementWhichCaughtMouseInput { get; private set; }
 
-    // public static Element? ElementWhichIsHoldingMouseInput { get; private set; }
+    public static IClickable? ElementWhichIsHoldingMouseInput { get; private set; }
 
     public static KeyEventArgs? PressedKey { get; private set; }
     public static KeyEventArgs? ReleasedKey { get; private set; }
@@ -228,8 +228,18 @@ public static class App
         s_deltaTimeStopwatch.Restart();
     }
 
+
+    // TODO: cleanup this
     private static void UpdateElementsMouseInputCatch()
     {
+        if (ElementWhichIsHoldingMouseInput is not null)
+        {
+            if (!ElementWhichIsHoldingMouseInput.MouseState.IsMouseDown)
+                ElementWhichIsHoldingMouseInput = null;
+            else
+                return;
+        }
+
         Element[] elements = Elements.ToArray();
 
         ElementWhichCaughtMouseInput = TrueElementWhichCaughtMouseInput = null;
@@ -248,9 +258,14 @@ public static class App
                 continue;
 
             if (!element.IgnoreMouseInput)
+            {
                 ElementWhichCaughtMouseInput = element;
 
-            TrueElementWhichCaughtMouseInput ??= element;
+                if (clickable is not null && clickable.MouseState.IsTruePressed)
+                    ElementWhichIsHoldingMouseInput = clickable;
+            }
+
+            TrueElementWhichCaughtMouseInput = element;
         }
     }
 
