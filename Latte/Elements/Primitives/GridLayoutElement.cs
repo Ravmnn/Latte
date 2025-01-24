@@ -281,12 +281,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         if (AreIndicesInsideMatrixBounds(oldCells, row, col))
             Cells[row, col] = oldCells[row, col];
         else
-        {
             Cells[row, col] = new(this, new(), new());
-
-            // TODO: please, add a way to track element creation automatically
-            App.AddElement(Cells[row, col]);
-        }
     }
 
     private void UpdateCellGeometry(uint row, uint col)

@@ -10,9 +10,6 @@ using Latte.Elements.Primitives;
 namespace Latte.Core.Application;
 
 
-// TODO: add a list of elements in which their new children are added automatically
-
-
 public class Section : IUpdateable, IDrawable
 {
     // Elements are ordered based on their priority
@@ -46,6 +43,13 @@ public class Section : IUpdateable, IDrawable
         => _elements = _elements.OrderBy(element => element.Priority).ToList();
 
 
+    private void OnElementChildAdded(object? _, ElementEventArgs e)
+    {
+        if (e.Element is not null)
+            AddElement(e.Element);
+    }
+
+
     public void AddElement(Element element)
     {
         AddSingleElement(element);
@@ -61,6 +65,8 @@ public class Section : IUpdateable, IDrawable
             return;
 
         _elements.Add(element);
+
+        element.ChildAddedEvent += OnElementChildAdded;
 
         ElementAddedEvent?.Invoke(null, new(element));
     }
@@ -85,6 +91,8 @@ public class Section : IUpdateable, IDrawable
     private bool RemoveSingleElement(Element element)
     {
         bool result = _elements.Remove(element);
+
+        element.ChildAddedEvent -= OnElementChildAdded;
 
         ElementRemovedEvent?.Invoke(null, new(element));
 

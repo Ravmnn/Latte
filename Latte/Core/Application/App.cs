@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+
 using SFML.System;
 using SFML.Window;
 using SFML.Graphics;
@@ -45,6 +46,8 @@ public static class App
     private static Vec2f s_lastMainViewMousePosition;
 
     private static readonly Stopwatch s_deltaTimeStopwatch;
+
+    private static bool s_elementWasAddedAndNotUpdated;
 
 
     public static Debugger? Debugger { get; private set; }
@@ -119,6 +122,8 @@ public static class App
 
         s_deltaTimeStopwatch = new();
 
+        s_elementWasAddedAndNotUpdated = false;
+
         RenderMode = RenderMode.Pinned;
 
         Section = new();
@@ -128,6 +133,8 @@ public static class App
         MainViewMousePosition = new();
 
         DeltaTime = TimeSpan.Zero;
+
+        Section.ElementAddedEvent += (_, _) => OnSectionElementAdded();
 
         // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
         // this must be ALWAYS initialized before the rendering window
@@ -194,7 +201,7 @@ public static class App
         UpdateElementsMouseInputCatch();
         Debugger?.Update(); // update before elements
 
-        UpdateElements();
+        UpdateElementsAndCheckForNewElements();
 
         UnsetElementRenderView();
 
@@ -247,15 +254,26 @@ public static class App
         }
     }
 
-    private static void UpdateElements()
+    private static void UpdateElementsAndCheckForNewElements()
     {
-        // use ToList() to avoid: InvalidOperationException "Collection was modified".
+        UpdateElements();
+
+        while (s_elementWasAddedAndNotUpdated)
+        {
+            s_elementWasAddedAndNotUpdated = false;
+            UpdateElements(true);
+        }
+    }
+
+    private static void UpdateElements(bool constantUpdateOnly = false)
+    {
+        // use ToArray() to avoid: InvalidOperationException "Collection was modified".
         // don't need to use it with DrawElements(), since it SHOULD not modify the element list
         // and SHOULD be used only for drawing stuff
 
-        foreach (Element element in Elements)
+        foreach (Element element in Elements.ToArray())
         {
-            if (element.Visible)
+            if (element.Visible && !constantUpdateOnly)
                 element.Update();
 
             element.ConstantUpdate();
@@ -307,6 +325,12 @@ public static class App
 
         ElementView.Size = newSize;
         ElementView.Center = (Vector2f)newSize / 2f;
+    }
+
+
+    private static void OnSectionElementAdded()
+    {
+        s_elementWasAddedAndNotUpdated = true;
     }
 
 

@@ -179,8 +179,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     {
         _properties = [];
 
-        Parent = parent;
         Children = [];
+        Parent = parent;
 
         Normal = new();
         Animator = new(this, 0.07)
@@ -227,9 +227,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
 
 
-    // called each frame, only if Visible is true
+    // called once each frame, only if Visible is true
     public virtual void Update()
     {
+        // make sure animation updating is called once a frame, since calling
+        // it more than one time may cause some bugs with the animation duration due
+        // to the fact that the application delta time (App.DeltaTime) is calculated once a frame.
+
         UpdatePropertyAnimations();
         UpdateAnimator();
 
@@ -266,7 +270,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
 
 
-    // always called each frame
+    // called at least one time each frame, independently of visibility. May be called
+    // more than one time a frame
     public virtual void ConstantUpdate()
     {
         if (!Initialized)
