@@ -104,3 +104,39 @@ public sealed class ClickableInspector : IInspector<IClickable>
         return new("Clickable", data.ToString());
     }
 }
+
+
+public sealed class DraggableInspector : IInspector<IDraggable>
+{
+    public InspectionData Inspect(IDraggable draggable)
+    {
+        StringBuilder data = new();
+
+        data.AppendLine($"Dragging: {draggable.Dragging}");
+        data.AppendLine($"Was dragging: {draggable.WasDragging}");
+
+        return new("Draggable", data.ToString());
+    }
+}
+
+
+public sealed class ResizableInspector : IInspector<IResizable>
+{
+    public InspectionData Inspect(IResizable resizable)
+    {
+        StringBuilder data = new();
+
+        data.AppendLine($"Resizing: {resizable.Resizing}");
+        data.AppendLine($"Was resizing: {resizable.WasResizing}");
+
+        data.AppendLine($"Rect: {resizable.Rect}");
+
+        data.AppendLine($"Minimum size: {resizable.MinSize}");
+        data.AppendLine($"Maximum size: {resizable.MaxSize}");
+
+        data.AppendLine($"Corners selected: {resizable.CornerToResize}");
+        data.AppendLine($"Corner selection size: {resizable.CornerResizeAreaSize}");
+
+        return new("Resizable", data.ToString());
+    }
+}

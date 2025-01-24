@@ -65,7 +65,10 @@ public class Debugger : IUpdateable, IDrawable
             Visible = false
         };
 
-        Inspectors = [new ElementInspector(), new ClickableInspector()];
+        Inspectors = [
+            new ElementInspector(), new ClickableInspector(), new DraggableInspector(),
+            new ResizableInspector()
+        ];
 
         App.AddElement(InspectionWindow);
 
