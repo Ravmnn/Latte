@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-
+using System.Linq;
 using SFML.System;
 using SFML.Window;
 using SFML.Graphics;
@@ -84,7 +85,7 @@ public static class App
     public static RenderMode RenderMode { get; set; }
 
     public static Section Section { get; set; }
-    public static Element[] Elements => Section.Elements;
+    public static IEnumerable<Element> Elements => Section.Elements;
 
     public static Element? ElementWhichCaughtMouseInput { get; private set; }
     public static Element? TrueElementWhichCaughtMouseInput { get; private set; }
@@ -222,11 +223,13 @@ public static class App
 
     private static void UpdateElementsMouseInputCatch()
     {
+        Element[] elements = Elements.ToArray();
+
         ElementWhichCaughtMouseInput = TrueElementWhichCaughtMouseInput = null;
 
-        for (int i = Elements.Length - 1; i >= 0; i--)
+        for (int i = elements.Length - 1; i >= 0; i--)
         {
-            Element element = Elements[i];
+            Element element = elements[i];
             IClickable? clickable = element as IClickable;
 
             bool isMouseOver = clickable?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);

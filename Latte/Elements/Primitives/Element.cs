@@ -100,7 +100,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public List<Element> Children { get; }
 
-    public Property[] Properties => _properties.ToArray();
+    public IEnumerable<Property> Properties => _properties;
 
     public ElementKeyframeAnimator Animator { get; set; }
     public Keyframe Normal { get; }
@@ -499,8 +499,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public Property this[string name] => GetProperty(name);
 
 
-    public AnimatableProperty[] GetAnimatableProperties()
-        => (from property in Properties where property is AnimatableProperty select property as AnimatableProperty).ToArray();
+    public IEnumerable<AnimatableProperty> GetAnimatableProperties()
+        => from property in Properties
+            where property is AnimatableProperty
+            select property as AnimatableProperty;
 
 
     public Keyframe ToKeyframe() => new(GetAnimatableProperties());

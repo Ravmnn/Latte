@@ -19,7 +19,7 @@ public class Section : IUpdateable, IDrawable
     private List<Element> _elements;
 
 
-    public Element[] Elements => _elements.ToArray();
+    public IEnumerable<Element> Elements => _elements;
 
     public event EventHandler<ElementEventArgs>? ElementAddedEvent;
     public event EventHandler<ElementEventArgs>? ElementRemovedEvent;
@@ -52,7 +52,7 @@ public class Section : IUpdateable, IDrawable
         AddElementsHierarchy(element.Children);
     }
 
-    private void AddElementsHierarchy(List<Element> elements)
+    private void AddElementsHierarchy(IEnumerable<Element> elements)
         => elements.ForeachElement(AddSingleElement);
 
     private void AddSingleElement(Element element)

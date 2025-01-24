@@ -1,5 +1,6 @@
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
 using SFML.Graphics;
 
 using Latte.Core.Type;
@@ -93,14 +94,16 @@ public static class RectExtensions
         => ExpandRect(rect, new Vec2f(amount, amount));
 
 
-    public static FloatRect GetBoundsOfRects(this FloatRect[] rects)
+    public static FloatRect GetBoundsOfRects(this IEnumerable<FloatRect> rects)
     {
-        if (rects.Length == 0)
+        FloatRect[] rectArray = rects.ToArray();
+
+        if (rectArray.Length == 0)
             return new();
 
-        FloatRect bounds = rects[0];
+        FloatRect bounds = rectArray[0];
 
-        foreach (FloatRect rect in rects)
+        foreach (FloatRect rect in rectArray)
         {
             if (rect.Left < bounds.Left)
                 bounds.Left = rect.Left;

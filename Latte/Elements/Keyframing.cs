@@ -11,7 +11,7 @@ namespace Latte.Elements;
 
 public class Keyframe() : Dictionary<string, IAnimatable>
 {
-    public Keyframe(AnimatableProperty[] properties) : this()
+    public Keyframe(IEnumerable<AnimatableProperty> properties) : this()
     {
         foreach (var (name, value) in ElementPropertiesToKeyframeProperties(properties))
             this[name] = value;
@@ -40,7 +40,7 @@ public class Keyframe() : Dictionary<string, IAnimatable>
     }
 
 
-    private static Dictionary<string, IAnimatable> ElementPropertiesToKeyframeProperties(AnimatableProperty[] properties)
+    private static Dictionary<string, IAnimatable> ElementPropertiesToKeyframeProperties(IEnumerable<AnimatableProperty> properties)
         => (from property in properties select new KeyValuePair<string, IAnimatable>(property.Name, property.Value)).ToDictionary();
 }
 
@@ -52,6 +52,7 @@ public class ElementKeyframeAnimator(Element element, double time, Easing easing
 
     public Keyframe? CurrentKeyframe { get; private set; }
     public Keyframe? BaseKeyframe { get; set; }
+
     protected IEnumerable<AnimationData> Animations { get; private set; } = [];
 
 
@@ -96,8 +97,6 @@ public class ElementKeyframeAnimator(Element element, double time, Easing easing
             Animations = Animate(Element, to, time ?? Time, easing ?? Easing);
     }
 
-
-    // TODO: return IEnumerable or IList
 
     public static IEnumerable<AnimationData> Animate(Element element, Keyframe to, double time, Easing easing = Easing.Linear)
     {
