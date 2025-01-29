@@ -25,6 +25,8 @@ public enum ScrollDirection
 }
 
 
+// TODO: wheel scrolling even if mouse is not over the area. fix
+
 [IgnoreScroll]
 public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
 {

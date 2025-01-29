@@ -198,7 +198,7 @@ public static class App
 
         Section.Update();
 
-        UpdateElementsMouseInputCatch();
+        UpdateMouseInputState();
         Debugger?.Update(); // update before elements
 
         UpdateElementsAndCheckForNewElements();
@@ -229,16 +229,10 @@ public static class App
     }
 
 
-    // TODO: cleanup this
-    private static void UpdateElementsMouseInputCatch()
+    private static void UpdateMouseInputState()
     {
-        if (ElementWhichIsHoldingMouseInput is not null)
-        {
-            if (!ElementWhichIsHoldingMouseInput.MouseState.IsMouseDown)
-                ElementWhichIsHoldingMouseInput = null;
-            else
-                return;
-        }
+        if (!CheckMouseInputHolding())
+            return;
 
         Element[] elements = Elements.ToArray();
 
@@ -247,27 +241,45 @@ public static class App
         for (int i = elements.Length - 1; i >= 0; i--)
         {
             Element element = elements[i];
-            IClickable? clickable = element as IClickable;
+            bool mouseInputWasCaught = ElementWhichCaughtMouseInput is not null;
+            bool isMouseOver = IsMouseOverElement(element);
 
-            bool isMouseOver = clickable?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
+            if (element is IClickable clickable)
+                clickable.CaughtMouseInput = !mouseInputWasCaught && isMouseOver;
 
-            if (clickable is not null)
-                clickable.CaughtMouseInput = ElementWhichCaughtMouseInput is null && isMouseOver;
-
-            if (!element.Visible || !isMouseOver || ElementWhichCaughtMouseInput is not null)
-                continue;
-
-            if (!element.IgnoreMouseInput)
-            {
-                ElementWhichCaughtMouseInput = element;
-
-                if (clickable is not null && clickable.MouseState.IsTruePressed)
-                    ElementWhichIsHoldingMouseInput = clickable;
-            }
-
-            TrueElementWhichCaughtMouseInput = element;
+            if (!mouseInputWasCaught && element.Visible && isMouseOver)
+                SetElementWhichCaughtMouseInput(element);
         }
     }
+
+    private static bool CheckMouseInputHolding()
+    {
+        if (ElementWhichIsHoldingMouseInput is null)
+            return true;
+
+        if (!ElementWhichIsHoldingMouseInput.MouseState.IsMouseDown)
+            ElementWhichIsHoldingMouseInput = null;
+        else
+            return false;
+
+        return true;
+    }
+
+    private static void SetElementWhichCaughtMouseInput(Element element)
+    {
+        if (!element.IgnoreMouseInput)
+        {
+            ElementWhichCaughtMouseInput = element;
+
+            if (element is IClickable { MouseState.IsTruePressed: true } clickable)
+                ElementWhichIsHoldingMouseInput = clickable;
+        }
+
+        TrueElementWhichCaughtMouseInput = element;
+    }
+
+    private static bool IsMouseOverElement(Element element)
+        => (element as IClickable)?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
 
     private static void UpdateElementsAndCheckForNewElements()
     {
