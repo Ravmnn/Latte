@@ -145,13 +145,13 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
     public void ProcessDragging()
     {
-        RelativePosition.Value += App.ElementViewMousePositionDelta;
+        RelativePosition.Value += MouseInput.PositionDeltaInElementView;
     }
 
 
     public void ProcessResizing()
     {
-        Vec2f delta = App.ElementViewMousePositionDelta;
+        Vec2f delta = MouseInput.PositionDeltaInElementView;
 
         if (CornerToResize.HasFlag(Corner.Top))
             ResizeCorners(top: delta.Y, bottom: -delta.Y);

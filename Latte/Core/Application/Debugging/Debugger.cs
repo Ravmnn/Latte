@@ -70,9 +70,9 @@ public sealed class Debugger : IUpdateable, IDrawable
             new ResizableInspector()
         ];
 
-        App.AddElement(InspectionWindow);
-
         Options = DebugOption.None;
+
+        App.AddElement(InspectionWindow);
     }
 
 
@@ -145,10 +145,10 @@ public sealed class Debugger : IUpdateable, IDrawable
 
     public void DebugElement(RenderTarget target, Element element)
     {
-        if (Options.HasFlag(DebugOption.OnlyHoveredElement) && element != App.ElementWhichCaughtMouseInput)
+        if (Options.HasFlag(DebugOption.OnlyHoveredElement) && element != MouseInput.ElementWhichCaughtMouseInput)
             return;
 
-        if (Options.HasFlag(DebugOption.OnlyTrueHoveredElement) && element != App.TrueElementWhichCaughtMouseInput)
+        if (Options.HasFlag(DebugOption.OnlyTrueHoveredElement) && element != MouseInput.TrueElementWhichCaughtMouseInput)
             return;
 
         bool clip = Options.HasFlag(DebugOption.Clip);

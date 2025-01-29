@@ -10,7 +10,6 @@ using SFML.Graphics;
 using OpenTK.Windowing.Desktop;
 
 using Latte.Core.Type;
-using Latte.Elements;
 using Latte.Elements.Primitives;
 
 
@@ -40,10 +39,6 @@ public static class App
     private static View? s_elementView;
 
     private static bool s_initialized;
-
-    private static Vec2i s_lastMousePosition;
-    private static Vec2f s_lastElementViewMousePosition;
-    private static Vec2f s_lastMainViewMousePosition;
 
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
@@ -90,22 +85,8 @@ public static class App
     public static Section Section { get; set; }
     public static IEnumerable<Element> Elements => Section.Elements;
 
-    public static Element? ElementWhichCaughtMouseInput { get; private set; }
-    public static Element? TrueElementWhichCaughtMouseInput { get; private set; }
-
-    public static IClickable? ElementWhichIsHoldingMouseInput { get; private set; }
-
     public static KeyEventArgs? PressedKey { get; private set; }
     public static KeyEventArgs? ReleasedKey { get; private set; }
-
-    public static Vec2i MousePosition { get; private set; }
-    public static Vec2i MousePositionDelta => MousePosition - s_lastMousePosition;
-    public static Vec2f ElementViewMousePosition { get; private set; }
-    public static Vec2f MainViewMousePosition { get; private set; }
-    public static Vec2f ElementViewMousePositionDelta => ElementViewMousePosition - s_lastElementViewMousePosition;
-    public static Vec2f MainViewMousePositionDelta => MainViewMousePosition - s_lastMainViewMousePosition;
-
-    public static float MouseScrollDelta { get; private set; }
 
     public static TimeSpan DeltaTime { get; private set; }
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
@@ -115,26 +96,15 @@ public static class App
     static App()
     {
         s_initialized = false;
-
-        s_lastMousePosition = new();
-        s_lastElementViewMousePosition = new();
-        s_lastMainViewMousePosition = new();
-
         s_deltaTimeStopwatch = new();
-
         s_elementWasAddedAndNotUpdated = false;
 
         RenderMode = RenderMode.Pinned;
 
         Section = new();
-
-        MousePosition = new();
-        ElementViewMousePosition = new();
-        MainViewMousePosition = new();
+        Section.ElementAddedEvent += (_, _) => OnSectionElementAdded();
 
         DeltaTime = TimeSpan.Zero;
-
-        Section.ElementAddedEvent += (_, _) => OnSectionElementAdded();
 
         // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
         // this must be ALWAYS initialized before the rendering window
@@ -172,7 +142,8 @@ public static class App
         Window = window;
         Window.Closed += (_, _) => Quit();
         Window.Resized += (_, args) => OnWindowResize(new(args.Width, args.Height));
-        Window.MouseWheelScrolled += (_, args) => MouseScrollDelta = args.Delta;
+
+        MouseInput.AddScrollListener(Window);
 
         Window.KeyPressed += (_, args) => PressedKey = args;
         Window.KeyReleased += (_, args) => ReleasedKey = args;
@@ -189,37 +160,22 @@ public static class App
     {
         ThrowAppNotInitializedExceptionIfNotInitialized();
 
-        Window.Update();
-
-        UpdateMouseProperties();
         UpdateDeltaTime();
+        MouseInput.Update();
+
+        Window.Update();
 
         SetElementRenderView();
 
         Section.Update();
-
-        UpdateMouseInputState();
         Debugger?.Update(); // update before elements
 
         UpdateElementsAndCheckForNewElements();
 
         UnsetElementRenderView();
 
-        MouseScrollDelta = 0f;
-
         PressedKey = null;
         ReleasedKey = null;
-    }
-
-    private static void UpdateMouseProperties()
-    {
-        s_lastMousePosition = MousePosition;
-        s_lastElementViewMousePosition = ElementViewMousePosition;
-        s_lastMainViewMousePosition = MainViewMousePosition;
-
-        MousePosition = Window.MousePosition;
-        ElementViewMousePosition = Window.MapPixelToCoords(MousePosition, ElementView);
-        MainViewMousePosition = Window.MapPixelToCoords(MousePosition, MainView);
     }
 
     private static void UpdateDeltaTime()
@@ -228,62 +184,13 @@ public static class App
         s_deltaTimeStopwatch.Restart();
     }
 
-
-    private static void UpdateMouseInputState()
-    {
-        if (!CheckMouseInputHolding())
-            return;
-
-        Element[] elements = Elements.ToArray();
-
-        ElementWhichCaughtMouseInput = TrueElementWhichCaughtMouseInput = null;
-
-        for (int i = elements.Length - 1; i >= 0; i--)
-        {
-            Element element = elements[i];
-            bool mouseInputWasCaught = ElementWhichCaughtMouseInput is not null;
-            bool isMouseOver = IsMouseOverElement(element);
-
-            if (element is IClickable clickable)
-                clickable.CaughtMouseInput = !mouseInputWasCaught && isMouseOver;
-
-            if (!mouseInputWasCaught && element.Visible && isMouseOver)
-                SetElementWhichCaughtMouseInput(element);
-        }
-    }
-
-    private static bool CheckMouseInputHolding()
-    {
-        if (ElementWhichIsHoldingMouseInput is null)
-            return true;
-
-        if (!ElementWhichIsHoldingMouseInput.MouseState.IsMouseDown)
-            ElementWhichIsHoldingMouseInput = null;
-        else
-            return false;
-
-        return true;
-    }
-
-    private static void SetElementWhichCaughtMouseInput(Element element)
-    {
-        if (!element.IgnoreMouseInput)
-        {
-            ElementWhichCaughtMouseInput = element;
-
-            if (element is IClickable { MouseState.IsTruePressed: true } clickable)
-                ElementWhichIsHoldingMouseInput = clickable;
-        }
-
-        TrueElementWhichCaughtMouseInput = element;
-    }
-
-    private static bool IsMouseOverElement(Element element)
-        => (element as IClickable)?.IsPointOver(ElementViewMousePosition) ?? element.IsPointOverBounds(ElementViewMousePosition);
-
     private static void UpdateElementsAndCheckForNewElements()
     {
         UpdateElements();
+
+        // if an element is added inside an Element.Update method, it won't be updated.
+        // to avoid bugs due to it, whenever an element is added inside an Element.Update method,
+        // another Update call will be made to update new added elements.
 
         while (s_elementWasAddedAndNotUpdated)
         {
@@ -341,9 +248,6 @@ public static class App
     public static void AddElement(Element element) => Section.AddElement(element);
     public static bool RemoveElement(Element element) => Section.RemoveElement(element);
     public static bool HasElement(Element element) => Section.HasElement(element);
-
-
-    public static bool IsMouseOverAnyElement() => ElementWhichCaughtMouseInput is not null;
 
 
     private static void OnWindowResize(Vec2u newSize)

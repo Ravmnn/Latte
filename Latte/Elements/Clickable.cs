@@ -60,7 +60,7 @@ public interface IDefaultClickable : IClickable
         MouseState.WasPressed = MouseState.IsPressed;
         MouseState.WasTruePressed = MouseState.IsTruePressed;
 
-        MouseState.IsMouseOver = IsPointOver(App.ElementViewMousePosition);
+        MouseState.IsMouseOver = IsPointOver(MouseInput.PositionInElementView);
         MouseState.IsMouseHover = CaughtMouseInput;
         MouseState.IsMouseDown = Mouse.IsButtonPressed(Mouse.Button.Left);
         MouseState.IsPressed = MouseState.IsMouseHover && MouseState.IsMouseDown;

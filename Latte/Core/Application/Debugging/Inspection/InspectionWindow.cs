@@ -90,6 +90,7 @@ public class InspectionWindow : WindowElement
         BorderColor.Set(new(255, 255, 255, 200));
 
         PrioritySnap = PrioritySnap.AlwaysOnTop;
+        PrioritySnapOffset = 2;
     }
 
 
@@ -103,7 +104,7 @@ public class InspectionWindow : WindowElement
 
     private void UpdateInspectionFrames()
     {
-        if (App.TrueElementWhichCaughtMouseInput is not {} element || App.Debugger is not {} debugger)
+        if (MouseInput.TrueElementWhichCaughtMouseInput is not {} element || App.Debugger is not {} debugger)
             return;
 
         if (element == _lastInspectedElement)
@@ -135,6 +136,6 @@ public class InspectionWindow : WindowElement
             App.AddElement(frame);
         }
 
-        _lastInspectedElement = App.TrueElementWhichCaughtMouseInput;
+        _lastInspectedElement = MouseInput.TrueElementWhichCaughtMouseInput;
     }
 }
