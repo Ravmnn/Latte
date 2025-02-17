@@ -406,7 +406,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         if (parent == Parent)
             return true;
 
-        return parent.Parent is not null && IsChildOf(parent.Parent);
+        return Parent is not null && Parent.IsChildOf(parent);
     }
 
 
