@@ -36,6 +36,8 @@ public class ButtonElement : RectangleElement, IDefaultClickable
             Text = new(this, new(), null, text)
             {
                 Alignment = { Value = Elements.Alignment.Center },
+                SizePolicy = { Value = SizePolicyType.FitParent },
+                SizePolicyMargin = { Value = new(3f, 3f) },
 
                 Color = { Value = SFML.Graphics.Color.Black }
             };

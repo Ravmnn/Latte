@@ -40,10 +40,10 @@ public class RectangleElement : ShapeElement
 
 
     public override FloatRect GetBounds()
-        => new FloatRect(AbsolutePosition, Size.Value).ExpandRect(BorderSize.Value);
+        => new FloatRect(AbsolutePosition, Size.Value * Scale.Value).ExpandRect(BorderSize.Value);
 
     public override FloatRect GetRelativeBounds()
-        => new FloatRect(RelativePosition.Value, Size.Value).ExpandRect(BorderSize.Value);
+        => new FloatRect(RelativePosition.Value, Size.Value * Scale.Value).ExpandRect(BorderSize.Value);
 
 
     public override void ApplySizePolicy()

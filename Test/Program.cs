@@ -1,6 +1,8 @@
-﻿using SFML.Window;
+﻿using Latte.Core.Animation;
+using SFML.Window;
 
 using Latte.Core.Application;
+using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
 
@@ -42,35 +44,24 @@ class Program
             Color = { Value = new(255, 255, 255) }
         };
 
-        ButtonElement addButton = new(rect, new(), new(100, 20), "Add")
+        ButtonElement button = new(rect, new(), new(200, 80), "Button")
         {
-            Alignment = { Value = Alignment.HorizontalCenter | Alignment.Bottom },
-            AlignmentMargin = { Value = new(0, -10f) },
+            Alignment = { Value = Alignment.Center },
 
-            // TODO: globally setting the origin to the center of the element may improve animations that change size and scale
+            Color = { Value = new(150, 150, 255) },
+            Radius = { Value = 8f },
 
-            Color = { Value = new(150, 150, 255) }
+            Down =
+            {
+                {"Scale", new Vec2f(0.5f, 0.5f)}
+            }
         };
 
-        addButton.Color.Set(new(255, 150, 150));
+        // BUG: start pressing the button quickly will cause an animation bug.
 
-        ScrollAreaElement scrollAreaElement = new(rect, new(), new(200, 200), true, true)
-        {
-            Color = { Value = new(200, 100, 100, 40) },
-
-            Alignment = { Value = Alignment.Center }
-        };
-
-        GridLayoutElement grid = new(scrollAreaElement, new(), 5, 10, 35, 35)
-        {
-            GrowDirection = GridLayoutGrowDirection.Vertical
-        };
-
-
-        for (int i = 0; i < 100; i++)
-            AddButtonToLayout(grid);
-
-        addButton.MouseClickEvent += (_, _) => AddButtonToLayout(grid);
+        button.Text!.SizePolicy.Value = SizePolicyType.FitParent;
+        button.Animator.Easing = Easing.EaseOutCirc;
+        button.Animator.Time = 0.5f;
 
         App.AddElement(rect);
 

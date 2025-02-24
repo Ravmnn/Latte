@@ -1,3 +1,5 @@
+using System;
+
 using SFML.Graphics;
 
 using Latte.Core;
@@ -13,7 +15,7 @@ namespace Latte.Elements.Primitives;
 
 public class TextElement : Element
 {
-    private uint _lastFitSize;
+    private float _lastFitSize;
 
 
     public override Transformable Transformable => SfmlText;
@@ -113,23 +115,35 @@ public class TextElement : Element
 
     public override void ApplySizePolicy()
     {
-        FloatRect targetRect = GetSizePolicyRect();
-        FloatRect bounds = GetBounds();
+        var (floatFitSize, fitSize) = CalculateFitSize(GetSizePolicyRect(), GetBounds());
 
-        uint size = CalculateSizePolicyTextSize(targetRect.Height, bounds.Height);
+        if (MathF.Abs(_lastFitSize - floatFitSize) > 0.5f)
+            Size.Set(fitSize);
 
-        if (CalculateBoundsOfTextWithSize(SfmlText, size).Width > targetRect.Width)
-            size = CalculateSizePolicyTextSize(targetRect.Width, bounds.Width);
+        _lastFitSize = floatFitSize;
+    }
 
-        if (Math.Abs((int)_lastFitSize - size) > 2)
-            Size.Set(size);
+    private (float, uint) CalculateFitSize(FloatRect targetRect, FloatRect bounds)
+    {
+        // first find the size based on the height...
 
-        _lastFitSize = size;
+        float floatFitSize = CalculateSizePolicyTextSize(targetRect.Height, bounds.Height);
+        uint fitSize = (uint)Math.Round(floatFitSize);
+
+        // if the calculated text size (bounds) width is greater than the target width, then
+        // calculates using the width instead
+        if (CalculateBoundsOfTextWithSize(SfmlText, fitSize).Width > targetRect.Width)
+        {
+            floatFitSize = CalculateSizePolicyTextSize(targetRect.Width, bounds.Width);
+            fitSize = (uint)Math.Round(floatFitSize);
+        }
+
+        return (floatFitSize, fitSize);
     }
 
     // https://math.stackexchange.com/questions/857073/formula-for-adjusting-font-height
-    private uint CalculateSizePolicyTextSize(float targetSize, float currentSize)
-        => (uint)Math.Round(targetSize * (Size.Value / currentSize));
+    private float CalculateSizePolicyTextSize(float targetSize, float currentSize)
+        => targetSize * (Size.Value / currentSize);
 
 
     private static FloatRect CalculateBoundsOfTextWithSize(Text text, uint size)

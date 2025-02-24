@@ -7,10 +7,10 @@ namespace Latte.Core.Animation;
 
 public abstract class AnimationData(double time, Easing easing = Easing.Linear, bool start = true) : IUpdateable
 {
-    public double Time { get; } = time;
+    public double Time { get; set; } = time;
     public double ElapsedTime { get; protected set; }
 
-    public Easing Easing { get; } = easing;
+    public Easing Easing { get; set; } = easing;
 
     public float Progress { get; protected set; }
     public float EasedProgress { get; protected set; }
