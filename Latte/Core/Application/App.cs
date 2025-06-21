@@ -21,6 +21,7 @@ namespace Latte.Core.Application;
 
 // TODO: add text inputs
 // TODO: add effects, which includes blur (a shader maybe), shadow and gradient (shader)
+// TODO: add the default widget library, Vanilla
 
 
 public enum RenderMode

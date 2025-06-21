@@ -102,9 +102,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public IEnumerable<Property> Properties => _properties;
 
-    public ElementKeyframeAnimator Animator { get; set; }
-    public Keyframe Normal { get; }
-
     public ElementAttributeManager Attributes { get; private set; }
 
     public bool Visible
@@ -182,12 +179,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Children = [];
         Parent = parent;
 
-        Normal = new();
-        Animator = new(this, 0.07)
-        {
-            BaseKeyframe = Normal
-        };
-
         Attributes = new(this);
 
         Visible = true;
@@ -217,9 +208,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     // called once after object construction
     public virtual void Setup()
     {
-        Normal.From(ToKeyframe());
-        Animator.Animate(Normal);
-
         Initialized = true;
 
         SetupEvent?.Invoke(this, EventArgs.Empty);
@@ -230,44 +218,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     // called once each frame, only if Visible is true
     public virtual void Update()
     {
-        // make sure animation updating is called once a frame, since calling
-        // it more than one time may cause some bugs with the animation duration due
-        // to the fact that the application delta time (App.DeltaTime) is calculated once a frame.
-
-        UpdatePropertyAnimations();
-        UpdateAnimator();
-
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
-
-    private void UpdatePropertyAnimations()
-    {
-        foreach (Property property in Properties)
-            if (property is AnimatableProperty { Animation: not null } animatableProperty)
-                animatableProperty.Animation.Update();
-    }
-
-    private void UpdateAnimator()
-    {
-        UpdateNormalKeyframe();
-        Animator.Update();
-    }
-
-    private void UpdateNormalKeyframe()
-    {
-        if (Animator.HasFinished && Animator.CurrentKeyframe == Normal)
-            Normal.From(ToKeyframe());
-
-        else if (Animator.CurrentKeyframe is not null)
-        {
-            Keyframe currentProperties = ToKeyframe();
-
-            foreach (var (key, value) in currentProperties)
-                if (!Animator.CurrentKeyframe.ContainsKey(key))
-                    Normal[key] = value;
-        }
-    }
-
 
 
     // called at least one time each frame, independently of visibility. May be called
@@ -508,9 +460,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         => from property in Properties
             where property is AnimatableProperty
             select property as AnimatableProperty;
-
-
-    public Keyframe ToKeyframe() => new(GetAnimatableProperties());
 
 
     protected virtual void OnParentChange()

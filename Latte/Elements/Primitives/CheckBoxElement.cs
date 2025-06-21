@@ -47,10 +47,6 @@ public class CheckBoxElement : ButtonElement
 
         Radius.Set(5f);
         BorderSize.Set(2f);
-
-        Down["Scale"] = new Vec2f(0.9f, 0.9f);
-
-        UseDefaultAnimation = false;
     }
 
 

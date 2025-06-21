@@ -1,8 +1,6 @@
-﻿using Latte.Core.Animation;
-using SFML.Window;
+﻿using SFML.Window;
 
 using Latte.Core.Application;
-using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
 
@@ -50,18 +48,9 @@ class Program
 
             Color = { Value = new(150, 150, 255) },
             Radius = { Value = 8f },
-
-            Down =
-            {
-                {"Scale", new Vec2f(0.5f, 0.5f)}
-            }
         };
 
-        // BUG: start pressing the button quickly will cause an animation bug.
-
         button.Text!.SizePolicy.Value = SizePolicyType.FitParent;
-        button.Animator.Easing = Easing.EaseOutCirc;
-        button.Animator.Time = 0.5f;
 
         App.AddElement(rect);
 

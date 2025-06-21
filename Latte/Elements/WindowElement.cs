@@ -36,8 +36,6 @@ public class WindowCloseButtonElement : ButtonElement
 
         Alignment.Set(Elements.Alignment.TopRight);
         AlignmentMargin.Set(new(-7, 8));
-
-        Down["Scale"] = new Vec2f(0.95f, 0.95f);
     }
 
 

@@ -23,13 +23,6 @@ public class ButtonElement : RectangleElement, IDefaultClickable
 
     public event EventHandler? MouseClickEvent;
 
-    public Keyframe Hover { get; }
-    public Keyframe Down { get; }
-
-    public bool UseDefaultAnimation { get; set; }
-
-    // TODO: improve default animation setting
-
     public ButtonElement(Element? parent, Vec2f position, Vec2f size, string? text) : base(parent, position, size)
     {
         if (text is not null)
@@ -46,17 +39,6 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         BorderSize.Set(1f);
 
         MouseState = new();
-
-        Hover = new();
-        Down = new();
-
-        UseDefaultAnimation = true;
-
-        Color.ValueChangedEvent += (_, _) =>
-        {
-            if (UseDefaultAnimation)
-                SetDefaultKeyframeAnimation();
-        };
     }
 
 
@@ -69,41 +51,17 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     }
 
 
-    private void SetDefaultKeyframeAnimation()
-    {
-        const byte ColorDecreaseAmount = 25;
-
-        if (!Normal.TryGetValue("Color", out IAnimatable? value) || value is not IAnimatable<ColorRGBA> color)
-            return;
-
-        Hover["Color"] = color.Get() - ColorDecreaseAmount;
-        Down["Color"] = color.Get() - ColorDecreaseAmount * 2;
-    }
-
-
     public virtual void OnMouseEnter()
-    {
-        Animator.Animate(Hover);
-        MouseEnterEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => MouseEnterEvent?.Invoke(this, EventArgs.Empty);
 
     public virtual void OnMouseLeave()
-    {
-        Animator.Animate(Normal);
-        MouseLeaveEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => MouseLeaveEvent?.Invoke(this, EventArgs.Empty);
 
     public virtual void OnMouseDown()
-    {
-        Animator.Animate(Down);
-        MouseDownEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => MouseDownEvent?.Invoke(this, EventArgs.Empty);
 
     public virtual void OnMouseUp()
-    {
-        Animator.Animate(MouseState.IsMouseHover ? Hover : Normal);
-        MouseUpEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => MouseUpEvent?.Invoke(this, EventArgs.Empty);
 
 
     public virtual void OnMouseClick()
