@@ -1,10 +1,10 @@
 ﻿using SFML.Window;
+using SFML.Graphics;
 
 using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
-using SFML.Graphics;
 
 
 namespace Latte.Test;
@@ -59,10 +59,7 @@ class Program
         while (!App.ShouldQuit)
         {
             App.Update();
-
-            App.Window.Clear();
             App.Draw();
-            App.Window.Display();
         }
     }
 }

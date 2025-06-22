@@ -8,6 +8,7 @@ using SFML.Graphics;
 using Latte.Core;
 using Latte.Core.Type;
 using Latte.Core.Application;
+using Latte.Exceptions.Element;
 
 
 namespace Latte.Elements.Primitives;
@@ -32,7 +33,7 @@ public class ChildrenTypeAttribute(Type type) : ElementAttribute
     {
         foreach (var child in element.Children)
             if (child.GetType() != Type)
-                throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have children of type: \"{Type.Name}\"");
+                throw new ElementException($"The element \"{element.GetType().Name}\" can only have children of type: \"{Type.Name}\"");
     }
 }
 
@@ -46,7 +47,7 @@ public class ChildrenAmountAttribute(uint amount) : ElementAttribute
     public override void Process(Element element)
     {
         if (element.Children.Count > Amount)
-            throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have {Amount} children.");
+            throw new ElementException($"The element \"{element.GetType().Name}\" can only have {Amount} children.");
     }
 }
 
@@ -434,9 +435,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public void AddProperty(Property property) => _properties.Add(property);
     public bool RemoveProperty(Property property) => _properties.Remove(property);
     public bool HasProperty(Property property) => _properties.Contains(property);
+
     public Property GetProperty(string name)
         => _properties.Find(property => property.Name == name)
-            ?? throw new ArgumentException($"Could not find property with name \"{name}\".");
+           ?? throw new ElementPropertyNotFoundException(name);
 
     public bool TryGetProperty(string name, [MaybeNullWhen(false)] out Property property)
     {

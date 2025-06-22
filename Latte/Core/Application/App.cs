@@ -11,6 +11,7 @@ using OpenTK.Windowing.Desktop;
 
 using Latte.Core.Type;
 using Latte.Elements.Primitives;
+using Latte.Exceptions.Application;
 
 
 using Debugger = Latte.Core.Application.Debugging.Debugger;
@@ -22,9 +23,6 @@ namespace Latte.Core.Application;
 // TODO: add text inputs
 // TODO: add effects, which includes blur (a shader maybe), shadow and gradient (shader)
 // TODO: add the default widget library, Vanilla. (the elements in here should be only the main functionality)
-
-// TODO: use custom exceptions whenever convenient.
-// TODO: add the ability to choose whether or not Latte should manage the clear/display process automatically.
 
 
 public enum RenderMode
@@ -42,8 +40,6 @@ public static class App
     private static View? s_mainView;
     private static View? s_elementView;
 
-    private static bool s_initialized;
-
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
     private static bool s_elementWasAddedAndNotUpdated;
@@ -53,13 +49,13 @@ public static class App
 
     public static Font DefaultFont
     {
-        get => s_defaultFont ?? throw new InvalidOperationException("Default font is not defined.");
+        get => s_defaultFont ?? throw new AppNotInitializedException();
         set => s_defaultFont = value;
     }
 
     public static Window Window
     {
-        get => s_window ?? throw AppNotInitializedException();
+        get => s_window ?? throw new AppNotInitializedException();
         private set => s_window = value;
     }
 
@@ -67,7 +63,7 @@ public static class App
 
     public static View MainView
     {
-        get => s_mainView ?? throw AppNotInitializedException();
+        get => s_mainView ?? throw new AppNotInitializedException();
         private set => s_mainView = value;
     }
 
@@ -78,7 +74,7 @@ public static class App
             if (RenderMode == RenderMode.Unpinned)
                 return MainView;
 
-            return s_elementView ?? throw AppNotInitializedException();
+            return s_elementView ?? throw new AppNotInitializedException();
         }
 
         private set => s_elementView = value;
@@ -96,10 +92,15 @@ public static class App
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
     public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
 
+    public static ColorRGBA BackgroundColor { get; set; }
+    public static bool ManualClearDisplayProcess { get; set; }
+
+    public static bool HasInitialized { get; private set; }
+
 
     static App()
     {
-        s_initialized = false;
+        HasInitialized = false;
         s_deltaTimeStopwatch = new Stopwatch();
         s_elementWasAddedAndNotUpdated = false;
 
@@ -110,6 +111,9 @@ public static class App
 
         DeltaTime = TimeSpan.Zero;
 
+        BackgroundColor = Color.Black;
+        ManualClearDisplayProcess = false;
+
         // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
         // this must be ALWAYS initialized before the rendering window
         _ = new GameWindow(new GameWindowSettings(), new NativeWindowSettings { StartVisible = false });
@@ -118,7 +122,7 @@ public static class App
 
     public static void Init(Font defaultFont)
     {
-        if (s_initialized)
+        if (HasInitialized)
         {
             Console.WriteLine("App has already been initialized.");
             return;
@@ -130,7 +134,7 @@ public static class App
 
         s_deltaTimeStopwatch.Start();
 
-        s_initialized = true;
+        HasInitialized = true;
     }
 
 
@@ -162,7 +166,7 @@ public static class App
 
     public static void Update()
     {
-        ThrowAppNotInitializedExceptionIfNotInitialized();
+        AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
         UpdateDeltaTime();
         MouseInput.Update();
@@ -221,14 +225,20 @@ public static class App
 
     public static void Draw()
     {
-        ThrowAppNotInitializedExceptionIfNotInitialized();
+        AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
         Window.Draw();
 
         SetElementRenderView();
 
+        if (!ManualClearDisplayProcess)
+            Window.Clear(BackgroundColor);
+
         Section.Draw(Window);
         DrawElements();
+
+        if (!ManualClearDisplayProcess)
+            Window.Display();
 
         Debugger?.Draw(Window); // draw after elements
 
@@ -267,14 +277,4 @@ public static class App
     {
         s_elementWasAddedAndNotUpdated = true;
     }
-
-
-    private static void ThrowAppNotInitializedExceptionIfNotInitialized()
-    {
-        if (!s_initialized)
-            throw AppNotInitializedException();
-    }
-
-
-    private static InvalidOperationException AppNotInitializedException() => new InvalidOperationException("App not initialized.");
 }

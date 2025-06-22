@@ -5,9 +5,13 @@ using System.Collections.Generic;
 using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
+using Latte.Exceptions.Element;
 
 
 namespace Latte.Elements.Primitives;
+
+
+// TODO: code cleanup in here
 
 
 [ChildrenAmount(1)]
@@ -149,7 +153,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     public Element RemoveFirstElement()
     {
-        var element = FindFirstElement() ?? throw EmptyGridException();
+        var element = FindFirstElement() ?? throw new EmptyGridException();
         element.Parent = null;
 
         return element;
@@ -157,7 +161,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     public Element RemoveLastElement()
     {
-        var element = FindLastElement() ?? throw EmptyGridException();
+        var element = FindLastElement() ?? throw new EmptyGridException();
         element.Parent = null;
 
         return element;
@@ -169,7 +173,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         var cell = Cells[row, column];
 
         if (cell.Element is null)
-            throw new InvalidOperationException($"No element at row {row} and column {column}.");
+            throw new IndexOutOfRangeException();
 
         var element = cell.Element;
         cell.Element = null;
@@ -241,7 +245,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     protected void GrowLayout()
     {
         if (Fixed)
-            throw new InvalidOperationException("Layout is fixed and can't be resized.");
+            return;
 
         switch (GrowDirection)
         {
@@ -293,9 +297,6 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     private static bool AreIndicesInsideMatrixBounds<T>(T[,] matrix, uint row, uint col)
         => row < matrix.GetLength(0) && col < matrix.GetLength(1);
-
-
-    private static InvalidOperationException EmptyGridException() => new InvalidOperationException("The grid contains no elements.");
 }
 
 
