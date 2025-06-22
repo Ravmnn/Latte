@@ -34,17 +34,17 @@ public class ProgressBarElement : Element
 
     public ProgressBarElement(Element? parent, Vec2f position, Vec2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
     {
-        MinValue = new(this, nameof(MinValue), minValue);
-        MaxValue = new(this, nameof(MaxValue), maxValue);;
+        MinValue = new Property<Float>(this, nameof(MinValue), minValue);
+        MaxValue = new Property<Float>(this, nameof(MaxValue), maxValue);;
 
-        Progress = new(this, nameof(Progress), 0f);
+        Progress = new AnimatableProperty<Float>(this, nameof(Progress), 0f);
 
         RelativePosition.Set(position);
 
-        Background = new(this, new(), size);
+        Background = new RectangleElement(this, new Vec2f(), size);
         Background.Color.Set(Color.Black);
 
-        Foreground = new(this, new(), size);
+        Foreground = new RectangleElement(this, new Vec2f(), size);
         Foreground.Color.Set(Color.White);
     }
 
@@ -63,7 +63,7 @@ public class ProgressBarElement : Element
     }
 
     private void UpdateSizeBasedOnProgress()
-        => Foreground.Size.Set(new(Background.Size.Value.X * CalculateNormalizedProgress(), Background.Size.Value.Y));
+        => Foreground.Size.Set(new Vec2f(Background.Size.Value.X * CalculateNormalizedProgress(), Background.Size.Value.Y));
 
 
     private float CalculateNormalizedProgress()

@@ -33,13 +33,13 @@ public class Window : RenderWindow, IUpdateable, IDrawable
     public Vec2i MousePosition => Mouse.GetPosition(this);
     public Vec2f ViewMousePosition => MapPixelToCoords(MousePosition);
 
-    public IntRect WindowRect => new(new(0, 0), (Vector2i)Size);
+    public IntRect WindowRect => new IntRect(new Vector2i(0, 0), (Vector2i)Size);
 
 
-    public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings settings = new()) : base(mode, title, style,
+    public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings settings = new ContextSettings()) : base(mode, title, style,
         settings)
     {
-        _cursor = new(Cursor.CursorType.Arrow);
+        _cursor = new Cursor(Cursor.CursorType.Arrow);
     }
 
 
@@ -58,24 +58,24 @@ public class Window : RenderWindow, IUpdateable, IDrawable
     public static Cursor GetCursorTypeFromCorners(Corner corner)
     {
         if (corner.HasFlag(Corner.TopLeft))
-            return new(Cursor.CursorType.SizeTopLeft);
+            return new Cursor(Cursor.CursorType.SizeTopLeft);
 
         if (corner.HasFlag(Corner.TopRight))
-            return new(Cursor.CursorType.SizeTopRight);
+            return new Cursor(Cursor.CursorType.SizeTopRight);
 
         if (corner.HasFlag(Corner.BottomLeft))
-            return new(Cursor.CursorType.SizeBottomLeft);
+            return new Cursor(Cursor.CursorType.SizeBottomLeft);
 
         if (corner.HasFlag(Corner.BottomRight))
-            return new(Cursor.CursorType.SizeBottomRight);
+            return new Cursor(Cursor.CursorType.SizeBottomRight);
 
 
         if (corner.HasFlag(Corner.Left) || corner.HasFlag(Corner.Right))
-            return new(Cursor.CursorType.SizeHorizontal);
+            return new Cursor(Cursor.CursorType.SizeHorizontal);
 
         if (corner.HasFlag(Corner.Top) || corner.HasFlag(Corner.Bottom))
-            return new(Cursor.CursorType.SizeVertical);
+            return new Cursor(Cursor.CursorType.SizeVertical);
 
-        return new(Cursor.CursorType.Arrow);
+        return new Cursor(Cursor.CursorType.Arrow);
     }
 }

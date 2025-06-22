@@ -39,7 +39,7 @@ public sealed class Inspectors : List<IInspector>
     {
         List<InspectionData> inspectionDataList = [];
 
-        foreach (IInspector inspector in this)
+        foreach (var inspector in this)
         {
             if (!inspector.CanInspect(value))
                 continue;
@@ -53,7 +53,7 @@ public sealed class Inspectors : List<IInspector>
 
     public InspectionData? InspectOnly<T>(object value)
     {
-        foreach (IInspector inspector in this)
+        foreach (var inspector in this)
             if (value is T && inspector.CanInspect(value))
                 return inspector.Inspect(value);
 
@@ -69,12 +69,12 @@ public sealed class ElementInspector : IInspector<Element>
 {
     public InspectionData Inspect(Element element)
     {
-        StringBuilder data = new();
+        var data = new StringBuilder();
 
-        foreach (Property property in element.Properties)
+        foreach (var property in element.Properties)
             data.AppendLine($"{property.Name}: {property.Value}");
 
-        return new("Element", data.ToString());
+        return new InspectionData("Element", data.ToString());
     }
 }
 
@@ -83,8 +83,8 @@ public sealed class ClickableInspector : IInspector<IClickable>
 {
     public InspectionData Inspect(IClickable clickable)
     {
-        MouseClickState ms = clickable.MouseState;
-        StringBuilder data = new();
+        var ms = clickable.MouseState;
+        var data = new StringBuilder();
 
         data.AppendLine($"Ignore mouse input: {clickable.IgnoreMouseInput}");
         data.AppendLine($"Caught mouse input: {clickable.CaughtMouseInput}");
@@ -101,7 +101,7 @@ public sealed class ClickableInspector : IInspector<IClickable>
         data.AppendLine($"Was pressed: {ms.WasPressed}");
         data.AppendLine($"Was true pressed: {ms.WasTruePressed}");
 
-        return new("Clickable", data.ToString());
+        return new InspectionData("Clickable", data.ToString());
     }
 }
 
@@ -110,12 +110,12 @@ public sealed class DraggableInspector : IInspector<IDraggable>
 {
     public InspectionData Inspect(IDraggable draggable)
     {
-        StringBuilder data = new();
+        var data = new StringBuilder();
 
         data.AppendLine($"Dragging: {draggable.Dragging}");
         data.AppendLine($"Was dragging: {draggable.WasDragging}");
 
-        return new("Draggable", data.ToString());
+        return new InspectionData("Draggable", data.ToString());
     }
 }
 
@@ -124,7 +124,7 @@ public sealed class ResizableInspector : IInspector<IResizable>
 {
     public InspectionData Inspect(IResizable resizable)
     {
-        StringBuilder data = new();
+        var data = new StringBuilder();
 
         data.AppendLine($"Resizing: {resizable.Resizing}");
         data.AppendLine($"Was resizing: {resizable.WasResizing}");
@@ -137,6 +137,6 @@ public sealed class ResizableInspector : IInspector<IResizable>
         data.AppendLine($"Corners selected: {resizable.CornerToResize}");
         data.AppendLine($"Corner selection size: {resizable.CornerResizeAreaSize}");
 
-        return new("Resizable", data.ToString());
+        return new InspectionData("Resizable", data.ToString());
     }
 }

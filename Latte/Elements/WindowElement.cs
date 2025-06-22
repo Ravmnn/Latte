@@ -30,12 +30,12 @@ public class WindowCloseButtonElement : ButtonElement
     public new WindowElement Parent => (base.Parent as WindowElement)!;
 
 
-    public WindowCloseButtonElement(WindowElement parent) : base(parent, new(), new(15, 15), null)
+    public WindowCloseButtonElement(WindowElement parent) : base(parent, new Vec2f(), new Vec2f(15, 15), null)
     {
-        Color.Set(new(255, 100, 100));
+        Color.Set(new ColorRGBA(255, 100, 100));
 
         Alignment.Set(Elements.Alignment.TopRight);
-        AlignmentMargin.Set(new(-7, 8));
+        AlignmentMargin.Set(new Vec2f(-7, 8));
     }
 
 
@@ -65,7 +65,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
 
     public Corner CornerToResize { get; set; }
-    public FloatRect Rect => new(RelativePosition.Value, Size.Value);
+    public FloatRect Rect => new FloatRect(RelativePosition.Value, Size.Value);
     public float CornerResizeAreaSize { get; protected set; }
 
     public Vec2f? MinSize { get; set; }
@@ -97,23 +97,23 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public WindowElement(string title, Vec2f position, Vec2f size, WindowElementStyles styles = WindowElementStyles.Default)
         : base(null, position, size)
     {
-        Title = new(this, new(), 20, title);
+        Title = new TextElement(this, new Vec2f(), 20, title);
         Title.Alignment.Set(Elements.Alignment.HorizontalCenter | Elements.Alignment.Top);
-        Title.AlignmentMargin.Set(new(0, 10));
+        Title.AlignmentMargin.Set(new Vec2f(0, 10));
 
-        Color.Set(new(50, 50, 50, 220));
+        Color.Set(new ColorRGBA(50, 50, 50, 220));
 
-        CloseButton = new(this);
+        CloseButton = new WindowCloseButtonElement(this);
 
         Styles = styles;
 
-        MouseState = new();
+        MouseState = new MouseClickState();
         DisableTruePressOnlyWhenMouseIsUp = true;
 
-        CornerToResize = new();
+        CornerToResize = new Corner();
         CornerResizeAreaSize = 10f;
 
-        MinSize = new(50, 50);
+        MinSize = new Vec2f(50, 50);
     }
 
 
@@ -149,7 +149,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
     public void ProcessResizing()
     {
-        Vec2f delta = MouseInput.PositionDeltaInElementView;
+        var delta = MouseInput.PositionDeltaInElementView;
 
         if (CornerToResize.HasFlag(Corner.Top))
             ResizeCorners(top: delta.Y, bottom: -delta.Y);

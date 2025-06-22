@@ -60,7 +60,7 @@ public sealed class Debugger : IUpdateable, IDrawable
 
     public Debugger()
     {
-        InspectionWindow = new()
+        InspectionWindow = new InspectionWindow
         {
             Visible = false
         };
@@ -139,7 +139,7 @@ public sealed class Debugger : IUpdateable, IDrawable
         if (Options == DebugOption.None)
             return;
 
-        foreach (Element element in App.Elements)
+        foreach (var element in App.Elements)
             DebugElement(target, element);
     }
 
@@ -151,7 +151,7 @@ public sealed class Debugger : IUpdateable, IDrawable
         if (Options.HasFlag(DebugOption.OnlyTrueHoveredElement) && element != MouseInput.TrueElementWhichCaughtMouseInput)
             return;
 
-        bool clip = Options.HasFlag(DebugOption.Clip);
+        var clip = Options.HasFlag(DebugOption.Clip);
 
         if (clip)
             ClipArea.BeginClip(element.GetFinalClipArea());
@@ -178,13 +178,13 @@ public sealed class Debugger : IUpdateable, IDrawable
 
     public static void DrawElementBoundsDimensions(RenderTarget target, Element element)
     {
-        FloatRect bounds = element.GetBounds();
-        FloatRect borderLessBounds = element.GetBorderLessBounds();
+        var bounds = element.GetBounds();
+        var borderLessBounds = element.GetBorderLessBounds();
 
-        Color backgroundColor = new(255, 255, 255, 220);
+        var backgroundColor = new Color(255, 255, 255, 220);
 
-        string width = bounds.Width.ToString(CultureInfo.InvariantCulture);
-        string height = bounds.Height.ToString(CultureInfo.InvariantCulture);
+        var width = bounds.Width.ToString(CultureInfo.InvariantCulture);
+        var height = bounds.Height.ToString(CultureInfo.InvariantCulture);
 
         Debugging.Draw.Text(target, borderLessBounds with { Top = borderLessBounds.Top + borderLessBounds.Height + 10 }, Alignment.HorizontalCenter | Alignment.Top, width, backgroundColor: backgroundColor);
         Debugging.Draw.Text(target, borderLessBounds with { Left = borderLessBounds.Left + borderLessBounds.Width + 10 }, Alignment.VerticalCenter | Alignment.Left, height, backgroundColor: backgroundColor);
@@ -195,7 +195,7 @@ public sealed class Debugger : IUpdateable, IDrawable
 
     public static void DrawElementPriority(RenderTarget target, Element element)
     {
-        uint absolutePriority = (uint)System.Math.Abs(element.Priority);
+        var absolutePriority = (uint)System.Math.Abs(element.Priority);
 
         Debugging.Draw.Rect(target, element.GetBounds(), ColorGenerator.FromIndex(absolutePriority, 50));
         Debugging.Draw.Text(target, element.GetBorderLessBounds(), Alignment.Center, element.Priority.ToString(), backgroundColor: Color.White);

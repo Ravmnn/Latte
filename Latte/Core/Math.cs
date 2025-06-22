@@ -20,20 +20,20 @@ public static class Math
 
     public static bool IsPointOverRoundedRect(this Vec2f point, Vec2f position, Vec2f size, float radius)
     {
-        Vec2f leftTopCenter = new(position.X + radius, position.Y + radius);
-        Vec2f rightTopCenter = new(position.X + size.X - radius, position.Y + radius);
-        Vec2f leftBottomCenter = new(position.X + radius, position.Y + size.Y - radius);
-        Vec2f rightBottomCenter = new(position.X + size.X - radius, position.Y + size.Y - radius);
+        var leftTopCenter = new Vec2f(position.X + radius, position.Y + radius);
+        var rightTopCenter = new Vec2f(position.X + size.X - radius, position.Y + radius);
+        var leftBottomCenter = new Vec2f(position.X + radius, position.Y + size.Y - radius);
+        var rightBottomCenter = new Vec2f(position.X + size.X - radius, position.Y + size.Y - radius);
 
-        FloatRect horizontalRect = new(new(position.X, position.Y + radius), new(size.X, size.Y - radius * 2));
-        FloatRect verticalRect = new(new(position.X + radius, position.Y), new(size.X - radius * 2, size.Y));
+        var horizontalRect = new FloatRect(new Vector2f(position.X, position.Y + radius), new Vector2f(size.X, size.Y - radius * 2));
+        var verticalRect = new FloatRect(new Vector2f(position.X + radius, position.Y), new Vector2f(size.X - radius * 2, size.Y));
 
-        bool overCorners = IsPointOverCircle(point, leftTopCenter, radius) ||
-                           IsPointOverCircle(point, rightTopCenter, radius) ||
-                           IsPointOverCircle(point, leftBottomCenter, radius) ||
-                           IsPointOverCircle(point, rightBottomCenter, radius);
+        var overCorners = IsPointOverCircle(point, leftTopCenter, radius) ||
+                          IsPointOverCircle(point, rightTopCenter, radius) ||
+                          IsPointOverCircle(point, leftBottomCenter, radius) ||
+                          IsPointOverCircle(point, rightBottomCenter, radius);
 
-        bool overRects = horizontalRect.Contains((Vector2f)point) || verticalRect.Contains((Vector2f)point);
+        var overRects = horizontalRect.Contains((Vector2f)point) || verticalRect.Contains((Vector2f)point);
 
         return overCorners || overRects;
     }
@@ -53,6 +53,5 @@ public static class Math
         => Distance(p1.X, p1.Y, p2.X, p2.Y);
 
 
-    public static Vec2f Round(this Vec2f vec)
-        => new(MathF.Round(vec.X), MathF.Round(vec.Y));
+    public static Vec2f Round(this Vec2f vec) => new Vec2f(MathF.Round(vec.X), MathF.Round(vec.Y));
 }

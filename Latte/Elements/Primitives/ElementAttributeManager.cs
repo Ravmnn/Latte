@@ -37,7 +37,7 @@ public class ElementAttributeManager
         if (Element.Parent is not null)
             InheritedAttributes = Element.Parent.Attributes.InheritedAttributes;
 
-        foreach (ElementAttribute attribute in GetCachedElementAttributes())
+        foreach (var attribute in GetCachedElementAttributes())
         {
             if (attribute.Inherit)
                 InheritedAttributes.Add(attribute);
@@ -45,7 +45,7 @@ public class ElementAttributeManager
                 attribute.Process(Element);
         }
 
-        foreach (ElementAttribute attribute in InheritedAttributes)
+        foreach (var attribute in InheritedAttributes)
             attribute.Process(Element);
     }
 

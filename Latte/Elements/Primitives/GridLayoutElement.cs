@@ -117,7 +117,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
 
     public GridLayoutElement(Element? parent, Vec2f position, uint rows, uint columns, float cellWidth, float cellHeight)
-        : base(parent, position, new())
+        : base(parent, position, new Vec2f())
     {
         _rows = rows;
         _columns = columns;
@@ -149,7 +149,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     public Element RemoveFirstElement()
     {
-        Element element = FindFirstElement() ?? throw EmptyGridException();
+        var element = FindFirstElement() ?? throw EmptyGridException();
         element.Parent = null;
 
         return element;
@@ -157,7 +157,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     public Element RemoveLastElement()
     {
-        Element element = FindLastElement() ?? throw EmptyGridException();
+        var element = FindLastElement() ?? throw EmptyGridException();
         element.Parent = null;
 
         return element;
@@ -166,12 +166,12 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     public Element RemoveElementAt(uint row, uint column)
     {
-        GridLayoutCell cell = Cells[row, column];
+        var cell = Cells[row, column];
 
         if (cell.Element is null)
             throw new InvalidOperationException($"No element at row {row} and column {column}.");
 
-        Element element = cell.Element;
+        var element = cell.Element;
         cell.Element = null;
 
         return element;
@@ -203,8 +203,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     public Element? FindFirstElement()
     {
-        for (int row = 0; row < Cells.GetLength(0) - 1; row++)
-        for (int col = 0; col < Cells.GetLength(1); col++)
+        for (var row = 0; row < Cells.GetLength(0) - 1; row++)
+        for (var col = 0; col < Cells.GetLength(1); col++)
             if (Cells[row, col].Element is { } element)
                 return element;
 
@@ -213,8 +213,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     public Element? FindLastElement()
     {
-        for (int row = Cells.GetLength(0) - 1; row >= 0; row--)
-        for (int col = Cells.GetLength(1) - 1; col >= 0; col--)
+        for (var row = Cells.GetLength(0) - 1; row >= 0; row--)
+        for (var col = Cells.GetLength(1) - 1; col >= 0; col--)
             if (Cells[row, col].Element is { } element)
                 return element;
 
@@ -228,7 +228,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     protected GridLayoutCell FindAvailableCell()
     {
-        foreach (GridLayoutCell cell in Cells)
+        foreach (var cell in Cells)
             if (cell.Element is null)
                 return cell;
 
@@ -271,7 +271,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
             UpdateCellGeometry(row, col);
         }
 
-        Size.Value = new(Columns * CellWidth, Rows * CellHeight);
+        Size.Value = new Vec2f(Columns * CellWidth, Rows * CellHeight);
 
         RecreationRequired = false;
     }
@@ -281,13 +281,13 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         if (AreIndicesInsideMatrixBounds(oldCells, row, col))
             Cells[row, col] = oldCells[row, col];
         else
-            Cells[row, col] = new(this, new(), new());
+            Cells[row, col] = new GridLayoutCell(this, new Vec2f(), new Vec2f());
     }
 
     private void UpdateCellGeometry(uint row, uint col)
     {
-        Cells[row, col].RelativePosition.Value = new(col * CellWidth, row * CellHeight);
-        Cells[row, col].Size.Value = new(CellWidth, CellHeight);
+        Cells[row, col].RelativePosition.Value = new Vec2f(col * CellWidth, row * CellHeight);
+        Cells[row, col].Size.Value = new Vec2f(CellWidth, CellHeight);
     }
 
 
@@ -295,7 +295,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         => row < matrix.GetLength(0) && col < matrix.GetLength(1);
 
 
-    private static InvalidOperationException EmptyGridException() => new("The grid contains no elements.");
+    private static InvalidOperationException EmptyGridException() => new InvalidOperationException("The grid contains no elements.");
 }
 
 

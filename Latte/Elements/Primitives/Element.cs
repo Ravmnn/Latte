@@ -30,7 +30,7 @@ public class ChildrenTypeAttribute(Type type) : ElementAttribute
 
     public override void Process(Element element)
     {
-        foreach (Element child in element.Children)
+        foreach (var child in element.Children)
             if (child.GetType() != Type)
                 throw new InvalidOperationException($"The element \"{element.GetType().Name}\" can only have children of type: \"{Type.Name}\"");
     }
@@ -179,23 +179,23 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Children = [];
         Parent = parent;
 
-        Attributes = new(this);
+        Attributes = new ElementAttributeManager(this);
 
         Visible = true;
 
         PrioritySnap = PrioritySnap.None;
         PrioritySnapOffset = 1;
 
-        RelativePosition = new(this, nameof(RelativePosition), new());
-        Origin = new(this, nameof(Origin), new());
-        Rotation = new(this, nameof(Rotation), 0f);
-        Scale = new(this, nameof(Scale), new(1f, 1f));
+        RelativePosition = new AnimatableProperty<Vec2f>(this, nameof(RelativePosition), new Vec2f());
+        Origin = new AnimatableProperty<Vec2f>(this, nameof(Origin), new Vec2f());
+        Rotation = new AnimatableProperty<Float>(this, nameof(Rotation), 0f);
+        Scale = new AnimatableProperty<Vec2f>(this, nameof(Scale), new Vec2f(1f, 1f));
 
-        Alignment = new(this, nameof(Alignment), Elements.Alignment.None);
-        AlignmentMargin = new(this, nameof(AlignmentMargin), new());
+        Alignment = new Property<Alignment>(this, nameof(Alignment), Elements.Alignment.None);
+        AlignmentMargin = new AnimatableProperty<Vec2f>(this, nameof(AlignmentMargin), new Vec2f());
 
-        SizePolicy = new(this, nameof(SizePolicy), SizePolicyType.None);
-        SizePolicyMargin = new(this, nameof(SizePolicyMargin), new());
+        SizePolicy = new Property<SizePolicyType>(this, nameof(SizePolicy), SizePolicyType.None);
+        SizePolicyMargin = new AnimatableProperty<Vec2f>(this, nameof(SizePolicyMargin), new Vec2f());
 
         if (Parent is null)
             return;
@@ -296,7 +296,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     protected virtual void EndDraw() => ClipArea.EndClip();
 
 
-    public IntRect GetFinalClipArea() => ClipArea.OverlapElementClipAreaToParents(this) ?? new();
+    public IntRect GetFinalClipArea() => ClipArea.OverlapElementClipAreaToParents(this) ?? new IntRect();
     public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.Window.WindowRect;
     public virtual IntRect GetThisClipArea() => GetBorderLessBounds().ToWindowCoordinates();
 
@@ -369,7 +369,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     private bool ParentHierarchyHasPrioritySnap()
     {
-        bool result = PrioritySnap != PrioritySnap.None;
+        var result = PrioritySnap != PrioritySnap.None;
 
         this.ForeachParent(element =>
         {
@@ -383,7 +383,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public void RaiseToTop()
     {
-        Element? element = App.Elements.LastOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
+        var element = App.Elements.LastOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
 
         if (element is not null)
             Priority = element.Priority + PrioritySnapOffset;
@@ -391,7 +391,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public void LowerToBottom()
     {
-        Element? element = App.Elements.FirstOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
+        var element = App.Elements.FirstOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
 
         if (element is not null)
             Priority = element.Priority - PrioritySnapOffset;
@@ -399,7 +399,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public void RaiseToParentTop()
     {
-        int higherPriority = int.MinValue;
+        var higherPriority = int.MinValue;
 
         Parent?.Children.ForeachElement(element =>
         {
@@ -412,7 +412,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public void LowerToParentBottom()
     {
-        int lowerPriority = int.MaxValue;
+        var lowerPriority = int.MaxValue;
 
         Parent?.Children.ForeachElement(element =>
         {
@@ -467,14 +467,14 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Priority = Parent?.Priority + 1 ?? Priority;
 
         Parent?.OnChildAdded(this);
-        ParentChangedEvent?.Invoke(this, new(Parent));
+        ParentChangedEvent?.Invoke(this, new ElementEventArgs(Parent));
     }
 
 
     protected virtual void OnChildAdded(Element child)
     {
         Children.Add(child);
-        ChildAddedEvent?.Invoke(this, new(child));
+        ChildAddedEvent?.Invoke(this, new ElementEventArgs(child));
     }
 
 
@@ -487,7 +487,7 @@ public static class ElementExtensions
 {
     public static void ForeachElement(this IEnumerable<Element> elements, Action<Element> action)
     {
-        foreach (Element element in elements)
+        foreach (var element in elements)
         {
             action(element);
             ForeachElement(element.Children, action);

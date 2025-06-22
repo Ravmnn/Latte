@@ -10,23 +10,23 @@ namespace Latte.Core.Animation;
 public static class Animate
 {
     public static FloatAnimation Value(float from, float to, double time, Easing easing = Easing.Linear) =>
-        new([from], [to], time, easing);
-    
-    
-    public static FloatAnimation Vec2f(Vec2f from, Vec2f to, double time, Easing easing = Easing.Linear)
-        => new([from.X, from.Y], [to.X, to.Y], time, easing);
-    
-    public static FloatAnimation Vec2i(Vec2i from, Vec2i to, double time, Easing easing = Easing.Linear)
-        => new([from.X, from.Y], [to.X, to.Y], time, easing);
-    
-    public static FloatAnimation Vec2u(Vec2u from, Vec2u to, double time, Easing easing = Easing.Linear)
-        => new([from.X, from.Y], [to.X, to.Y], time, easing);
+        new FloatAnimation([from], [to], time, easing);
 
-    
-    public static FloatAnimation Color(ColorRGBA from, ColorRGBA to, double time, Easing easing = Easing.Linear)
-        => new([from.R, from.G, from.B, from.A], [to.R, to.G, to.B, to.A], time, easing);
-    
-    
+
+    public static FloatAnimation Vec2f(Vec2f from, Vec2f to, double time, Easing easing = Easing.Linear) =>
+        new FloatAnimation([from.X, from.Y], [to.X, to.Y], time, easing);
+
+    public static FloatAnimation Vec2i(Vec2i from, Vec2i to, double time, Easing easing = Easing.Linear) =>
+        new FloatAnimation([from.X, from.Y], [to.X, to.Y], time, easing);
+
+    public static FloatAnimation Vec2u(Vec2u from, Vec2u to, double time, Easing easing = Easing.Linear) =>
+        new FloatAnimation([from.X, from.Y], [to.X, to.Y], time, easing);
+
+
+    public static FloatAnimation Color(ColorRGBA from, ColorRGBA to, double time, Easing easing = Easing.Linear) =>
+        new FloatAnimation([from.R, from.G, from.B, from.A], [to.R, to.G, to.B, to.A], time, easing);
+
+
 
     public static FloatAnimation Vector2f(Vector2f from, Vector2f to, double time, Easing easing = Easing.Linear)
         => Vec2f(from, to, time, easing);
@@ -50,15 +50,15 @@ public static class FloatArrayConversion
 {
     public static float ToValue(this float[] values)
         => values[0];
-    
-    
-    public static Vec2f ToVec2f(this float[] values) => new(values[0], values[1]);
-    public static Vec2i ToVec2i(this float[] values) => new((int)values[0], (int)values[1]);
-    public static Vec2u ToVec2u(this float[] values) => new((uint)values[0], (uint)values[1]);
+
+
+    public static Vec2f ToVec2f(this float[] values) => new Vec2f(values[0], values[1]);
+    public static Vec2i ToVec2i(this float[] values) => new Vec2i((int)values[0], (int)values[1]);
+    public static Vec2u ToVec2u(this float[] values) => new Vec2u((uint)values[0], (uint)values[1]);
 
     // forces the values to be between 0 and 255
-    public static ColorRGBA ToColor(this float[] values)
-        => new((byte)System.Math.Clamp(values[0], 0, 255), (byte)System.Math.Clamp(values[1], 0, 255),
+    public static ColorRGBA ToColor(this float[] values) =>
+        new ColorRGBA((byte)System.Math.Clamp(values[0], 0, 255), (byte)System.Math.Clamp(values[1], 0, 255),
             (byte)System.Math.Clamp(values[2], 0, 255), (byte)System.Math.Clamp(values[3], 0, 255));
 
 

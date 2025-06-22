@@ -27,7 +27,7 @@ public static class SizePolicyCalculator
 {
     public static FloatRect CalculateChildRect(FloatRect child, FloatRect parent, SizePolicyType policyType)
     {
-        FloatRect rect = child;
+        var rect = child;
 
         if (policyType.HasFlag(SizePolicyType.FitParentHorizontally))
         {

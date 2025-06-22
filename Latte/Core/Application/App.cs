@@ -21,7 +21,10 @@ namespace Latte.Core.Application;
 
 // TODO: add text inputs
 // TODO: add effects, which includes blur (a shader maybe), shadow and gradient (shader)
-// TODO: add the default widget library, Vanilla
+// TODO: add the default widget library, Vanilla. (the elements in here should be only the main functionality)
+
+// TODO: use custom exceptions whenever convenient.
+// TODO: add the ability to choose whether or not Latte should manage the clear/display process automatically.
 
 
 public enum RenderMode
@@ -97,19 +100,19 @@ public static class App
     static App()
     {
         s_initialized = false;
-        s_deltaTimeStopwatch = new();
+        s_deltaTimeStopwatch = new Stopwatch();
         s_elementWasAddedAndNotUpdated = false;
 
         RenderMode = RenderMode.Pinned;
 
-        Section = new();
+        Section = new Section();
         Section.ElementAddedEvent += (_, _) => OnSectionElementAdded();
 
         DeltaTime = TimeSpan.Zero;
 
         // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
         // this must be ALWAYS initialized before the rendering window
-        _ = new GameWindow(new(), new() { StartVisible = false });
+        _ = new GameWindow(new GameWindowSettings(), new NativeWindowSettings { StartVisible = false });
     }
 
 
@@ -123,7 +126,7 @@ public static class App
 
         DefaultFont = defaultFont;
 
-        Debugger = new();
+        Debugger = new Debugger();
 
         s_deltaTimeStopwatch.Start();
 
@@ -131,10 +134,10 @@ public static class App
     }
 
 
-    public static void Init(VideoMode mode, string title, Font defaultFont, Styles style = Styles.Default, ContextSettings settings = new())
+    public static void Init(VideoMode mode, string title, Font defaultFont, Styles style = Styles.Default, ContextSettings settings = new ContextSettings())
     {
         Init(defaultFont);
-        InitWindow(new(mode, title, style, settings));
+        InitWindow(new Window(mode, title, style, settings));
     }
 
 
@@ -142,15 +145,15 @@ public static class App
     {
         Window = window;
         Window.Closed += (_, _) => Quit();
-        Window.Resized += (_, args) => OnWindowResize(new(args.Width, args.Height));
+        Window.Resized += (_, args) => OnWindowResize(new Vec2u(args.Width, args.Height));
 
         MouseInput.AddScrollListener(Window);
 
         Window.KeyPressed += (_, args) => PressedKey = args;
         Window.KeyReleased += (_, args) => ReleasedKey = args;
 
-        MainView = new(Window.GetView());
-        ElementView = new(MainView);
+        MainView = new View(Window.GetView());
+        ElementView = new View(MainView);
     }
 
 
@@ -206,7 +209,7 @@ public static class App
         // don't need to use it with DrawElements(), since it SHOULD not modify the element list
         // and SHOULD be used only for drawing stuff
 
-        foreach (Element element in Elements.ToArray())
+        foreach (var element in Elements.ToArray())
         {
             if (element.Visible && !constantUpdateOnly)
                 element.Update();
@@ -234,7 +237,7 @@ public static class App
 
     private static void DrawElements()
     {
-        foreach (Element element in Elements)
+        foreach (var element in Elements)
             if (element.CanDraw)
                 element.Draw(Window);
     }
@@ -273,6 +276,5 @@ public static class App
     }
 
 
-    private static InvalidOperationException AppNotInitializedException()
-        => new("App not initialized.");
+    private static InvalidOperationException AppNotInitializedException() => new InvalidOperationException("App not initialized.");
 }

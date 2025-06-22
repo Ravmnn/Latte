@@ -14,7 +14,7 @@ public static class ClipArea
 {
     public static void BeginClip(IntRect area)
     {
-        Vector2u windowSize = App.Window.Size;
+        var windowSize = App.Window.Size;
 
         GL.Enable(EnableCap.ScissorTest);
 
@@ -31,16 +31,16 @@ public static class ClipArea
 
     public static IntRect? OverlapElementClipAreaToParents(Element start)
     {
-        Element? element = start;
+        var element = start;
         IntRect? area = null;
 
         do
         {
-            IntRect newArea = element.GetClipArea();
+            var newArea = element.GetClipArea();
 
             area ??= newArea;
 
-            if (area.Value.Intersects(newArea, out IntRect overlap))
+            if (area.Value.Intersects(newArea, out var overlap))
                 area = overlap;
             else
                 return null;
@@ -55,7 +55,7 @@ public static class ClipArea
 
     public static IntRect GetTopMostClipAreaOfElement(Element element)
     {
-        Element currentElement = element;
+        var currentElement = element;
         
         while (currentElement.Parent is not null)
             currentElement = currentElement.Parent;

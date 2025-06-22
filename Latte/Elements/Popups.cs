@@ -1,3 +1,4 @@
+using Latte.Core.Type;
 using Latte.Elements.Primitives;
 
 
@@ -11,15 +12,15 @@ public class ProgressBarPopup : WindowElement
     public bool CloseOnComplete { get; set; }
     
     
-    public ProgressBarPopup(string title) : base(title, new(), new(300, 200))
+    public ProgressBarPopup(string title) : base(title, new Vec2f(), new Vec2f(300, 200))
     {
         Alignment.Set(Elements.Alignment.Center);
         
         CloseOnComplete = true;
 
-        ProgressBar = new(this, new(), new(Size.Value.X - 30, 20));
+        ProgressBar = new ProgressBarElement(this, new Vec2f(), new Vec2f(Size.Value.X - 30, 20));
         ProgressBar.Alignment.Set(Elements.Alignment.HorizontalCenter | Elements.Alignment.Bottom);
-        ProgressBar.AlignmentMargin.Set(new(0, -10));
+        ProgressBar.AlignmentMargin.Set(new Vec2f(0, -10));
     }
 
 

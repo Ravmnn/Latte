@@ -58,8 +58,8 @@ public struct ColorRGBA : IAnimatable<ColorRGBA>,
     public ColorRGBA Get() => this;
 
 
-    public static implicit operator Color(ColorRGBA color) => new(color.R, color.G, color.B, color.A);
-    public static implicit operator ColorRGBA(Color color) => new(color.R, color.G, color.B, color.A);
+    public static implicit operator Color(ColorRGBA color) => new Color(color.R, color.G, color.B, color.A);
+    public static implicit operator ColorRGBA(Color color) => new ColorRGBA(color.R, color.G, color.B, color.A);
 
 
     public static ColorRGBA operator+(ColorRGBA left, byte right)
@@ -97,13 +97,13 @@ public static class ColorGenerator
         int[] color = [255, 0, 0];
         uint channelIndex = 1;
 
-        bool decreasePrevious = false;
+        var decreasePrevious = false;
 
         for (uint i = 0; i < index; i++)
         {
-            uint realChannelIndex = RelativateChannelIndex(channelIndex);
-            ref int channel = ref color[realChannelIndex];
-            ref int previousChannel = ref color[GetPreviousChannelIndex(realChannelIndex)];
+            var realChannelIndex = RelativateChannelIndex(channelIndex);
+            ref var channel = ref color[realChannelIndex];
+            ref var previousChannel = ref color[GetPreviousChannelIndex(realChannelIndex)];
 
             if (decreasePrevious)
                 previousChannel -= step;
@@ -124,7 +124,7 @@ public static class ColorGenerator
             }
         }
 
-        return new((byte)color[0], (byte)color[1], (byte)color[2]);
+        return new ColorRGBA((byte)color[0], (byte)color[1], (byte)color[2]);
     }
 
     private static bool IsChannelMaxed(this int channel) => channel >= 255;

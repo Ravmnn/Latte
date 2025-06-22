@@ -45,12 +45,12 @@ public interface IDefaultResizable : IResizable
         if (Resizing)
             return;
         
-        Vec2f point = App.Window.ViewMousePosition;
+        var point = App.Window.ViewMousePosition;
         
-        FloatRect left = Rect with { Width = CornerResizeAreaSize };
-        FloatRect right = Rect with { Left = Rect.Left + Rect.Width - CornerResizeAreaSize, Width = CornerResizeAreaSize };
-        FloatRect top = Rect with { Height = CornerResizeAreaSize };
-        FloatRect bottom = Rect with { Top = Rect.Top + Rect.Height - CornerResizeAreaSize, Height = CornerResizeAreaSize };
+        var left = Rect with { Width = CornerResizeAreaSize };
+        var right = Rect with { Left = Rect.Left + Rect.Width - CornerResizeAreaSize, Width = CornerResizeAreaSize };
+        var top = Rect with { Height = CornerResizeAreaSize };
+        var bottom = Rect with { Top = Rect.Top + Rect.Height - CornerResizeAreaSize, Height = CornerResizeAreaSize };
 
         CornerToResize = Corner.None;
         

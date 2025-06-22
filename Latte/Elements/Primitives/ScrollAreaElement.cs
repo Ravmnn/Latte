@@ -40,7 +40,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
     public event EventHandler? DraggingEvent;
 
 
-    public ScrollAreaHandleElement(ScrollAreaElement parent, ScrollDirection orientation) : base(parent, new(), new(), null)
+    public ScrollAreaHandleElement(ScrollAreaElement parent, ScrollDirection orientation) : base(parent, new Vec2f(), new Vec2f(), null)
     {
         Orientation = orientation;
 
@@ -87,10 +87,10 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
 
     protected void UpdateSize()
     {
-        FloatRect bounds = Parent.GetChildrenBounds();
-        Vec2f parentSize = Parent.Size.Value;
+        var bounds = Parent.GetChildrenBounds();
+        var parentSize = Parent.Size.Value;
 
-        Vec2f sizeRatio = new(parentSize.X / bounds.Width, parentSize.Y / bounds.Height);
+        var sizeRatio = new Vec2f(parentSize.X / bounds.Width, parentSize.Y / bounds.Height);
         Vec2f size = parentSize * sizeRatio;
 
         if (Orientation == ScrollDirection.Vertical)
@@ -176,13 +176,13 @@ public class ScrollAreaElement : ButtonElement
             : base(parent, position, size, null)
     {
         if (verticalScrollHandle)
-            VerticalScrollHandle = new(this, ScrollDirection.Vertical);
+            VerticalScrollHandle = new ScrollAreaHandleElement(this, ScrollDirection.Vertical);
 
         if (horizontalScrollHandle)
-            HorizontalScrollHandle = new(this, ScrollDirection.Horizontal);
+            HorizontalScrollHandle = new ScrollAreaHandleElement(this, ScrollDirection.Horizontal);
 
-        ScrollOffset = new();
-        LastScrollOffset = new();
+        ScrollOffset = new Vec2f();
+        LastScrollOffset = new Vec2f();
 
         ScrollOffsetStep = 10f;
         Direction = ScrollDirection.Vertical;
@@ -193,7 +193,7 @@ public class ScrollAreaElement : ButtonElement
     {
         UpdateScrollHandlesVisibility();
 
-        bool isMouseHover = MouseInput.TrueElementWhichCaughtMouseInput?.IsChildOf(this) ?? false;
+        var isMouseHover = MouseInput.TrueElementWhichCaughtMouseInput?.IsChildOf(this) ?? false;
 
         if (!IsAnyHandlePressed && isMouseHover)
             AddAppMouseScrollDeltaToScrollOffset();
@@ -208,7 +208,7 @@ public class ScrollAreaElement : ButtonElement
 
     private void UpdateScrollHandlesVisibility()
     {
-        FloatRect childrenBounds = GetChildrenBounds();
+        var childrenBounds = GetChildrenBounds();
 
         if (VerticalScrollHandle is not null)
             VerticalScrollHandle.Visible = childrenBounds.Size.Y > Size.Value.Y;
@@ -219,7 +219,7 @@ public class ScrollAreaElement : ButtonElement
 
     protected void AddAppMouseScrollDeltaToScrollOffset()
     {
-        float step = ScrollOffsetStep * -MouseInput.ScrollDelta;
+        var step = ScrollOffsetStep * -MouseInput.ScrollDelta;
 
         switch (Direction)
         {
@@ -246,7 +246,7 @@ public class ScrollAreaElement : ButtonElement
 
     protected void SyncScrollHandlesPositionToScrollOffset()
     {
-        FloatRect childrenBounds = GetChildrenBounds();
+        var childrenBounds = GetChildrenBounds();
         Vec2f progress = ScrollOffset / ((Vec2f)childrenBounds.Size - Size.Value);
 
         if (VerticalScrollHandle is not null)
@@ -259,7 +259,7 @@ public class ScrollAreaElement : ButtonElement
 
     protected void ClampScrollOffset()
     {
-        FloatRect bounds = GetChildrenBounds();
+        var bounds = GetChildrenBounds();
 
         ScrollOffset.X = Math.Clamp(ScrollOffset.X, 0, bounds.Width - Size.Value.X);
         ScrollOffset.Y = Math.Clamp(ScrollOffset.Y, 0, bounds.Height - Size.Value.Y);
@@ -268,7 +268,7 @@ public class ScrollAreaElement : ButtonElement
 
     public FloatRect GetChildrenBounds()
     {
-        FloatRect bounds = (from child in Children where !child.HasAttribute<IgnoreScrollAttribute>()
+        var bounds = (from child in Children where !child.HasAttribute<IgnoreScrollAttribute>()
             select new FloatRect(child.RelativePosition.Value, child.GetBounds().Size)).ToArray().GetBoundsOfRects();
 
         if (bounds.Width < Size.Value.X)
@@ -283,15 +283,15 @@ public class ScrollAreaElement : ButtonElement
 
     protected void Scroll(Vec2f offset)
     {
-        foreach (Element child in Children)
+        foreach (var child in Children)
             if (!child.HasAttribute<IgnoreScrollAttribute>())
                 child.RelativePosition.Value += offset;
 
         OnScroll(offset);
     }
 
-    protected void ScrollVertically(float offset) => Scroll(new(y: offset));
-    protected void ScrollHorizontally(float offset) => Scroll(new(x: offset));
+    protected void ScrollVertically(float offset) => Scroll(new Vec2f(y: offset));
+    protected void ScrollHorizontally(float offset) => Scroll(new Vec2f(x: offset));
 
 
     protected virtual void OnScroll(Vec2f offset)

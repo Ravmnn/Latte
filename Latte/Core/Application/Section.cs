@@ -68,7 +68,7 @@ public class Section : IUpdateable, IDrawable
 
         element.ChildAddedEvent += OnElementChildAdded;
 
-        ElementAddedEvent?.Invoke(null, new(element));
+        ElementAddedEvent?.Invoke(null, new ElementEventArgs(element));
     }
 
 
@@ -83,18 +83,18 @@ public class Section : IUpdateable, IDrawable
 
     private void RemoveElementsChildrenOf(Element parent)
     {
-        foreach (Element element in _elements.ToArray().Reverse())
+        foreach (var element in _elements.ToArray().Reverse())
             if (element.IsChildOf(parent))
                 RemoveSingleElement(element);
     }
 
     private bool RemoveSingleElement(Element element)
     {
-        bool result = _elements.Remove(element);
+        var result = _elements.Remove(element);
 
         element.ChildAddedEvent -= OnElementChildAdded;
 
-        ElementRemovedEvent?.Invoke(null, new(element));
+        ElementRemovedEvent?.Invoke(null, new ElementEventArgs(element));
 
         return result;
     }

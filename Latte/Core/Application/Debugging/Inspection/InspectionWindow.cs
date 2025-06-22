@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Collections.Generic;
-
+using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
@@ -31,21 +31,21 @@ public class InspectionFrameElement : RectangleElement
 
 
     public InspectionFrameElement(InspectionData data)
-        : base(null, new(), new(350, 350), 5)
+        : base(null, new Vec2f(), new Vec2f(350, 350), 5)
     {
         _data = data;
 
-        NameText = new(this, new(), 10, data.Name)
+        NameText = new TextElement(this, new Vec2f(), 10, data.Name)
         {
             Alignment = { Value = Elements.Alignment.HorizontalCenter | Elements.Alignment.Top },
-            AlignmentMargin = { Value = new(0, 10) }
+            AlignmentMargin = { Value = new Vec2f(0, 10) }
         };
 
-        DataText = new(this, new(5, 20), 13, data.Data);
+        DataText = new TextElement(this, new Vec2f(5, 20), 13, data.Data);
 
         Alignment.Set(Elements.Alignment.Center);
 
-        Color.Set(new(100, 100, 100, 150));
+        Color.Set(new ColorRGBA(100, 100, 100, 150));
     }
 }
 
@@ -62,21 +62,21 @@ public class InspectionWindow : WindowElement
     public GridLayoutElement DataGrid { get; }
 
 
-    public InspectionWindow() : base("Inspector", new(10, 10), new(400, 400), WindowElementStyles.Moveable)
+    public InspectionWindow() : base("Inspector", new Vec2f(10, 10), new Vec2f(400, 400), WindowElementStyles.Moveable)
     {
         _lastInspectedElement = null;
         _frames = [];
 
-        ScrollArea = new(this, new(), new(380, 340))
+        ScrollArea = new ScrollAreaElement(this, new Vec2f(), new Vec2f(380, 340))
         {
             Alignment = { Value = Elements.Alignment.Center },
-            AlignmentMargin = { Value = new(0, 20) },
+            AlignmentMargin = { Value = new Vec2f(0, 20) },
 
-            Color = { Value = new(150, 150, 150, 100) },
+            Color = { Value = new ColorRGBA(150, 150, 150, 100) },
             Radius = { Value = 3f }
         };
 
-        DataGrid = new(ScrollArea, new(), 0, 0, 380, 380)
+        DataGrid = new GridLayoutElement(ScrollArea, new Vec2f(), 0, 0, 380, 380)
         {
             GrowDirection = GridLayoutGrowDirection.Vertical,
             MinColumns = 1
@@ -86,8 +86,8 @@ public class InspectionWindow : WindowElement
 
         BorderSize.Set(1f);
 
-        Color.Set(new(100, 100, 100, 100));
-        BorderColor.Set(new(255, 255, 255, 200));
+        Color.Set(new ColorRGBA(100, 100, 100, 100));
+        BorderColor.Set(new ColorRGBA(255, 255, 255, 200));
 
         PrioritySnap = PrioritySnap.AlwaysOnTop;
         PrioritySnapOffset = 2;
@@ -117,7 +117,7 @@ public class InspectionWindow : WindowElement
 
     private void UpdateInspectionFramesData(IEnumerable<InspectionData> data)
     {
-        foreach (InspectionData inspectionData in data)
+        foreach (var inspectionData in data)
             _frames.First(frame => frame.Data.Name == inspectionData.Name).Data = inspectionData;
     }
 
@@ -127,9 +127,9 @@ public class InspectionWindow : WindowElement
         DataGrid.Clear();
         _frames.Clear();
 
-        foreach (InspectionData inspectionData in data)
+        foreach (var inspectionData in data)
         {
-            InspectionFrameElement frame = new(inspectionData);
+            var frame = new InspectionFrameElement(inspectionData);
             DataGrid.AddElementAtEnd(frame);
             _frames.Add(frame);
 

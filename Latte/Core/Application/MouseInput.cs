@@ -32,13 +32,13 @@ public static class MouseInput
 
     static MouseInput()
     {
-        s_lastMousePosition = new();
-        s_lastElementViewMousePosition = new();
-        s_lastMainViewMousePosition = new();
+        s_lastMousePosition = new Vec2i();
+        s_lastElementViewMousePosition = new Vec2f();
+        s_lastMainViewMousePosition = new Vec2f();
 
-        Position = new();
-        PositionInElementView = new();
-        PositionInMainView = new();
+        Position = new Vec2i();
+        PositionInElementView = new Vec2f();
+        PositionInMainView = new Vec2f();
     }
 
 
@@ -74,11 +74,11 @@ public static class MouseInput
 
         ElementWhichCaughtMouseInput = TrueElementWhichCaughtMouseInput = null;
 
-        for (int i = elements.Length - 1; i >= 0; i--)
+        for (var i = elements.Length - 1; i >= 0; i--)
         {
-            Element element = elements[i];
-            bool mouseInputWasCaught = ElementWhichCaughtMouseInput is not null;
-            bool isMouseOver = IsMouseOverElement(element);
+            var element = elements[i];
+            var mouseInputWasCaught = ElementWhichCaughtMouseInput is not null;
+            var isMouseOver = IsMouseOverElement(element);
 
             if (element is IClickable clickable)
                 clickable.CaughtMouseInput = !mouseInputWasCaught && isMouseOver;

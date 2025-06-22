@@ -39,24 +39,24 @@ public class TextElement : Element
     {
         IgnoreMouseInput = true;
 
-        SfmlText = new(text, font ?? App.DefaultFont);
+        SfmlText = new Text(text, font ?? App.DefaultFont);
 
         RelativePosition.Set(position);
 
         if (size is null)
             SizePolicy.Set(SizePolicyType.FitParent);
 
-        Text = new(this, nameof(Text), text);
-        Style = new(this, nameof(Style), SFML.Graphics.Text.Styles.Regular);
+        Text = new Property<string>(this, nameof(Text), text);
+        Style = new Property<Text.Styles>(this, nameof(Style), SFML.Graphics.Text.Styles.Regular);
 
-        Size = new(this, nameof(Size), size ?? 7);
-        LetterSpacing = new(this, nameof(LetterSpacing), 1f);
-        LineSpacing = new(this, nameof(LineSpacing), 1f);
+        Size = new Property<uint>(this, nameof(Size), size ?? 7);
+        LetterSpacing = new AnimatableProperty<Float>(this, nameof(LetterSpacing), 1f);
+        LineSpacing = new AnimatableProperty<Float>(this, nameof(LineSpacing), 1f);
 
-        BorderSize = new(this, nameof(BorderSize), 0f);
+        BorderSize = new AnimatableProperty<Float>(this, nameof(BorderSize), 0f);
 
-        Color = new(this, nameof(Color), SFML.Graphics.Color.White);
-        BorderColor = new(this, nameof(BorderColor), SFML.Graphics.Color.Black);
+        Color = new AnimatableProperty<ColorRGBA>(this, nameof(Color), SFML.Graphics.Color.White);
+        BorderColor = new AnimatableProperty<ColorRGBA>(this, nameof(BorderColor), SFML.Graphics.Color.Black);
     }
 
 
@@ -127,8 +127,8 @@ public class TextElement : Element
     {
         // first find the size based on the height...
 
-        float floatFitSize = CalculateSizePolicyTextSize(targetRect.Height, bounds.Height);
-        uint fitSize = (uint)Math.Round(floatFitSize);
+        var floatFitSize = CalculateSizePolicyTextSize(targetRect.Height, bounds.Height);
+        var fitSize = (uint)Math.Round(floatFitSize);
 
         // if the calculated text size (bounds) width is greater than the target width, then
         // calculates using the width instead
@@ -148,10 +148,10 @@ public class TextElement : Element
 
     private static FloatRect CalculateBoundsOfTextWithSize(Text text, uint size)
     {
-        uint oldSize = text.CharacterSize;
+        var oldSize = text.CharacterSize;
         text.CharacterSize = size;
 
-        FloatRect bounds = text.GetGlobalBounds();
+        var bounds = text.GetGlobalBounds();
         text.CharacterSize = oldSize;
 
         return bounds;

@@ -5,7 +5,7 @@ namespace Latte.Core.Animation;
 
 
 /// <summary>
-/// Definition of easing functions. 
+/// Definition of easing functions.
 /// </summary>
 public enum Easing
 {
@@ -34,11 +34,11 @@ public static class EasingFunctions
 
     private static float InOut(float t, int pow)
     {
-        int mult = (int)MathF.Pow(2, pow - 1);
+        var mult = (int)MathF.Pow(2, pow - 1);
 
         if (t < 0.5)
             return mult * In(t, pow);
-        
+
         return 1 - MathF.Pow(-2 * t + 2, pow) / 2;
     }
 
@@ -116,7 +116,7 @@ public static class EasingFunctions
 
         if (t < 0.5f)
             return MathF.Pow(2f, 20f * t - 10f) / 2f;
-        
+
         return (2f - MathF.Pow(2f, -20f * t + 10f)) / 2f;
     }
 
@@ -127,7 +127,7 @@ public static class EasingFunctions
     {
         if (t < 0.5f)
             return (1f - MathF.Sqrt(1f - MathF.Pow(2f * t, 2f))) / 2f;
-        
+
         return (MathF.Sqrt(1f - MathF.Pow(-2f * t + 2f, 2f)) + 1f) / 2f;
     }
 
@@ -161,7 +161,7 @@ public static class EasingFunctions
 
         if (t < 0.5f)
             return -(MathF.Pow(2f, 20f * t - 10f) * MathF.Sin((20f * t - 11.125f) * C5)) / 2f;
-        
+
         return MathF.Pow(2f, -20f * t + 10f) * MathF.Sin((20f * t - 11.125f) * C5) / 2f + 1f;
     }
 
@@ -202,13 +202,13 @@ public static class EasingFunctions
 
         if (t < 1f / D1)
             return N1 * t * t;
-        
-        if (t < 2 / D1) 
+
+        if (t < 2 / D1)
             return N1 * (t -= 1.5f / D1) * t + 0.75f;
-        
-        if (t < 2.5 / D1) 
+
+        if (t < 2.5 / D1)
             return N1 * (t -= 2.25f / D1) * t + 0.9375f;
-        
+
         return N1 * (t -= 2.625f / D1) * t + 0.984375f;
     }
 
@@ -216,7 +216,7 @@ public static class EasingFunctions
     {
         if (t < 0.5f)
             return (1f - OutBounce(1f - 2f * t)) / 2f;
-        
+
         return (1f + OutBounce(2f * t - 1f)) / 2f;
     }
 }

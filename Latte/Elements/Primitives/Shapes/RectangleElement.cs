@@ -25,8 +25,8 @@ public class RectangleElement : ShapeElement
     {
         RelativePosition.Set(position);
 
-        Size = new(this, nameof(Size), size);
-        Radius = new(this, nameof(Radius), radius);
+        Size = new AnimatableProperty<Vec2f>(this, nameof(Size), size);
+        Radius = new AnimatableProperty<Float>(this, nameof(Radius), radius);
     }
 
 
@@ -48,7 +48,7 @@ public class RectangleElement : ShapeElement
 
     public override void ApplySizePolicy()
     {
-        FloatRect rect = GetSizePolicyRect();
+        var rect = GetSizePolicyRect();
         AbsolutePosition = rect.Position;
         Size.Set(rect.Size);
     }

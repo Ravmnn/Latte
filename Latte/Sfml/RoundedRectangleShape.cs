@@ -65,10 +65,10 @@ public class RoundedRectangleShape : Shape
 
     private Vector2f RectangleGetPoint(uint index) => index switch
     {
-        1 => new (Size.X, 0),
-        2 => new (Size.X, Size.Y),
-        3 => new (0, Size.Y),
-        _ => new (0, 0)
+        1 => new Vector2f(Size.X, 0),
+        2 => new Vector2f(Size.X, Size.Y),
+        3 => new Vector2f(0, Size.Y),
+        _ => new Vector2f(0, 0)
     };
 
     public override Vector2f GetPoint(uint index)
@@ -80,12 +80,12 @@ public class RoundedRectangleShape : Shape
             return RectangleGetPoint(index);
         
         if (index >= CornerPointCount * 4)
-            return new();
+            return new Vector2f();
 
-        float deltaAngle = 90.0f / (CornerPointCount - 1);
+        var deltaAngle = 90.0f / (CornerPointCount - 1);
         
-        Vector2f center = new();
-        uint centerIndex = index / CornerPointCount;
+        var center = new Vector2f();
+        var centerIndex = index / CornerPointCount;
 
         switch (centerIndex)
         {
@@ -110,7 +110,7 @@ public class RoundedRectangleShape : Shape
                 break;
         }
 
-        return new(Radius * MathF.Cos(deltaAngle * (index - centerIndex) * Pi / 180f) + center.X,
+        return new Vector2f(Radius * MathF.Cos(deltaAngle * (index - centerIndex) * Pi / 180f) + center.X,
             -Radius * MathF.Sin(deltaAngle * (index - centerIndex) * Pi / 180f) + center.Y);
     }
 }

@@ -81,11 +81,11 @@ public interface IDefaultClickable : IClickable
 
     void ProcessMouseEvents()
     {
-        bool entered = MouseState.IsMouseHover && !MouseState.WasMouseHover;
-        bool leaved = !MouseState.IsMouseHover && MouseState.WasMouseHover;
+        var entered = MouseState.IsMouseHover && !MouseState.WasMouseHover;
+        var leaved = !MouseState.IsMouseHover && MouseState.WasMouseHover;
 
-        bool pressed = MouseState.IsTruePressed && !MouseState.WasTruePressed;
-        bool unpressed = !MouseState.IsTruePressed && MouseState.WasTruePressed;
+        var pressed = MouseState.IsTruePressed && !MouseState.WasTruePressed;
+        var unpressed = !MouseState.IsTruePressed && MouseState.WasTruePressed;
 
         if (pressed)
             OnMouseDown();

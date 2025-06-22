@@ -31,13 +31,13 @@ public record struct FloatRectVertices(Vec2f TopLeft, Vec2f TopRight, Vec2f Bott
 {
     public FloatRectVertices(FloatRect rect) : this(
         rect.Position,
-        new(rect.Left + rect.Width, rect.Top),
-        new(rect.Left, rect.Top + rect.Height),
+        new Vec2f(rect.Left + rect.Width, rect.Top),
+        new Vec2f(rect.Left, rect.Top + rect.Height),
         rect.Position + rect.Size
     ) {}
 
 
-    public FloatRectVertices() : this(new())
+    public FloatRectVertices() : this(new FloatRect())
     {}
 
 
@@ -48,11 +48,10 @@ public record struct FloatRectVertices(Vec2f TopLeft, Vec2f TopRight, Vec2f Bott
 
 public static class RectExtensions
 {
-    public static FloatRect VerticesToRect(this FloatRectVertices vertices)
-        => new(vertices.TopLeft, vertices.BottomRight - vertices.TopLeft);
+    public static FloatRect VerticesToRect(this FloatRectVertices vertices) =>
+        new FloatRect(vertices.TopLeft, vertices.BottomRight - vertices.TopLeft);
 
-    public static FloatRectVertices RectToVertices(this FloatRect rect)
-        => new(rect);
+    public static FloatRectVertices RectToVertices(this FloatRect rect) => new FloatRectVertices(rect);
 
 
     public static IntRect ToWindowCoordinates(this FloatRect rect)
@@ -60,7 +59,7 @@ public static class RectExtensions
         Vec2i transformedPosition = App.Window.MapCoordsToPixel(rect.Position);
         Vec2i transformedSize = App.Window.MapCoordsToPixel(rect.Position + rect.Size) - transformedPosition;
 
-        return new(transformedPosition, transformedSize);
+        return new IntRect(transformedPosition, transformedSize);
     }
 
 
@@ -69,7 +68,7 @@ public static class RectExtensions
         Vec2f transformedPosition = App.Window.MapPixelToCoords(rect.Position);
         Vec2f transformedSize = App.Window.MapPixelToCoords(rect.Position + rect.Size) - transformedPosition;
 
-        return new(transformedPosition, transformedSize);
+        return new FloatRect(transformedPosition, transformedSize);
     }
 
 
@@ -96,14 +95,14 @@ public static class RectExtensions
 
     public static FloatRect GetBoundsOfRects(this IEnumerable<FloatRect> rects)
     {
-        FloatRect[] rectArray = rects.ToArray();
+        var rectArray = rects.ToArray();
 
         if (rectArray.Length == 0)
-            return new();
+            return new FloatRect();
 
-        FloatRect bounds = rectArray[0];
+        var bounds = rectArray[0];
 
-        foreach (FloatRect rect in rectArray)
+        foreach (var rect in rectArray)
         {
             if (rect.Left < bounds.Left)
                 bounds.Left = rect.Left;

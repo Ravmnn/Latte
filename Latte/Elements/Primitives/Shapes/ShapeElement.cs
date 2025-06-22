@@ -23,10 +23,10 @@ public abstract class ShapeElement : Element
     {
         SfmlShape = shape;
 
-        BorderSize = new(this, nameof(BorderSize), 0f);
+        BorderSize = new AnimatableProperty<Float>(this, nameof(BorderSize), 0f);
 
-        Color = new(this, nameof(Color), SFML.Graphics.Color.White);
-        BorderColor = new(this, nameof(BorderColor), SFML.Graphics.Color.White);
+        Color = new AnimatableProperty<ColorRGBA>(this, nameof(Color), SFML.Graphics.Color.White);
+        BorderColor = new AnimatableProperty<ColorRGBA>(this, nameof(BorderColor), SFML.Graphics.Color.White);
     }
 
 

@@ -28,8 +28,6 @@ public class FloatAnimation(float[] startValues, float[] endValues, double time,
     public float[] EndValues { get; } = endValues;
     public float[] CurrentValues { get; private set; } = new float[startValues.Length];
 
-    public bool SetEndValuesWhenAbort { get; set; } = true;
-
 
     public override void Update()
     {
@@ -54,17 +52,5 @@ public class FloatAnimation(float[] startValues, float[] endValues, double time,
             CurrentValues = EndValues;
 
         base.OnUpdated();
-    }
-
-
-    protected override void OnAborted()
-    {
-        // if (SetEndValuesWhenAbort)
-        // {
-        //     CurrentValues = EndValues;
-        //     base.OnUpdated();
-        // }
-
-        base.OnAborted();
     }
 }

@@ -28,7 +28,7 @@ public static class Draw
 
     public static void Text(RenderTarget target, Vec2f position, string text, uint size = 5, Color? color = null, Color? backgroundColor = null)
     {
-        Text textObject = new(text, App.DefaultFont, size)
+        var textObject = new Text(text, App.DefaultFont, size)
         {
             Position = position.Round(),
             FillColor = color ?? Color.Black
@@ -42,7 +42,7 @@ public static class Draw
 
     public static void Text(RenderTarget target, FloatRect parent, Alignment alignment, string text, uint size = 15, Color? color = null, Color? backgroundColor = null)
     {
-        Text textObject = new(text, App.DefaultFont, size)
+        var textObject = new Text(text, App.DefaultFont, size)
         {
             FillColor = color ?? Color.Black
         };

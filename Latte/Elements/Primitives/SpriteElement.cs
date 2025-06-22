@@ -22,13 +22,13 @@ public class SpriteElement : Element
 
     public SpriteElement(Element? parent, string imagePath, Vec2f position, Vec2f size) : base(parent)
     {
-        SfmlSprite = new(new Texture(imagePath));
+        SfmlSprite = new Sprite(new Texture(imagePath));
 
-        Texture = new(this, nameof(Texture), SfmlTexture);
-        Smooth = new(this, nameof(Smooth), true);
-        Repeat = new(this, nameof(Repeat), false);
+        Texture = new Property<Texture>(this, nameof(Texture), SfmlTexture);
+        Smooth = new Property<bool>(this, nameof(Smooth), true);
+        Repeat = new Property<bool>(this, nameof(Repeat), false);
 
-        Size = new(this, nameof(Size), size);
+        Size = new AnimatableProperty<Vec2f>(this, nameof(Size), size);
 
         RelativePosition.Set(position);
     }
@@ -73,16 +73,14 @@ public class SpriteElement : Element
     }
 
 
-    public override FloatRect GetBounds()
-        => new(AbsolutePosition, Size.Value);
+    public override FloatRect GetBounds() => new FloatRect(AbsolutePosition, Size.Value);
 
-    public override FloatRect GetRelativeBounds()
-        => new(RelativePosition.Value, Size.Value);
+    public override FloatRect GetRelativeBounds() => new FloatRect(RelativePosition.Value, Size.Value);
 
 
     public override void ApplySizePolicy()
     {
-        FloatRect rect = GetSizePolicyRect();
+        var rect = GetSizePolicyRect();
         AbsolutePosition = rect.Position;
         Size.Set(rect.Size);
     }

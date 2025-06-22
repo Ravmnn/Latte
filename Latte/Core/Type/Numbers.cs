@@ -13,7 +13,7 @@ public struct Float(float value) : IAnimatable<Float>
 
 
     public static implicit operator float(Float @float) => @float.Value;
-    public static implicit operator Float(float @float) => new(@float);
+    public static implicit operator Float(float @float) => new Float(@float);
 
 
     public readonly FloatAnimation AnimateThis(Float to, double time, Easing easing = Easing.Linear)
