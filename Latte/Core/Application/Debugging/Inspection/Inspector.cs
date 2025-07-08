@@ -70,9 +70,15 @@ public sealed class ElementInspector : IInspector<Element>
     public InspectionData Inspect(Element element)
     {
         var data = new StringBuilder();
+        var mousePosition = MouseInput.PositionInElementView;
 
         foreach (var property in element.Properties)
             data.AppendLine($"{property.Name}: {property.Value}");
+
+        data.AppendLine("\n");
+
+        data.AppendLine($"Mouse over bounds: {element.IsPointOverBounds(mousePosition)}");
+        data.AppendLine($"Mouse over clip area: {element.IsPointOverClipArea(mousePosition)}");
 
         return new InspectionData("Element", data.ToString());
     }

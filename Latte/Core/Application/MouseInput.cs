@@ -70,7 +70,7 @@ public static class MouseInput
         if (!CheckMouseInputHolding())
             return;
 
-        Element[] elements = App.Elements.ToArray();
+        var elements = App.Elements.ToArray();
 
         ElementWhichCaughtMouseInput = TrueElementWhichCaughtMouseInput = null;
 

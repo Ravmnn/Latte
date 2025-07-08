@@ -118,8 +118,13 @@ public sealed class Debugger : IUpdateable, IDrawable
                 ToggleDebugOption(DebugOption.ShowPriority);
                 break;
 
+            case Keyboard.Scancode.F9:
+                InspectionWindow.LockAtElement = InspectionWindow.LockAtElement is null
+                    ? MouseInput.TrueElementWhichCaughtMouseInput : null;
 
-            case Keyboard.Scancode.F12:
+                break;
+
+            case Keyboard.Scancode.F10:
                 InspectionWindow.Visible = !InspectionWindow.Visible;
                 break;
         }
@@ -157,7 +162,7 @@ public sealed class Debugger : IUpdateable, IDrawable
             ClipArea.BeginClip(element.GetFinalClipArea());
 
         if (Options.HasFlag(DebugOption.ShowBounds) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsAttribute>())
-            DrawElementBounds(target, element);
+            DrawElementBounds(target, element, Color.Red);
 
         if (Options.HasFlag(DebugOption.ShowBoundsDimensions) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsDimensionsAttribute>())
             DrawElementBoundsDimensions(target, element);
@@ -173,8 +178,8 @@ public sealed class Debugger : IUpdateable, IDrawable
     }
 
 
-    public static void DrawElementBounds(RenderTarget target, Element element)
-        => Debugging.Draw.LineRect(target, element.GetBounds(), Color.Red);
+    public static void DrawElementBounds(RenderTarget target, Element element, ColorRGBA color)
+        => Debugging.Draw.LineRect(target, element.GetBounds(), color);
 
     public static void DrawElementBoundsDimensions(RenderTarget target, Element element)
     {

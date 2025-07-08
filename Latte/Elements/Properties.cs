@@ -81,12 +81,9 @@ public abstract class AnimatableProperty(Element owner, string name, object valu
     public FloatAnimation? Animation { get; protected set; }
 
 
-    public FloatAnimation? Animate(object to, double time, Easing easing = Easing.Linear)
+    public FloatAnimation Animate(object to, double time, Easing easing = Easing.Linear)
     {
         _lastTarget = to;
-
-        // if (Animation is not null && !Animation.HasFinished)
-        //    Value = (_lastTarget as IAnimatable)!;
 
         Animation?.Abort();
 
@@ -117,7 +114,7 @@ public class AnimatableProperty<T>(Element owner, string name, T value) : Animat
     public static implicit operator T(AnimatableProperty<T> property) => property.Get();
 
 
-    public FloatAnimation? Animate(T to, double time, Easing easing = Easing.Linear)
+    public FloatAnimation Animate(T to, double time, Easing easing = Easing.Linear)
         => base.Animate(to, time, easing);
 
 }

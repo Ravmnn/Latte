@@ -1,9 +1,11 @@
 using System.Linq;
 using System.Collections.Generic;
+
 using Latte.Core.Type;
 using Latte.Elements;
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
+using SFML.Graphics;
 
 
 namespace Latte.Core.Application.Debugging.Inspection;
@@ -55,11 +57,15 @@ public class InspectionFrameElement : RectangleElement
 public class InspectionWindow : WindowElement
 {
     private Element? _lastInspectedElement;
+
     private readonly List<InspectionFrameElement> _frames;
 
 
     public ScrollAreaElement ScrollArea { get; }
     public GridLayoutElement DataGrid { get; }
+    
+    public Element? ElementToInspect { get; set; }
+    public Element? LockAtElement { get; set; }
 
 
     public InspectionWindow() : base("Inspector", new Vec2f(10, 10), new Vec2f(400, 400), WindowElementStyles.Moveable)
@@ -96,6 +102,12 @@ public class InspectionWindow : WindowElement
 
     public override void ConstantUpdate()
     {
+        if (LockAtElement is not null)
+            ElementToInspect = LockAtElement;
+
+        else if (MouseInput.TrueElementWhichCaughtMouseInput is { } element && App.Debugger is not null)
+            ElementToInspect = element;
+
         UpdateInspectionFrames();
 
         base.ConstantUpdate();
@@ -104,14 +116,14 @@ public class InspectionWindow : WindowElement
 
     private void UpdateInspectionFrames()
     {
-        if (MouseInput.TrueElementWhichCaughtMouseInput is not {} element || App.Debugger is not {} debugger)
+        if (App.Debugger is null || ElementToInspect is null)
             return;
 
-        if (element == _lastInspectedElement)
-            UpdateInspectionFramesData(debugger.Inspectors.InspectAll(_lastInspectedElement));
+        if (ElementToInspect == _lastInspectedElement )
+            UpdateInspectionFramesData(App.Debugger.Inspectors.InspectAll(ElementToInspect));
 
-        else if (!element.HasCachedElementAttribute<DebuggerIgnoreInspection>())
-            CreateInspectionFrames(debugger.Inspectors.InspectAll(element));
+        else if (!ElementToInspect.HasCachedElementAttribute<DebuggerIgnoreInspection>())
+            CreateInspectionFrames(App.Debugger.Inspectors.InspectAll(ElementToInspect));
     }
 
 
@@ -137,5 +149,14 @@ public class InspectionWindow : WindowElement
         }
 
         _lastInspectedElement = MouseInput.TrueElementWhichCaughtMouseInput;
+    }
+
+
+    public override void Draw(RenderTarget renderTarget)
+    {
+        base.Draw(renderTarget);
+
+        if (LockAtElement is not null)
+            Debugger.DrawElementBounds(renderTarget, LockAtElement, SFML.Graphics.Color.Green);
     }
 }

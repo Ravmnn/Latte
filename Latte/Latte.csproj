@@ -4,6 +4,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
         <PackageId>MarvinMarjan.Latte</PackageId>
         <Version>0.0.1</Version>
         <Title>An immediate mode GUI for SFML.Net</Title>

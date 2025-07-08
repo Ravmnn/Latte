@@ -21,8 +21,10 @@ namespace Latte.Core.Application;
 
 
 // TODO: add text inputs
+// TODO: add dropdown
 // TODO: add effects, which includes blur (a shader maybe), shadow and gradient (shader)
-// TODO: add the default widget library, Vanilla. (the elements in here should be only the main functionality)
+
+// TODO: apply using good sense: "A class per file".
 
 
 public enum RenderMode
@@ -137,8 +139,9 @@ public static class App
         HasInitialized = true;
     }
 
+    // TODO: create a constant for ContextSettings.
 
-    public static void Init(VideoMode mode, string title, Font defaultFont, Styles style = Styles.Default, ContextSettings settings = new ContextSettings())
+    public static void Init(VideoMode mode, string title, Font defaultFont, Styles style = Styles.Default, ContextSettings settings = default)
     {
         Init(defaultFont);
         InitWindow(new Window(mode, title, style, settings));
@@ -169,11 +172,14 @@ public static class App
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
         UpdateDeltaTime();
-        MouseInput.Update();
 
         Window.Update();
 
         SetElementRenderView();
+
+        // mouse input needs correct mouse coordinate information, so
+        // it needs to update while using the correct view.
+        MouseInput.Update();
 
         Section.Update();
         Debugger?.Update(); // update before elements
@@ -237,10 +243,10 @@ public static class App
         Section.Draw(Window);
         DrawElements();
 
+        Debugger?.Draw(Window); // draw after elements
+
         if (!ManualClearDisplayProcess)
             Window.Display();
-
-        Debugger?.Draw(Window); // draw after elements
 
         UnsetElementRenderView();
     }
