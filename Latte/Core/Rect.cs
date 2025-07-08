@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using SFML.Graphics;
 
 using Latte.Core.Type;
@@ -46,7 +47,7 @@ public record struct FloatRectVertices(Vec2f TopLeft, Vec2f TopRight, Vec2f Bott
 }
 
 
-public static class RectExtensions
+public static class Rect
 {
     public static FloatRect VerticesToRect(this FloatRectVertices vertices) =>
         new FloatRect(vertices.TopLeft, vertices.BottomRight - vertices.TopLeft);

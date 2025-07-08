@@ -4,6 +4,7 @@ using SFML.Graphics;
 
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
+using Latte.Elements.Properties;
 
 
 namespace Latte.Elements.Primitives;

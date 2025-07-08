@@ -5,7 +5,7 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
-public class CheckBoxSelectedIndicatorElement : RectangleElement
+internal class CheckBoxSelectedIndicatorElement : RectangleElement
 {
     public new CheckBoxElement Parent => (base.Parent as CheckBoxElement)!;
 

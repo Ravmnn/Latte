@@ -3,6 +3,7 @@ using SFML.Graphics;
 using Latte.Sfml;
 using Latte.Core;
 using Latte.Core.Type;
+using Latte.Elements.Properties;
 
 
 namespace Latte.Elements.Primitives.Shapes;

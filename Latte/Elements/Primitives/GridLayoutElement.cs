@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using Latte.Core.Application;
 using Latte.Core.Type;
+using Latte.Elements.Attributes;
 using Latte.Elements.Primitives.Shapes;
 using Latte.Exceptions.Element;
 
@@ -13,31 +14,6 @@ namespace Latte.Elements.Primitives;
 
 // TODO: code cleanup in here
 
-
-[ChildrenAmount(1)]
-public class GridLayoutCell : RectangleElement
-{
-    public Element? Element
-    {
-        get => Children.Count == 0 ? null : Children[0];
-        set
-        {
-            if (Element is not null)
-                Element.Parent = null;
-
-            if (value is not null)
-                value.Parent = this;
-        }
-    }
-
-
-    public GridLayoutCell(GridLayoutElement parent, Vec2f position, Vec2f size) : base(parent, position, size)
-    {
-        Color.Value = SFML.Graphics.Color.Transparent;
-    }
-}
-
-
 public enum GridLayoutGrowDirection
 {
     Horizontal,
@@ -45,7 +21,7 @@ public enum GridLayoutGrowDirection
 }
 
 
-[ChildrenType(typeof(GridLayoutCell))]
+[ChildrenType(typeof(GridLayoutCellElement))]
 public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 {
     private uint _rows;
@@ -54,7 +30,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     private float _cellWidth;
 
 
-    public GridLayoutCell[,] Cells { get; private set; }
+    public GridLayoutCellElement[,] Cells { get; private set; }
 
     public uint Rows
     {
@@ -133,7 +109,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
         Color.Value = SFML.Graphics.Color.Transparent;
 
-        Cells = new GridLayoutCell[0, 0];
+        Cells = new GridLayoutCellElement[0, 0];
         CreateCells();
     }
 
@@ -230,7 +206,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
-    protected GridLayoutCell FindAvailableCell()
+    protected GridLayoutCellElement FindAvailableCell()
     {
         foreach (var cell in Cells)
             if (cell.Element is null)
@@ -264,9 +240,9 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     protected void CreateCells()
     {
-        GridLayoutCell[,] oldCells = Cells;
+        GridLayoutCellElement[,] oldCells = Cells;
 
-        Cells = new GridLayoutCell[Rows, Columns];
+        Cells = new GridLayoutCellElement[Rows, Columns];
 
         for (uint row = 0; row < Rows; row++)
         for (uint col = 0; col < Columns; col++)
@@ -280,12 +256,12 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         RecreationRequired = false;
     }
 
-    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCell[,] oldCells, uint row, uint col)
+    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCellElement[,] oldCells, uint row, uint col)
     {
         if (AreIndicesInsideMatrixBounds(oldCells, row, col))
             Cells[row, col] = oldCells[row, col];
         else
-            Cells[row, col] = new GridLayoutCell(this, new Vec2f(), new Vec2f());
+            Cells[row, col] = new GridLayoutCellElement(this, new Vec2f(), new Vec2f());
     }
 
     private void UpdateCellGeometry(uint row, uint col)
@@ -297,71 +273,4 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     private static bool AreIndicesInsideMatrixBounds<T>(T[,] matrix, uint row, uint col)
         => row < matrix.GetLength(0) && col < matrix.GetLength(1);
-}
-
-
-public class GridLayoutEnumerator : IEnumerator<Element?>
-{
-    private readonly GridLayoutElement _gridLayout;
-    private uint _row, _col;
-
-    public Element? Current => _gridLayout[_row, _col];
-    object? IEnumerator.Current => Current;
-
-    private bool _disposed;
-
-
-    public GridLayoutEnumerator(GridLayoutElement gridLayout)
-    {
-        _gridLayout = gridLayout;
-        _row = _col = 0;
-
-        _disposed = false;
-    }
-
-
-    public bool MoveNext()
-    {
-        _col++;
-
-        if (_col < _gridLayout.Columns)
-            return true;
-
-        _col = 0;
-        _row++;
-
-        return _row < _gridLayout.Rows;
-    }
-
-    public void Reset()
-    {
-        _row = _col = 0;
-    }
-
-
-    // an IEnumerator should implement the dispose pattern
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        // nothing to dispose...
-
-        if (_disposed)
-            return;
-
-        if (disposing) {}
-
-        _disposed = true;
-    }
-
-
-    ~GridLayoutEnumerator()
-    {
-        Dispose(false);
-    }
 }

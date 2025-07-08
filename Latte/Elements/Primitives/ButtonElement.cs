@@ -1,7 +1,6 @@
 using System;
 
 using Latte.Core;
-using Latte.Core.Animation;
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
 

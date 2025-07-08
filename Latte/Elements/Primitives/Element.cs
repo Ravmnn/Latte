@@ -8,51 +8,12 @@ using SFML.Graphics;
 using Latte.Core;
 using Latte.Core.Type;
 using Latte.Core.Application;
+using Latte.Elements.Attributes;
+using Latte.Elements.Properties;
 using Latte.Exceptions.Element;
 
 
 namespace Latte.Elements.Primitives;
-
-
-public abstract class ElementAttribute(bool inherit = false) : Attribute
-{
-    public bool Inherit { get; } = inherit;
-
-
-    public virtual void Process(Element element) {}
-}
-
-
-[AttributeUsage(AttributeTargets.Class)]
-public class ChildrenTypeAttribute(Type type) : ElementAttribute
-{
-    public Type Type { get; } = type;
-
-
-    public override void Process(Element element)
-    {
-        foreach (var child in element.Children)
-            if (child.GetType() != Type)
-                throw new ElementException($"The element \"{element.GetType().Name}\" can only have children of type: \"{Type.Name}\"");
-    }
-}
-
-
-[AttributeUsage(AttributeTargets.Class)]
-public class ChildrenAmountAttribute(uint amount) : ElementAttribute
-{
-    public uint Amount { get; } = amount;
-
-
-    public override void Process(Element element)
-    {
-        if (element.Children.Count > Amount)
-            throw new ElementException($"The element \"{element.GetType().Name}\" can only have {Amount} children.");
-    }
-}
-
-
-
 
 
 public class ElementEventArgs(Element? element) : EventArgs

@@ -1,14 +1,17 @@
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 using Latte.Core;
+using Latte.Elements.Primitives;
 
 
-namespace Latte.Elements.Primitives;
+namespace Latte.Elements.Attributes;
 
 
 public class ElementAttributeManager
 {
+    // Attributes of the current element. Instead of loading it everytime before using it,
+    // store all of them here, which increases performance.
     private IEnumerable<ElementAttribute> _cachedAttributes;
 
 
@@ -82,27 +85,4 @@ public class ElementAttributeManager
 
     private bool HasInheritedElementAttribute<T>() where T : ElementAttribute
         => InheritedAttributes.Any(attribute => attribute is T);
-}
-
-
-public static class ElementAttributeExtensions
-{
-    public static T? GetCachedElementAttribute<T>(this Element element) where T : ElementAttribute
-        => element.Attributes.GetCachedElementAttribute<T>();
-
-    public static IEnumerable<ElementAttribute> GetCachedElementAttributes(this Element element)
-        => element.Attributes.GetCachedElementAttributes();
-
-    public static bool HasCachedElementAttribute<T>(this Element element) where T : ElementAttribute
-        => element.Attributes.HasCachedElementAttribute<T>();
-
-
-    public static T? GetElementAttribute<T>(this Element element) where T : ElementAttribute
-        => element.Attributes.GetElementAttribute<T>();
-
-    public static IEnumerable<ElementAttribute> GetElementAttributes(this Element element)
-        => element.Attributes.GetElementAttributes();
-
-    public static bool HasElementAttribute<T>(this Element element) where T : ElementAttribute
-        => element.Attributes.HasElementAttribute<T>();
 }
