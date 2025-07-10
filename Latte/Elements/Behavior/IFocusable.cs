@@ -10,6 +10,8 @@ public interface IFocusable
     event EventHandler UnfocusEvent;
 
     bool Focused { get; set; }
+    bool CanFocus { get; }
+    bool DisableFocus { get; set; }
 
     void OnFocus();
     void OnUnfocus();

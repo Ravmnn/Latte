@@ -6,7 +6,6 @@ using SFML.Graphics;
 
 using Latte.Core.Type;
 using Latte.Core.Application.Debugging.Inspection;
-using Latte.Elements;
 using Latte.Elements.Attributes;
 using Latte.Elements.Behavior;
 using Latte.Elements.Primitives;
@@ -27,7 +26,8 @@ public enum DebugOption
     ShowBounds = 1 << 3,
     ShowBoundsDimensions = 1 << 4,
     ShowClipArea = 1 << 5,
-    ShowPriority = 1 << 6
+    ShowPriority = 1 << 6,
+    ShowFocus = 1 << 7
 }
 
 
@@ -45,6 +45,10 @@ public class DebuggerIgnoreShowClipAreaAttribute(bool inherit = true) : ElementA
 
 [AttributeUsage(AttributeTargets.Class)]
 public class DebuggerIgnoreShowPriorityAttribute(bool inherit = true) : ElementAttribute(inherit);
+
+
+[AttributeUsage(AttributeTargets.Class)]
+public class DebuggerIgnoreShowFocusAttribute(bool inherit = true) : ElementAttribute(inherit);
 
 
 [AttributeUsage(AttributeTargets.Class)]
@@ -88,7 +92,9 @@ public sealed class Debugger : IUpdateable, IDrawable
         switch (KeyboardInput.PressedKeyCode)
         {
             case Keyboard.Scancode.Escape:
-                Options = DebugOption.None;
+                if (KeyboardInput.PressedKey?.Shift ?? false)
+                    Options = DebugOption.None;
+
                 break;
 
             case Keyboard.Scancode.F1:
@@ -118,6 +124,10 @@ public sealed class Debugger : IUpdateable, IDrawable
 
             case Keyboard.Scancode.F7:
                 ToggleDebugOption(DebugOption.ShowPriority);
+                break;
+
+            case Keyboard.Scancode.F8:
+                ToggleDebugOption(DebugOption.ShowFocus);
                 break;
 
             case Keyboard.Scancode.F9:
@@ -175,6 +185,10 @@ public sealed class Debugger : IUpdateable, IDrawable
         if (Options.HasFlag(DebugOption.ShowPriority) && !element.HasCachedElementAttribute<DebuggerIgnoreShowPriorityAttribute>())
             DrawElementPriority(target, element);
 
+        if (Options.HasFlag(DebugOption.ShowFocus) && !element.HasCachedElementAttribute<DebuggerIgnoreShowFocusAttribute>())
+            if (element is IFocusable { Focused: true })
+                DrawFocusIndicator(target, element);
+
         if (clip)
             ClipArea.EndClip();
     }
@@ -207,4 +221,7 @@ public sealed class Debugger : IUpdateable, IDrawable
         Debugging.Draw.Rect(target, element.GetBounds(), ColorGenerator.FromIndex(absolutePriority, 50));
         Debugging.Draw.Text(target, element.GetBorderLessBounds(), Alignment.Center, element.Priority.ToString(), backgroundColor: Color.White);
     }
+
+    public static void DrawFocusIndicator(RenderTarget target, Element element)
+        => Debugging.Draw.LineRect(target, element.GetBounds(), Color.Magenta, 3f);
 }

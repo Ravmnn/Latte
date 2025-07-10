@@ -20,8 +20,6 @@ using Debugger = Latte.Core.Application.Debugging.Debugger;
 namespace Latte.Core.Application;
 
 
-// TODO: add keyboard-based UI navigation
-// TODO: add focused state for every interactable element (based on keyboard navigation).
 // TODO: add math infrastructure which calculates the position and size of each individual letter.
 // TODO: add the ability to select text with the cursor (property which can be disabled or enabled).
 
@@ -179,6 +177,8 @@ public static class App
         // mouse input needs correct mouse coordinate information, so
         // it needs to update while using the correct view.
         MouseInput.Update();
+        NavigationManager.Update();
+        FocusManager.Update();
 
         Section.Update();
         Debugger?.Update(); // update before elements

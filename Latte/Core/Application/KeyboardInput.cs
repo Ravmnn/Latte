@@ -3,8 +3,6 @@ using System;
 using SFML.Window;
 
 using Latte.Elements.Behavior;
-using Latte.Elements.Primitives;
-using OpenTK.Graphics.GL;
 
 
 namespace Latte.Core.Application;
@@ -19,8 +17,6 @@ public static class KeyboardInput
     public static KeyEventArgs? ReleasedKey { get; private set; }
     public static Keyboard.Scancode? PressedKeyCode => PressedKey?.Scancode;
     public static Keyboard.Scancode? ReleasedKeyCode => ReleasedKey?.Scancode;
-
-    public static Element? ElementWithFocus { get; private set; }
 
 
     static KeyboardInput()
@@ -46,19 +42,9 @@ public static class KeyboardInput
     }
 
 
-    public static void Update()
-    {
-        ElementWithFocus = null;
-
-        foreach (var element in App.Elements)
-            if (element is IKeyboardInputTarget { Focused: true })
-                ElementWithFocus = element;
-    }
-
-
     private static void OnKeyPressed(KeyEventArgs key)
     {
-        if (ElementWithFocus is IKeyboardInputTarget inputTarget)
+        if (FocusManager.ElementWithFocus is IKeyboardInputTarget inputTarget)
             inputTarget.OnKeyboardInputReceived(key);
     }
 }

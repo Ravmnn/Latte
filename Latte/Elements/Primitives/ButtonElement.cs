@@ -12,7 +12,7 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
-public class ButtonElement : RectangleElement, IDefaultClickable, IKeyboardInputTarget
+public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTarget
 {
     private bool _focused;
 
@@ -29,6 +29,13 @@ public class ButtonElement : RectangleElement, IDefaultClickable, IKeyboardInput
 
     public event EventHandler? MouseClickEvent;
 
+    public int NavigationPriority { get; set; }
+
+    public event EventHandler<KeyEventArgs>? KeyboardInputReceivedEvent;
+
+    public bool IgnoreKeyboardInput { get; set; }
+    public bool CaughtKeyboardInput { get; set; }
+
     public event EventHandler? FocusEvent;
     public event EventHandler? UnfocusEvent;
 
@@ -37,6 +44,12 @@ public class ButtonElement : RectangleElement, IDefaultClickable, IKeyboardInput
         get => _focused;
         set
         {
+            if (!CanFocus)
+            {
+                _focused = false;
+                return;
+            }
+
             var oldFocused = _focused;
             _focused = value;
 
@@ -50,12 +63,10 @@ public class ButtonElement : RectangleElement, IDefaultClickable, IKeyboardInput
         }
     }
 
+    public bool CanFocus => Visible && !DisableFocus;
+    public bool DisableFocus { get; set; }
+
     public bool FocusOnClick { get; set; }
-
-    public event EventHandler<KeyEventArgs>? KeyboardInputReceivedEvent;
-
-    public bool IgnoreKeyboardInput { get; set; }
-    public bool CaughtKeyboardInput { get; set; }
 
     public ButtonElement(Element? parent, Vec2f position, Vec2f size, string? text) : base(parent, position, size)
     {
@@ -113,12 +124,20 @@ public class ButtonElement : RectangleElement, IDefaultClickable, IKeyboardInput
 
 
     public void OnFocus()
-        => FocusEvent?.Invoke(this, EventArgs.Empty);
+    {
+        FocusManager.FocusOn(this);
+        FocusEvent?.Invoke(this, EventArgs.Empty);
+    }
 
     public void OnUnfocus()
         => UnfocusEvent?.Invoke(this, EventArgs.Empty);
 
 
     public void OnKeyboardInputReceived(KeyEventArgs key)
-        => KeyboardInputReceivedEvent?.Invoke(this, key);
+    {
+        if (key.Scancode == Keyboard.Scancode.Enter)
+            OnMouseClick();
+
+        KeyboardInputReceivedEvent?.Invoke(this, key);
+    }
 }
