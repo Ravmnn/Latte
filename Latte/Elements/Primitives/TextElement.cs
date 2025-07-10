@@ -5,6 +5,7 @@ using SFML.Graphics;
 using Latte.Core;
 using Latte.Core.Application;
 using Latte.Core.Type;
+using Latte.Elements.Behavior;
 using Latte.Elements.Properties;
 
 
@@ -46,6 +47,8 @@ public class TextElement : Element
 
         if (size is null)
             SizePolicy.Set(SizePolicyType.FitParent);
+
+        SizePolicyMargin.Set(new Vec2f(3f, 3f));
 
         Text = new Property<string>(this, nameof(Text), text);
         Style = new Property<Text.Styles>(this, nameof(Style), SFML.Graphics.Text.Styles.Regular);

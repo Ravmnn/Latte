@@ -5,6 +5,7 @@ using SFML.Graphics;
 using Latte.Core;
 using Latte.Core.Application;
 using Latte.Core.Type;
+using Latte.Elements.Behavior;
 using Latte.Elements.Primitives;
 using Latte.Elements.Primitives.Shapes;
 
@@ -34,7 +35,7 @@ public class WindowCloseButtonElement : ButtonElement
     {
         Color.Set(new ColorRGBA(255, 100, 100));
 
-        Alignment.Set(Elements.Alignment.TopRight);
+        Alignment.Set(Behavior.Alignment.TopRight);
         AlignmentMargin.Set(new Vec2f(-7, 8));
     }
 
@@ -98,7 +99,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         : base(null, position, size)
     {
         Title = new TextElement(this, new Vec2f(), 20, title);
-        Title.Alignment.Set(Elements.Alignment.HorizontalCenter | Elements.Alignment.Top);
+        Title.Alignment.Set(Behavior.Alignment.HorizontalCenter | Behavior.Alignment.Top);
         Title.AlignmentMargin.Set(new Vec2f(0, 10));
 
         Color.Set(new ColorRGBA(50, 50, 50, 220));

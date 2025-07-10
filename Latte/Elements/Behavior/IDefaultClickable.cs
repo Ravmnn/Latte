@@ -1,9 +1,9 @@
-using SFML.Window;
-
 using Latte.Core.Application;
 
+using SFML.Window;
 
-namespace Latte.Elements;
+
+namespace Latte.Elements.Behavior;
 
 
 public interface IDefaultClickable : IClickable

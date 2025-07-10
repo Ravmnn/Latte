@@ -20,11 +20,15 @@ using Debugger = Latte.Core.Application.Debugging.Debugger;
 namespace Latte.Core.Application;
 
 
+// TODO: add keyboard-based UI navigation
+// TODO: add focused state for every interactable element (based on keyboard navigation).
+// TODO: add math infrastructure which calculates the position and size of each individual letter.
+// TODO: add the ability to select text with the cursor (property which can be disabled or enabled).
+
 // TODO: add text inputs
 // TODO: add dropdown
+// TODO: add radial buttons
 // TODO: add effects, which includes blur (a shader maybe), shadow and gradient (shader)
-
-// TODO: apply using good sense: "A class per file".
 
 
 public enum RenderMode
@@ -86,9 +90,6 @@ public static class App
 
     public static Section Section { get; set; }
     public static IEnumerable<Element> Elements => Section.Elements;
-
-    public static KeyEventArgs? PressedKey { get; private set; }
-    public static KeyEventArgs? ReleasedKey { get; private set; }
 
     public static TimeSpan DeltaTime { get; private set; }
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
@@ -155,9 +156,7 @@ public static class App
         Window.Resized += (_, args) => OnWindowResize(new Vec2u(args.Width, args.Height));
 
         MouseInput.AddScrollListener(Window);
-
-        Window.KeyPressed += (_, args) => PressedKey = args;
-        Window.KeyReleased += (_, args) => ReleasedKey = args;
+        KeyboardInput.AddKeyListener(Window);
 
         MainView = new View(Window.GetView());
         ElementView = new View(MainView);
@@ -188,8 +187,7 @@ public static class App
 
         UnsetElementRenderView();
 
-        PressedKey = null;
-        ReleasedKey = null;
+        KeyboardInput.ClearKeyBuffers();
     }
 
     private static void UpdateDeltaTime()

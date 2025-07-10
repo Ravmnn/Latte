@@ -4,6 +4,7 @@ using SFML.Graphics;
 using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements;
+using Latte.Elements.Behavior;
 using Latte.Elements.Primitives;
 
 

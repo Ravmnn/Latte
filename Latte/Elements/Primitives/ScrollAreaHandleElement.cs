@@ -3,6 +3,7 @@ using System;
 using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements.Attributes;
+using Latte.Elements.Behavior;
 
 
 namespace Latte.Elements.Primitives;
@@ -42,12 +43,12 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
         switch (orientation)
         {
             case ScrollDirection.Vertical:
-                Alignment.Set(Elements.Alignment.Right);
+                Alignment.Set(Behavior.Alignment.Right);
                 Size.Value.X = 10;
                 break;
 
             case ScrollDirection.Horizontal:
-                Alignment.Set(Elements.Alignment.Bottom);
+                Alignment.Set(Behavior.Alignment.Bottom);
                 Size.Value.Y = 10;
                 break;
         }

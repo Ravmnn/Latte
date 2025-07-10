@@ -41,7 +41,7 @@ public class InspectionWindow : WindowElement
 
         ScrollArea = new ScrollAreaElement(this, new Vec2f(), new Vec2f(380, 340))
         {
-            Alignment = { Value = Elements.Alignment.Center },
+            Alignment = { Value = Elements.Behavior.Alignment.Center },
             AlignmentMargin = { Value = new Vec2f(0, 20) },
 
             Color = { Value = new ColorRGBA(150, 150, 150, 100) },

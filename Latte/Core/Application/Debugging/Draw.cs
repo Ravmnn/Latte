@@ -2,6 +2,7 @@ using SFML.Graphics;
 
 using Latte.Core.Type;
 using Latte.Elements;
+using Latte.Elements.Behavior;
 
 
 namespace Latte.Core.Application.Debugging;

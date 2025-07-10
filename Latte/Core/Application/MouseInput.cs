@@ -1,7 +1,7 @@
 using System.Linq;
 
 using Latte.Core.Type;
-using Latte.Elements;
+using Latte.Elements.Behavior;
 using Latte.Elements.Primitives;
 
 

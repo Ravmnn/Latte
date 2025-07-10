@@ -1,13 +1,12 @@
-using SFML.System;
-using SFML.Graphics;
-
-using OpenTK.Graphics.OpenGL;
-
 using Latte.Core.Application;
 using Latte.Elements.Primitives;
 
+using OpenTK.Graphics.OpenGL;
 
-namespace Latte.Elements;
+using SFML.Graphics;
+
+
+namespace Latte.Elements.Behavior;
 
 
 public static class ClipArea
@@ -56,7 +55,7 @@ public static class ClipArea
     public static IntRect GetTopMostClipAreaOfElement(Element element)
     {
         var currentElement = element;
-        
+
         while (currentElement.Parent is not null)
             currentElement = currentElement.Parent;
 

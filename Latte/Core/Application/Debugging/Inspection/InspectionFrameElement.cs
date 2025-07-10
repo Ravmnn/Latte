@@ -34,13 +34,13 @@ public class InspectionFrameElement : RectangleElement
 
         NameText = new TextElement(this, new Vec2f(), 10, data.Name)
         {
-            Alignment = { Value = Elements.Alignment.HorizontalCenter | Elements.Alignment.Top },
+            Alignment = { Value = Elements.Behavior.Alignment.HorizontalCenter | Elements.Behavior.Alignment.Top },
             AlignmentMargin = { Value = new Vec2f(0, 10) }
         };
 
         DataText = new TextElement(this, new Vec2f(5, 20), 13, data.Data);
 
-        Alignment.Set(Elements.Alignment.Center);
+        Alignment.Set(Elements.Behavior.Alignment.Center);
 
         Color.Set(new ColorRGBA(100, 100, 100, 150));
     }

@@ -3,7 +3,7 @@ using System;
 using Latte.Core.Type;
 
 
-namespace Latte.Elements;
+namespace Latte.Elements.Behavior;
 
 
 public interface IClickable : IMouseInputTarget

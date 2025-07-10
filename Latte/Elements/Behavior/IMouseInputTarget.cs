@@ -1,4 +1,4 @@
-namespace Latte.Elements;
+namespace Latte.Elements.Behavior;
 
 
 public interface IMouseInputTarget

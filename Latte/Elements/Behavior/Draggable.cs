@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Latte.Elements;
+namespace Latte.Elements.Behavior;
 
 
 public interface IDraggable : IDefaultClickable

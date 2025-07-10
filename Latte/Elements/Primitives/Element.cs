@@ -9,6 +9,7 @@ using Latte.Core;
 using Latte.Core.Type;
 using Latte.Core.Application;
 using Latte.Elements.Attributes;
+using Latte.Elements.Behavior;
 using Latte.Elements.Properties;
 using Latte.Exceptions.Element;
 
@@ -153,7 +154,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Rotation = new AnimatableProperty<Float>(this, nameof(Rotation), 0f);
         Scale = new AnimatableProperty<Vec2f>(this, nameof(Scale), new Vec2f(1f, 1f));
 
-        Alignment = new Property<Alignment>(this, nameof(Alignment), Elements.Alignment.None);
+        Alignment = new Property<Alignment>(this, nameof(Alignment), Behavior.Alignment.None);
         AlignmentMargin = new AnimatableProperty<Vec2f>(this, nameof(AlignmentMargin), new Vec2f());
 
         SizePolicy = new Property<SizePolicyType>(this, nameof(SizePolicy), SizePolicyType.None);
@@ -234,7 +235,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         if (SizePolicy.Value != SizePolicyType.None)
             ApplySizePolicy();
 
-        if (Alignment.Value != Elements.Alignment.None)
+        if (Alignment.Value != Behavior.Alignment.None)
             ApplyAlignment();
     }
 

@@ -8,6 +8,7 @@ using Latte.Core.Type;
 using Latte.Core.Application.Debugging.Inspection;
 using Latte.Elements;
 using Latte.Elements.Attributes;
+using Latte.Elements.Behavior;
 using Latte.Elements.Primitives;
 
 
@@ -81,10 +82,10 @@ public sealed class Debugger : IUpdateable, IDrawable
 
     private void ProcessDebugShortcuts()
     {
-        if (!EnableKeyShortcuts || App.PressedKey is null)
+        if (!EnableKeyShortcuts || KeyboardInput.PressedKeyCode is null)
             return;
 
-        switch (App.PressedKey.Scancode)
+        switch (KeyboardInput.PressedKeyCode)
         {
             case Keyboard.Scancode.Escape:
                 Options = DebugOption.None;

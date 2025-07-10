@@ -1,12 +1,12 @@
 using System;
 
-using SFML.Graphics;
-
 using Latte.Core;
 using Latte.Core.Type;
 
+using SFML.Graphics;
 
-namespace Latte.Elements;
+
+namespace Latte.Elements.Behavior;
 
 
 public interface IResizable

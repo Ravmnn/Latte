@@ -2,7 +2,7 @@ using Latte.Core;
 using Latte.Core.Application;
 
 
-namespace Latte.Elements;
+namespace Latte.Elements.Behavior;
 
 
 public interface IDefaultResizable : IResizable

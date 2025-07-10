@@ -1,16 +1,19 @@
 using System;
 
+
 using SFML.Graphics;
 
 
-namespace Latte.Elements;
+namespace Latte.Elements.Behavior;
 
+
+// TODO: add policies that modify the size of parents, like "FitChildHorizontally"
 
 [Flags]
 public enum SizePolicyType
 {
     None = 0,
-    
+
     FitParentHorizontally = 1 << 0,
     FitParentVertically = 1 << 1,
     FitParent = FitParentHorizontally | FitParentVertically,
@@ -40,7 +43,7 @@ public static class SizePolicyCalculator
             rect.Top = parent.Top;
             rect.Height = parent.Height;
         }
-        
+
         return rect;
     }
 }

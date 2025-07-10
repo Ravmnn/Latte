@@ -1,4 +1,5 @@
 using Latte.Core.Type;
+using Latte.Elements.Behavior;
 using Latte.Elements.Primitives.Shapes;
 
 
@@ -14,7 +15,7 @@ internal class CheckBoxSelectedIndicatorElement : RectangleElement
     {
         IgnoreMouseInput = true;
 
-        Alignment.Set(Elements.Alignment.Center);
+        Alignment.Set(Behavior.Alignment.Center);
         SizePolicy.Set(SizePolicyType.FitParent);
         SizePolicyMargin.Set(new Vec2f(5f, 5f));
 

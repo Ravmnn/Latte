@@ -2,6 +2,7 @@ using System;
 
 using Latte.Core;
 using Latte.Core.Type;
+using Latte.Elements.Behavior;
 using Latte.Elements.Primitives.Shapes;
 
 
@@ -10,7 +11,7 @@ namespace Latte.Elements.Primitives;
 
 public class ButtonElement : RectangleElement, IDefaultClickable
 {
-    public TextElement? Text { get; protected set; }
+    public TextElement? Text { get; set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
@@ -27,9 +28,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable
         if (text is not null)
             Text = new TextElement(this, new Vec2f(), null, text)
             {
-                Alignment = { Value = Elements.Alignment.Center },
-                SizePolicy = { Value = SizePolicyType.FitParent },
-                SizePolicyMargin = { Value = new Vec2f(3f, 3f) },
+                Alignment = { Value = Behavior.Alignment.Center },
 
                 Color = { Value = SFML.Graphics.Color.Black }
             };
