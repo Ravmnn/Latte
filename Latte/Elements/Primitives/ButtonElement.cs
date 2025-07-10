@@ -1,6 +1,9 @@
 using System;
 
+using SFML.Window;
+
 using Latte.Core;
+using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements.Behavior;
 using Latte.Elements.Primitives.Shapes;
@@ -9,8 +12,11 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
-public class ButtonElement : RectangleElement, IDefaultClickable
+public class ButtonElement : RectangleElement, IDefaultClickable, IKeyboardInputTarget
 {
+    private bool _focused;
+
+
     public TextElement? Text { get; set; }
 
     public MouseClickState MouseState { get; }
@@ -22,6 +28,34 @@ public class ButtonElement : RectangleElement, IDefaultClickable
     public event EventHandler? MouseUpEvent;
 
     public event EventHandler? MouseClickEvent;
+
+    public event EventHandler? FocusEvent;
+    public event EventHandler? UnfocusEvent;
+
+    public bool Focused
+    {
+        get => _focused;
+        set
+        {
+            var oldFocused = _focused;
+            _focused = value;
+
+            if (value == oldFocused)
+                return;
+
+            if (value)
+                OnFocus();
+            else
+                OnUnfocus();
+        }
+    }
+
+    public bool FocusOnClick { get; set; }
+
+    public event EventHandler<KeyEventArgs>? KeyboardInputReceivedEvent;
+
+    public bool IgnoreKeyboardInput { get; set; }
+    public bool CaughtKeyboardInput { get; set; }
 
     public ButtonElement(Element? parent, Vec2f position, Vec2f size, string? text) : base(parent, position, size)
     {
@@ -63,7 +97,12 @@ public class ButtonElement : RectangleElement, IDefaultClickable
 
 
     public virtual void OnMouseClick()
-        => MouseClickEvent?.Invoke(this, EventArgs.Empty);
+    {
+        if (FocusOnClick)
+            Focused = true;
+
+        MouseClickEvent?.Invoke(this, EventArgs.Empty);
+    }
 
 
     public virtual bool IsPointOver(Vec2f point)
@@ -71,4 +110,15 @@ public class ButtonElement : RectangleElement, IDefaultClickable
 
     protected bool IsPointOverThis(Vec2f point)
         => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius.Value);
+
+
+    public void OnFocus()
+        => FocusEvent?.Invoke(this, EventArgs.Empty);
+
+    public void OnUnfocus()
+        => UnfocusEvent?.Invoke(this, EventArgs.Empty);
+
+
+    public void OnKeyboardInputReceived(KeyEventArgs key)
+        => KeyboardInputReceivedEvent?.Invoke(this, key);
 }
