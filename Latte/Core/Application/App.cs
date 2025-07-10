@@ -179,6 +179,8 @@ public static class App
         // mouse input needs correct mouse coordinate information, so
         // it needs to update while using the correct view.
         MouseInput.Update();
+        NavigationManager.Update();
+        FocusManager.Update();
 
         Section.Update();
         Debugger?.Update(); // update before elements
