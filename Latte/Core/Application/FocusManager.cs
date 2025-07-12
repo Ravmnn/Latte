@@ -35,7 +35,9 @@ public static class FocusManager
             return;
 
         ElementWithFocus = element;
-        focusable.Focused = true;
+
+        if (!focusable.Focused)
+            focusable.Focused = true;
     }
 
 

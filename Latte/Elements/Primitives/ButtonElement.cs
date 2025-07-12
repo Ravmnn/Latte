@@ -31,7 +31,10 @@ public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTar
 
     public int NavigationPriority { get; set; }
 
-    public event EventHandler<KeyEventArgs>? KeyboardInputReceivedEvent;
+    public event EventHandler<KeyEventArgs>? KeyDownEvent;
+    public event EventHandler<KeyEventArgs>? KeyUpEvent;
+    public event EventHandler<KeyEventArgs>? SubmitKeyDownEvent;
+    public event EventHandler<KeyEventArgs>? SubmitKeyUpEvent;
 
     public bool IgnoreKeyboardInput { get; set; }
     public bool CaughtKeyboardInput { get; set; }
@@ -123,21 +126,39 @@ public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTar
         => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius.Value);
 
 
-    public void OnFocus()
+    public virtual void OnFocus()
     {
         FocusManager.FocusOn(this);
         FocusEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    public void OnUnfocus()
+    public virtual void OnUnfocus()
         => UnfocusEvent?.Invoke(this, EventArgs.Empty);
 
 
-    public void OnKeyboardInputReceived(KeyEventArgs key)
+    public virtual void OnKeyDown(KeyEventArgs key)
     {
         if (key.Scancode == Keyboard.Scancode.Enter)
-            OnMouseClick();
+            OnSubmitKeyDown(key);
 
-        KeyboardInputReceivedEvent?.Invoke(this, key);
+        KeyDownEvent?.Invoke(this, key);
+    }
+
+    public virtual void OnKeyUp(KeyEventArgs key)
+    {
+        if (key.Scancode == Keyboard.Scancode.Enter)
+            OnSubmitKeyUp(key);
+
+        KeyUpEvent?.Invoke(this, key);
+    }
+
+
+    public virtual void OnSubmitKeyDown(KeyEventArgs key)
+        => SubmitKeyDownEvent?.Invoke(this, key);
+
+    public virtual void OnSubmitKeyUp(KeyEventArgs key)
+    {
+        OnMouseClick();
+        SubmitKeyUpEvent?.Invoke(this, key);
     }
 }

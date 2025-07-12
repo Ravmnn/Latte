@@ -22,6 +22,7 @@ public static class KeyboardInput
     static KeyboardInput()
     {
         KeyPressedEvent += (_, args) => OnKeyPressed(args);
+        KeyReleasedEvent += (_, args) => OnKeyReleased(args);
     }
 
 
@@ -45,6 +46,12 @@ public static class KeyboardInput
     private static void OnKeyPressed(KeyEventArgs key)
     {
         if (FocusManager.ElementWithFocus is IKeyboardInputTarget inputTarget)
-            inputTarget.OnKeyboardInputReceived(key);
+            inputTarget.OnKeyDown(key);
+    }
+
+    private static void OnKeyReleased(KeyEventArgs key)
+    {
+        if (FocusManager.ElementWithFocus is IKeyboardInputTarget inputTarget)
+            inputTarget.OnKeyUp(key);
     }
 }
