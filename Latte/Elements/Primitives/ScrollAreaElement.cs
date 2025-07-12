@@ -22,6 +22,9 @@ public enum ScrollDirection
 }
 
 
+// BUG: scrolling is not 100% accurate.
+
+
 public class ScrollAreaElement : ButtonElement
 {
     public ScrollAreaHandleElement? VerticalScrollHandle { get; set; }

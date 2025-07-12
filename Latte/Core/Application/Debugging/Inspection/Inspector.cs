@@ -1,62 +1,123 @@
-using System.Text;
+using System.Linq;
+using System.Reflection;
 using System.Collections.Generic;
-
-using Latte.Elements;
-using Latte.Elements.Primitives;
+using System.Text;
 
 
 namespace Latte.Core.Application.Debugging.Inspection;
 
 
+// TODO: code clean-up
+
+
 public record InspectionData(string Name, string Data);
 
 
-
-public interface IInspector
+public static class Inspector
 {
-    InspectionData Inspect(object value);
-
-    bool CanInspect(object value);
-}
-
-
-public interface IInspector<T> : IInspector
-{
-    InspectionData Inspect(T value);
-
-
-    InspectionData IInspector.Inspect(object value)
-        => Inspect((T)value);
-
-    bool IInspector.CanInspect(object value)
-        => value is T;
-}
-
-
-public sealed class Inspectors : List<IInspector>
-{
-    public IEnumerable<InspectionData> InspectAll(object value)
+    public static IEnumerable<InspectionData> Inspect(object @object)
     {
-        List<InspectionData> inspectionDataList = [];
+        var inspectionDatas = new List<InspectionData>();
+        var properties = GetOrganizedProperties(@object);
 
-        foreach (var inspector in this)
-        {
-            if (!inspector.CanInspect(value))
-                continue;
+        foreach (var (type, typeProperties) in properties)
+            inspectionDatas.Add(new InspectionData(type.Name, PropertiesToString(@object, typeProperties)));
 
-            inspectionDataList.Add(inspector.Inspect(value));
-        }
-
-        return inspectionDataList;
+        return inspectionDatas;
     }
 
 
-    public InspectionData? InspectOnly<T>(object value)
+    private static string PropertiesToString(object @object, IEnumerable<PropertyInfo> properties, string? offset = null)
     {
-        foreach (var inspector in this)
-            if (value is T && inspector.CanInspect(value))
-                return inspector.Inspect(value);
+        var builder = new StringBuilder();
 
-        return null;
+        foreach (var property in properties)
+            builder.AppendLine($"{offset ?? ""}{property.Name}: {property.GetValue(@object)}"); // TODO: non-primitive objects shows the type only, without the values
+
+        return builder.ToString();
+    }
+
+
+    public static Dictionary<System.Type, List<PropertyInfo>> GetOrganizedProperties(object @object)
+    {
+        var objectType = @object.GetType();
+
+        var allBaseTypes = GetAllBaseClassesOf(objectType);
+        var allInterfaces = objectType.GetInterfaces();
+
+        var allTypes = allBaseTypes.Concat(allInterfaces);
+        var allProperties = GetPropertiesWithNoParameters(objectType);
+
+        return OrganizePropertiesAccordingToTheirDeclaringTypes(allTypes, allProperties);
+    }
+
+
+    private static Dictionary<System.Type, List<PropertyInfo>> OrganizePropertiesAccordingToTheirDeclaringTypes(IEnumerable<System.Type> types, IEnumerable<PropertyInfo> properties)
+    {
+        var organizedPropertyContainer = InitializeOrganizedPropertyContainer(types);
+
+        foreach (var property in properties)
+        {
+            var typeWhichDeclared = GetTypeWhichDeclaresProperty(property);
+
+            if (typeWhichDeclared is null)
+                continue;
+
+            if (organizedPropertyContainer.TryGetValue(typeWhichDeclared, out var propertyInfos))
+                propertyInfos.Add(property);
+        }
+
+        return (from item in organizedPropertyContainer where item.Value.Count > 0 select item).ToDictionary();
+    }
+
+
+    private static System.Type? GetTypeWhichDeclaresProperty(PropertyInfo property)
+    {
+        // use this method instead of only PropertyInfo.DeclaringType, since it doesn't know
+        // when an interface is the declaring type.
+
+        if (property.DeclaringType is null)
+            return null;
+
+        var baseInterfaces = property.DeclaringType.GetInterfaces();
+
+        foreach (var baseInterface in baseInterfaces)
+            foreach (var baseInterfaceProperty in baseInterface.GetProperties())
+                if (baseInterfaceProperty.Name == property.Name)
+                    return baseInterface;
+
+        return property.DeclaringType;
+    }
+
+
+    private static Dictionary<System.Type, List<PropertyInfo>> InitializeOrganizedPropertyContainer(IEnumerable<System.Type> types)
+    {
+        var organizedPropertyContainer = new Dictionary<System.Type, List<PropertyInfo>>();
+
+        foreach (var type in types)
+            organizedPropertyContainer[type] = [];
+
+        return organizedPropertyContainer;
+    }
+
+
+    private static IEnumerable<PropertyInfo> GetPropertiesWithNoParameters(System.Type type)
+        => from property in type.GetProperties()
+            where property.GetIndexParameters().Length == 0
+            select property;
+
+
+    private static IEnumerable<System.Type> GetAllBaseClassesOf(System.Type type)
+    {
+        var baseClasses = new List<System.Type> { type };
+        var current = type;
+
+        while (current.BaseType is not null)
+        {
+            current = current.BaseType;
+            baseClasses.Add(current);
+        }
+
+        return baseClasses;
     }
 }

@@ -6,7 +6,7 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Core.Application.Debugging.Inspection;
 
 
-public class InspectionFrameElement : RectangleElement
+public class InspectionFrameElement : ScrollAreaElement
 {
     private InspectionData _data;
 
@@ -28,7 +28,7 @@ public class InspectionFrameElement : RectangleElement
 
 
     public InspectionFrameElement(InspectionData data)
-        : base(null, new Vec2f(), new Vec2f(350, 350), 5)
+        : base(null, new Vec2f(), new Vec2f(350, 350))
     {
         _data = data;
 
@@ -43,5 +43,6 @@ public class InspectionFrameElement : RectangleElement
         Alignment.Set(Elements.Behavior.Alignment.Center);
 
         Color.Set(new ColorRGBA(100, 100, 100, 150));
+        Radius.Set(5f);
     }
 }

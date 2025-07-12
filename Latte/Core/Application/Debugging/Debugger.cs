@@ -58,7 +58,6 @@ public class DebuggerIgnoreInspection(bool inherit = true) : ElementAttribute(in
 public sealed class Debugger : IUpdateable, IDrawable
 {
     public InspectionWindow InspectionWindow { get; }
-    public Inspectors Inspectors { get; }
 
     public DebugOption Options { get; set; }
     public bool EnableKeyShortcuts { get; set; }
@@ -70,11 +69,6 @@ public sealed class Debugger : IUpdateable, IDrawable
         {
             Visible = false
         };
-
-        Inspectors = [
-            new ElementInspector(), new ClickableInspector(), new DraggableInspector(),
-            new ResizableInspector()
-        ];
 
         Options = DebugOption.None;
 

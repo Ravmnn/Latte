@@ -86,10 +86,10 @@ public class InspectionWindow : WindowElement
             return;
 
         if (ElementToInspect == _lastInspectedElement )
-            UpdateInspectionFramesData(App.Debugger.Inspectors.InspectAll(ElementToInspect));
+            UpdateInspectionFramesData(Inspector.Inspect(ElementToInspect));
 
         else if (!ElementToInspect.HasCachedElementAttribute<DebuggerIgnoreInspection>())
-            CreateInspectionFrames(App.Debugger.Inspectors.InspectAll(ElementToInspect));
+            CreateInspectionFrames(Inspector.Inspect(ElementToInspect));
     }
 
 

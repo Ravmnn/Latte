@@ -44,6 +44,9 @@ public abstract class Property
 
     protected virtual void OnValueChanged()
         => ValueChangedEvent?.Invoke(this, EventArgs.Empty);
+
+
+    public override string ToString() => Value.ToString()!;
 }
 
 

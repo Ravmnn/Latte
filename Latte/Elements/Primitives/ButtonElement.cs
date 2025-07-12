@@ -37,7 +37,6 @@ public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTar
     public event EventHandler<KeyEventArgs>? SubmitKeyUpEvent;
 
     public bool IgnoreKeyboardInput { get; set; }
-    public bool CaughtKeyboardInput { get; set; }
 
     public event EventHandler? FocusEvent;
     public event EventHandler? UnfocusEvent;
