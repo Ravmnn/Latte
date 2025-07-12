@@ -97,6 +97,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         }
     }
 
+    public bool Clip { get; set; }
+
     protected int LastPriority { get; private set; }
 
     public PrioritySnap PrioritySnap { get; set; }
@@ -255,8 +257,17 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         DrawEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    protected virtual void BeginDraw() => ClipArea.BeginClip(GetFinalClipArea());
-    protected virtual void EndDraw() => ClipArea.EndClip();
+    protected virtual void BeginDraw()
+    {
+        if (Clip)
+            ClipArea.BeginClip(GetFinalClipArea());
+    }
+
+    protected virtual void EndDraw()
+    {
+        if (Clip)
+            ClipArea.EndClip();
+    }
 
 
     public IntRect GetFinalClipArea() => ClipArea.OverlapElementClipAreaToParents(this) ?? new IntRect();
