@@ -14,7 +14,7 @@ public class MouseClickState
     // the last iteration.
 
     // Basically, it means that something is pressed and that the press state
-    // started with the mouse inside of that thing. It's important to know that because, if not,
+    // started with the mouse inside of that thing. It's important to know that,
     // a button would be considered as pressed if the mouse just entered it with the left button down.
     // Complicated.
 

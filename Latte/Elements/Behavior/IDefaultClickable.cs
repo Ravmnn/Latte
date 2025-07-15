@@ -24,7 +24,7 @@ public interface IDefaultClickable : IClickable
         if (!MouseState.IsTruePressed)
             MouseState.IsTruePressed = MouseState.IsPressed && !MouseState.WasMouseDown;
 
-        if (MouseState.IsTruePressed && !(DisableTruePressOnlyWhenMouseIsUp ? MouseState.IsMouseDown : MouseState.IsPressed))
+        if (MouseState.IsTruePressed && !(DisableTruePressOnlyWhenMouseIsUpBigForDisableTruePressOnlyWhenMouseIsUp ? MouseState.IsMouseDown : MouseState.IsPressed))
             MouseState.IsTruePressed = false;
     }
 

@@ -1,7 +1,8 @@
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
+
+using Latte.Core.Application.Debugging.Inspection.Formatting;
 
 
 namespace Latte.Core.Application.Debugging.Inspection;
@@ -21,20 +22,9 @@ public static class Inspector
         var properties = GetOrganizedProperties(@object);
 
         foreach (var (type, typeProperties) in properties)
-            inspectionDatas.Add(new InspectionData(type.Name, PropertiesToString(@object, typeProperties)));
+            inspectionDatas.Add(new InspectionData(type.Name, InspectionObjectFormatter.PropertiesToString(@object, typeProperties)));
 
         return inspectionDatas;
-    }
-
-
-    private static string PropertiesToString(object @object, IEnumerable<PropertyInfo> properties, string? offset = null)
-    {
-        var builder = new StringBuilder();
-
-        foreach (var property in properties)
-            builder.AppendLine($"{offset ?? ""}{property.Name}: {property.GetValue(@object)}"); // TODO: non-primitive objects shows the type only, without the values
-
-        return builder.ToString();
     }
 
 
@@ -52,7 +42,7 @@ public static class Inspector
     }
 
 
-    private static Dictionary<System.Type, List<PropertyInfo>> OrganizePropertiesAccordingToTheirDeclaringTypes(IEnumerable<System.Type> types, IEnumerable<PropertyInfo> properties)
+    public static Dictionary<System.Type, List<PropertyInfo>> OrganizePropertiesAccordingToTheirDeclaringTypes(IEnumerable<System.Type> types, IEnumerable<PropertyInfo> properties)
     {
         var organizedPropertyContainer = InitializeOrganizedPropertyContainer(types);
 
@@ -71,7 +61,7 @@ public static class Inspector
     }
 
 
-    private static System.Type? GetTypeWhichDeclaresProperty(PropertyInfo property)
+    public static System.Type? GetTypeWhichDeclaresProperty(PropertyInfo property)
     {
         // use this method instead of only PropertyInfo.DeclaringType, since it doesn't know
         // when an interface is the declaring type.
@@ -90,7 +80,7 @@ public static class Inspector
     }
 
 
-    private static Dictionary<System.Type, List<PropertyInfo>> InitializeOrganizedPropertyContainer(IEnumerable<System.Type> types)
+    public static Dictionary<System.Type, List<PropertyInfo>> InitializeOrganizedPropertyContainer(IEnumerable<System.Type> types)
     {
         var organizedPropertyContainer = new Dictionary<System.Type, List<PropertyInfo>>();
 
@@ -101,13 +91,13 @@ public static class Inspector
     }
 
 
-    private static IEnumerable<PropertyInfo> GetPropertiesWithNoParameters(System.Type type)
+    public static IEnumerable<PropertyInfo> GetPropertiesWithNoParameters(System.Type type)
         => from property in type.GetProperties()
             where property.GetIndexParameters().Length == 0
             select property;
 
 
-    private static IEnumerable<System.Type> GetAllBaseClassesOf(System.Type type)
+    public static IEnumerable<System.Type> GetAllBaseClassesOf(System.Type type)
     {
         var baseClasses = new List<System.Type> { type };
         var current = type;

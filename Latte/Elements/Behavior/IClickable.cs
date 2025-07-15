@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+
 using Latte.Core.Type;
 
 
@@ -9,7 +9,7 @@ namespace Latte.Elements.Behavior;
 public interface IClickable : IMouseInputTarget
 {
     MouseClickState MouseState { get; }
-    bool DisableTruePressOnlyWhenMouseIsUp { get; }
+    bool DisableTruePressOnlyWhenMouseIsUpBigForDisableTruePressOnlyWhenMouseIsUp { get; }
 
     event EventHandler? MouseEnterEvent;
     event EventHandler? MouseLeaveEvent;

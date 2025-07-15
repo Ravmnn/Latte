@@ -28,7 +28,7 @@ public class InspectionFrameElement : ScrollAreaElement
 
 
     public InspectionFrameElement(InspectionData data)
-        : base(null, new Vec2f(), new Vec2f(350, 350))
+        : base(null, new Vec2f(), new Vec2f(350, 350), true, true)
     {
         _data = data;
 

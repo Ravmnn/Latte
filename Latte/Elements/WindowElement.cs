@@ -63,7 +63,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public bool WasResizing { get; protected set; }
 
     public MouseClickState MouseState { get; }
-    public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
+    public bool DisableTruePressOnlyWhenMouseIsUpBigForDisableTruePressOnlyWhenMouseIsUp { get; protected set; }
 
     public Corner CornerToResize { get; set; }
     public FloatRect Rect => new FloatRect(RelativePosition.Value, Size.Value);
@@ -109,7 +109,7 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         Styles = styles;
 
         MouseState = new MouseClickState();
-        DisableTruePressOnlyWhenMouseIsUp = true;
+        DisableTruePressOnlyWhenMouseIsUpBigForDisableTruePressOnlyWhenMouseIsUp = true;
 
         CornerToResize = new Corner();
         CornerResizeAreaSize = 10f;

@@ -34,7 +34,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
 
         InitFromOrientation(Orientation);
 
-        DisableTruePressOnlyWhenMouseIsUp = true;
+        DisableTruePressOnlyWhenMouseIsUpBigForDisableTruePressOnlyWhenMouseIsUp = true;
     }
 
 

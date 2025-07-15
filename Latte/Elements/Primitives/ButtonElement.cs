@@ -20,7 +20,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTar
     public TextElement? Text { get; set; }
 
     public MouseClickState MouseState { get; }
-    public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
+    public bool DisableTruePressOnlyWhenMouseIsUpBigForDisableTruePressOnlyWhenMouseIsUp { get; protected set; }
 
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
