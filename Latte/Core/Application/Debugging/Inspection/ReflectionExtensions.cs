@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
@@ -45,5 +46,14 @@ public static class ReflectionExtensions
         }
 
         return baseClasses;
+    }
+
+
+    public static void ForeachProperty(this System.Type type, Action<PropertyInfo> action)
+    {
+        var properties = type.GetPropertiesWithNoParameters();
+
+        foreach (var property in properties)
+            action(property);
     }
 }

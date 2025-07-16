@@ -12,6 +12,22 @@ namespace Latte.Core.Application.Debugging.Inspection.Formatting;
 public abstract class InspectionObjectFormatter<T>
 {
     public abstract string Format(T @object, int indent = 0);
+
+
+    protected string FormatAllProperties(object @object, int indent = 0)
+    {
+        var builder = new StringBuilder();
+        var type = @object.GetType();
+
+        type.ForeachProperty(property =>
+        {
+            builder.AppendLine(InspectionObjectFormatter.PropertyToString(@object, property, indent));
+        });
+
+        builder.Remove(builder.Length - 1, 1); // remove new line character
+
+        return builder.ToString();
+    }
 }
 
 
