@@ -34,9 +34,6 @@ public enum PrioritySnap
 }
 
 
-// TODO: looks like it's possible to get all properties from a class (with its name and value using reflection). if so, improve inspection by applying that.
-
-
 public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePoliciable, IMouseInputTarget
 {
     private Element? _parent;

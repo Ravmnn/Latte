@@ -25,7 +25,10 @@ class Program
 
     private static void Main()
     {
-        App.Init(VideoMode.DesktopMode, "Latte Test", new Font("../../../resources/Itim-Regular.ttf"), settings: new ContextSettings
+        var font = new Font("resources/Roboto-Regular.ttf");
+        font.SetSmooth(false);
+
+        App.Init(VideoMode.DesktopMode, "Latte Test", font, settings: new ContextSettings
         {
             AntialiasingLevel = 8,
             DepthBits = 24,

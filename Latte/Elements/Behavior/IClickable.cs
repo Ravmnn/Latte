@@ -9,7 +9,7 @@ namespace Latte.Elements.Behavior;
 public interface IClickable : IMouseInputTarget
 {
     MouseClickState MouseState { get; }
-    bool DisableTruePressOnlyWhenMouseIsUpBigForDisableTruePressOnlyWhenMouseIsUp { get; }
+    bool DisableTruePressOnlyWhenMouseIsUp { get; }
 
     event EventHandler? MouseEnterEvent;
     event EventHandler? MouseLeaveEvent;

@@ -12,4 +12,8 @@
       <ProjectReference Include="..\Latte\Latte.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="resources/**/*" CopyToOutputDirectory="Always" />
+    </ItemGroup>
+
 </Project>
