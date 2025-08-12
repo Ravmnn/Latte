@@ -14,6 +14,9 @@ using Latte.Elements.Primitives;
 namespace Latte.Core.Application.Debugging;
 
 
+// TODO: move to outside from Core namespace
+
+
 [Flags]
 public enum DebugOption
 {

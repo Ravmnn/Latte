@@ -38,27 +38,6 @@ class Program
         //App.DebugOptions = DebugOption.RenderBounds | DebugOption.RenderBoundsDimensions | DebugOption.OnlyTrueHoveredElement;
         App.Debugger.EnableKeyShortcuts = true;
 
-        var rect = new WindowElement("this is a text", new Vec2f(), new Vec2f(600, 400))
-        {
-            Title =
-            {
-                Color = { Value = new ColorRGBA(0, 0, 0)}
-            },
-
-            Color = { Value = new ColorRGBA(255, 255, 255) }
-        };
-
-        var button = new ButtonElement(rect, new Vec2f(), new Vec2f(200, 80), "Button")
-        {
-            Alignment = { Value = Alignment.Center },
-
-            Color = { Value = new ColorRGBA(150, 150, 255) },
-            Radius = { Value = 8f },
-        };
-
-        button.Text!.SizePolicy.Value = SizePolicyType.FitParent;
-
-        App.AddElement(rect);
 
         while (!App.ShouldQuit)
         {

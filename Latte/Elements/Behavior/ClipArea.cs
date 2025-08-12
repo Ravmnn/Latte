@@ -9,6 +9,9 @@ using SFML.Graphics;
 namespace Latte.Elements.Behavior;
 
 
+// BUG: clip not 100% accurate... 1 pixel error margin.
+
+
 public static class ClipArea
 {
     public static void BeginClip(IntRect area)
@@ -49,16 +52,5 @@ public static class ClipArea
         while (element is not null);
 
         return area.Value;
-    }
-
-
-    public static IntRect GetTopMostClipAreaOfElement(Element element)
-    {
-        var currentElement = element;
-
-        while (currentElement.Parent is not null)
-            currentElement = currentElement.Parent;
-
-        return currentElement.GetThisClipArea();
     }
 }

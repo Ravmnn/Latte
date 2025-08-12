@@ -7,10 +7,8 @@ using SFML.Graphics;
 namespace Latte.Elements.Behavior;
 
 
-// TODO: add policies that modify the size of parents, like "FitChildHorizontally"
-
 [Flags]
-public enum SizePolicyType
+public enum SizePolicy
 {
     None = 0,
 
@@ -22,23 +20,23 @@ public enum SizePolicyType
 
 public interface ISizePoliciable
 {
-    FloatRect GetSizePolicyRect(SizePolicyType policyType);
+    FloatRect GetSizePolicyRect(SizePolicy policy);
 }
 
 
 public static class SizePolicyCalculator
 {
-    public static FloatRect CalculateChildRect(FloatRect child, FloatRect parent, SizePolicyType policyType)
+    public static FloatRect CalculateChildRect(FloatRect child, FloatRect parent, SizePolicy policy)
     {
         var rect = child;
 
-        if (policyType.HasFlag(SizePolicyType.FitParentHorizontally))
+        if (policy.HasFlag(SizePolicy.FitParentHorizontally))
         {
             rect.Left = parent.Left;
             rect.Width = parent.Width;
         }
 
-        if (policyType.HasFlag(SizePolicyType.FitParentVertically))
+        if (policy.HasFlag(SizePolicy.FitParentVertically))
         {
             rect.Top = parent.Top;
             rect.Height = parent.Height;

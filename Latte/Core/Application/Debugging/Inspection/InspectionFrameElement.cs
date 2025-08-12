@@ -1,6 +1,5 @@
 using Latte.Core.Type;
 using Latte.Elements.Primitives;
-using Latte.Elements.Primitives.Shapes;
 
 
 namespace Latte.Core.Application.Debugging.Inspection;

@@ -71,7 +71,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
 
     protected void UpdateSize()
     {
-        var bounds = Parent.GetChildrenBounds();
+        var bounds = Parent.GetClampedChildrenBounds();
         var parentSize = Parent.Size.Value;
 
         var sizeRatio = new Vec2f(parentSize.X / bounds.Width, parentSize.Y / bounds.Height);
@@ -85,7 +85,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
 
     protected void UpdateScrollAreaScrollOffset()
     {
-        Vec2f scrollOffset = ((Vec2f)Parent.GetChildrenBounds().Size - Parent.Size.Value) * GetProgress();
+        Vec2f scrollOffset = ((Vec2f)Parent.GetClampedChildrenBounds().Size - Parent.Size.Value) * GetProgress();
 
         if (Orientation == ScrollDirection.Vertical)
             Parent.ScrollOffset.Y = scrollOffset.Y;

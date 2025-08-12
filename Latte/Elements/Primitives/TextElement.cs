@@ -46,7 +46,7 @@ public class TextElement : Element
         RelativePosition.Set(position);
 
         if (size is null)
-            SizePolicy.Set(SizePolicyType.FitParent);
+            SizePolicy.Set(Behavior.SizePolicy.FitParent);
 
         SizePolicyMargin.Set(new Vec2f(3f, 3f));
 

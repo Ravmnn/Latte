@@ -78,7 +78,7 @@ public class ScrollAreaElement : ButtonElement
 
     private void UpdateScrollHandlesVisibility()
     {
-        var childrenBounds = GetChildrenBounds();
+        var childrenBounds = GetClampedChildrenBounds();
 
         if (VerticalScrollHandle is not null)
             VerticalScrollHandle.Visible = childrenBounds.Size.Y > Size.Value.Y;
@@ -116,7 +116,7 @@ public class ScrollAreaElement : ButtonElement
 
     protected void SyncScrollHandlesPositionToScrollOffset()
     {
-        var childrenBounds = GetChildrenBounds();
+        var childrenBounds = GetClampedChildrenBounds();
         Vec2f progress = ScrollOffset / ((Vec2f)childrenBounds.Size - Size.Value);
 
         if (VerticalScrollHandle is not null)
@@ -129,14 +129,14 @@ public class ScrollAreaElement : ButtonElement
 
     protected void ClampScrollOffset()
     {
-        var bounds = GetChildrenBounds();
+        var bounds = GetClampedChildrenBounds();
 
         ScrollOffset.X = Math.Clamp(ScrollOffset.X, 0, bounds.Width - Size.Value.X);
         ScrollOffset.Y = Math.Clamp(ScrollOffset.Y, 0, bounds.Height - Size.Value.Y);
     }
 
 
-    public FloatRect GetChildrenBounds()
+    public FloatRect GetClampedChildrenBounds()
     {
         var bounds = (from child in Children where !child.HasAttribute<IgnoreScrollAttribute>()
             select new FloatRect(child.RelativePosition.Value, child.GetBounds().Size)).ToArray().GetBoundsOfRects();

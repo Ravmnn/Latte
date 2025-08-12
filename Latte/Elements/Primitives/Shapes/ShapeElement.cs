@@ -57,9 +57,4 @@ public abstract class ShapeElement : Element
 
     public override FloatRect GetBorderLessRelativeBounds()
         => GetRelativeBounds().ShrinkRect(BorderSize.Value);
-
-
-    // using bounds with borders causes a bug
-    public override FloatRect GetSizePolicyRect(SizePolicyType policyType)
-        => SizePolicyCalculator.CalculateChildRect(GetBorderLessBounds(), GetParentBounds(), policyType);
 }

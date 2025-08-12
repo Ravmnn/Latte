@@ -123,7 +123,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public Property<Alignment> Alignment { get; }
     public AnimatableProperty<Vec2f> AlignmentMargin { get; }
 
-    public Property<SizePolicyType> SizePolicy { get; }
+    public Property<SizePolicy> SizePolicy { get; }
     public AnimatableProperty<Vec2f> SizePolicyMargin { get; }
 
     public event EventHandler<ElementEventArgs>? ParentChangedEvent;
@@ -160,7 +160,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Alignment = new Property<Alignment>(this, nameof(Alignment), Behavior.Alignment.None);
         AlignmentMargin = new AnimatableProperty<Vec2f>(this, nameof(AlignmentMargin), new Vec2f());
 
-        SizePolicy = new Property<SizePolicyType>(this, nameof(SizePolicy), SizePolicyType.None);
+        SizePolicy = new Property<SizePolicy>(this, nameof(SizePolicy), Behavior.SizePolicy.None);
         SizePolicyMargin = new AnimatableProperty<Vec2f>(this, nameof(SizePolicyMargin), new Vec2f());
 
         if (Parent is null)
@@ -235,7 +235,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     private void UpdateGeometry()
     {
-        if (SizePolicy.Value != SizePolicyType.None)
+        if (SizePolicy.Value != Behavior.SizePolicy.None)
             ApplySizePolicy();
 
         if (Alignment.Value != Behavior.Alignment.None)
@@ -296,6 +296,17 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public FloatRect GetParentBorderLessBounds() => Parent?.GetBorderLessBounds() ?? (FloatRect)App.Window.WindowRect;
     public FloatRect GetParentBorderLessRelativeBounds() => Parent?.GetBorderLessRelativeBounds() ?? (FloatRect)App.Window.WindowRect;
 
+    public FloatRect GetChildrenBounds()
+        => (from child in Children select child.GetBounds()).GetBoundsOfRects();
+
+    public FloatRect GetChildrenRelativeBounds()
+        => (from child in Children select child.GetRelativeBounds()).GetBoundsOfRects();
+
+    public FloatRect GetChildrenBorderLessBounds()
+        => (from child in Children select child.GetBorderLessBounds()).GetBoundsOfRects();
+
+    public FloatRect GetChildrenBorderLessRelativeBounds()
+        => (from child in Children select child.GetBorderLessRelativeBounds()).GetBoundsOfRects();
 
     public virtual Vec2f GetAlignmentPosition(Alignment alignment)
         => AlignmentCalculator.GetAlignedPositionOfChild(GetBorderLessBounds(), GetParentBorderLessBounds(), alignment);
@@ -308,7 +319,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public Vec2f GetAlignmentRelativePosition() => GetAlignmentRelativePosition(Alignment);
 
 
-    public virtual FloatRect GetSizePolicyRect(SizePolicyType policyType)
+    public virtual FloatRect GetSizePolicyRect(SizePolicy policyType)
         => SizePolicyCalculator.CalculateChildRect(GetBorderLessBounds(), GetParentBorderLessBounds(), policyType);
 
     public FloatRect GetSizePolicyRect()

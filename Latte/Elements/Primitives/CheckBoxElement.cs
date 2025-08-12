@@ -16,7 +16,7 @@ internal class CheckBoxSelectedIndicatorElement : RectangleElement
         IgnoreMouseInput = true;
 
         Alignment.Set(Behavior.Alignment.Center);
-        SizePolicy.Set(SizePolicyType.FitParent);
+        SizePolicy.Set(Behavior.SizePolicy.FitParent);
         SizePolicyMargin.Set(new Vec2f(5f, 5f));
 
         Color.Set(new ColorRGBA(50, 50, 50));
