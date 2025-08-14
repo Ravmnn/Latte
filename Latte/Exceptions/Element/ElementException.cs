@@ -3,12 +3,8 @@ using System;
 namespace Latte.Exceptions.Element;
 
 
-public class ElementException : Exception
+public class ElementException : LatteException
 {
-    public ElementException()
-    {
-    }
-
     public ElementException(string message) : base(message)
     {
     }

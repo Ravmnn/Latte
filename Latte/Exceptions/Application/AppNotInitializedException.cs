@@ -6,7 +6,7 @@ using Latte.Core.Application;
 namespace Latte.Exceptions.Application;
 
 
-public class AppNotInitializedException : Exception
+public class AppNotInitializedException : LatteException
 {
     public AppNotInitializedException() : base("App not initialized.")
     {

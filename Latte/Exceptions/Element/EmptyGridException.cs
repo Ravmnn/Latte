@@ -4,7 +4,7 @@ using System;
 namespace Latte.Exceptions.Element;
 
 
-public class EmptyGridException : Exception
+public class EmptyGridException : LatteException
 {
     public EmptyGridException() : base("Grid is empty.")
     {

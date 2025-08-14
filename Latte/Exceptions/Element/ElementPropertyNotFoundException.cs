@@ -4,7 +4,7 @@ using System;
 namespace Latte.Exceptions.Element;
 
 
-public class ElementPropertyNotFoundException : Exception
+public class ElementPropertyNotFoundException : ElementException
 {
     public string PropertyName { get; }
 

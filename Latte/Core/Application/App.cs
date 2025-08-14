@@ -20,10 +20,6 @@ using Debugger = Latte.Core.Application.Debugging.Debugger;
 namespace Latte.Core.Application;
 
 
-// TODO: create a log system. log can be redirected to the terminal or a file.
-
-// TODO: having a own exception system may be a good idea
-
 // TODO: add math infrastructure which calculates the position and size of each individual letter.
 // TODO: add the ability to select text with the cursor (property which can be disabled or enabled).
 
