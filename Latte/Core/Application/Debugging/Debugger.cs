@@ -167,8 +167,8 @@ public sealed class Debugger : IUpdateable, IDrawable
 
         var clip = Options.HasFlag(DebugOption.Clip);
 
-        if (clip)
-            ClipArea.BeginClip(element.GetFinalClipArea());
+        // if (clip)
+        //     ClipArea.BeginClip(element.GetFinalClipArea());
 
         if (Options.HasFlag(DebugOption.ShowBounds) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsAttribute>())
             DrawElementBounds(target, element, Color.Red);
@@ -187,7 +187,7 @@ public sealed class Debugger : IUpdateable, IDrawable
                 DrawFocusIndicator(target, element);
 
         if (clip)
-            ClipArea.EndClip();
+            Clipping.ClipDisable();
     }
 
 

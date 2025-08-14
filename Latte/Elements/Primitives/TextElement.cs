@@ -20,7 +20,8 @@ public class TextElement : Element
     private float _lastFitSize;
 
 
-    public override Transformable Transformable => SfmlText;
+    public override Transformable SfmlTransformable => SfmlText;
+    public override Drawable SfmlDrawable => SfmlText;
 
     public Text SfmlText { get; }
 
@@ -69,8 +70,8 @@ public class TextElement : Element
         base.UpdateSfmlProperties();
 
         // round to avoid blurry text
-        Transformable.Position = AbsolutePosition.Round();
-        Transformable.Origin = new Vec2f(Origin.Value.X, Origin.Value.Y).Round();
+        SfmlTransformable.Position = AbsolutePosition.Round();
+        SfmlTransformable.Origin = new Vec2f(Origin.Value.X, Origin.Value.Y).Round();
 
         SfmlText.DisplayedString = Text;
         SfmlText.Style = Style.Value;
@@ -84,13 +85,11 @@ public class TextElement : Element
     }
 
 
-    public override void Draw(RenderTarget target)
+    public override void BorderLessSimpleDraw(RenderTarget target)
     {
-        BeginDraw();
-        target.Draw(SfmlText);
-        EndDraw();
-
-        base.Draw(target);
+        SfmlText.OutlineThickness = 0f;
+        SimpleDraw(target);
+        SfmlText.OutlineThickness = BorderSize.Value;
     }
 
 

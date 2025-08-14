@@ -44,7 +44,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     private int _priority;
 
 
-    public abstract Transformable Transformable { get; }
+    public abstract Transformable SfmlTransformable { get; }
+    public abstract Drawable SfmlDrawable { get; }
 
     public bool Initialized { get; private set; }
 
@@ -244,10 +245,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     protected virtual void UpdateSfmlProperties()
     {
-        Transformable.Position = AbsolutePosition;
-        Transformable.Origin = Origin.Value;
-        Transformable.Rotation = Rotation.Value;
-        Transformable.Scale = Scale.Value;
+        SfmlTransformable.Position = AbsolutePosition;
+        SfmlTransformable.Origin = Origin.Value;
+        SfmlTransformable.Rotation = Rotation.Value;
+        SfmlTransformable.Scale = Scale.Value;
     }
 
 
@@ -255,35 +256,60 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     // same as Update, but should be used to drawings
     public virtual void Draw(RenderTarget target)
     {
+        BeginDraw(target);
+        target.Draw(SfmlDrawable);
+        EndDraw();
+        
         DrawEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    protected virtual void BeginDraw()
+
+    public void SimpleDraw(RenderTarget target)
+        => target.Draw(SfmlDrawable);
+
+    public abstract void BorderLessSimpleDraw(RenderTarget target);
+        
+
+    protected virtual void BeginDraw(RenderTarget target)
     {
-        if (Clip)
-            ClipArea.BeginClip(GetFinalClipArea());
+        if (!Clip)
+            return;
+
+        Clipping.ClipEnable();
+
+        if (Parent is null)
+            return;
+
+        Clipping.SetClipToParents(target, this);
+        Clipping.Clip(Clipping.GetClipLayerIndexOf(this));
     }
 
     protected virtual void EndDraw()
     {
-        if (Clip)
-            ClipArea.EndClip();
+        if (!Clip)
+            return;
+
+        Clipping.ClipDisable();
     }
 
 
-    public IntRect GetFinalClipArea() => ClipArea.OverlapElementClipAreaToParents(this) ?? new IntRect();
+    // The clip area is a rectangle. It represents the borderless bounds of
+    // the parent of an element. It is not used to directly clip the element,
+    // stencil buffer is used instead.
+    
+    public IntRect GetIntersectedClipArea() => Clipping.OverlapElementClipAreaToParents(this) ?? new IntRect();
     public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.Window.WindowRect;
     public virtual IntRect GetThisClipArea() => GetBorderLessBounds().ToWindowCoordinates();
 
     public bool IsInsideClipArea()
-        => GetBounds().Intersects((FloatRect)GetFinalClipArea());
+        => GetBounds().Intersects((FloatRect)GetIntersectedClipArea());
 
 
     public bool IsPointOverBounds(Vec2f point)
         => IsPointOverClipArea(point) && point.IsPointOverRect(GetBounds());
 
     public bool IsPointOverClipArea(Vec2f point)
-        => point.IsPointOverRect(GetFinalClipArea().ToWorldCoordinates());
+        => point.IsPointOverRect(GetIntersectedClipArea().ToWorldCoordinates());
 
 
     public abstract FloatRect GetBounds();
@@ -326,6 +352,25 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         => GetSizePolicyRect(SizePolicy).ShrinkRect(SizePolicyMargin);
 
 
+    public IEnumerable<Element> GetParents()
+    {
+        var parents = new List<Element>();
+        var parent = Parent;
+
+        if (parent is null)
+            return parents;
+
+        do
+        {
+            parents.Add(parent);
+            parent = parent.Parent;
+        }
+        while (parent is not null);
+
+        return parents;
+    }
+
+
     public virtual void ApplyAlignment()
         => RelativePosition.Set(GetAlignmentRelativePosition() + AlignmentMargin);
 
@@ -357,11 +402,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     {
         var result = PrioritySnap != PrioritySnap.None;
 
-        this.ForeachParent(element =>
-        {
-            if (element.PrioritySnap != PrioritySnap.None)
+        foreach (var parent in GetParents())
+            if (parent.PrioritySnap != PrioritySnap.None)
                 result = true;
-        });
 
         return result;
     }
@@ -387,7 +430,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     {
         var higherPriority = int.MinValue;
 
-        Parent?.Children.ForeachElement(element =>
+        Parent?.Children.ForeachElementRecursively(element =>
         {
             if (element != this && !element.ParentHierarchyHasPrioritySnap() && element.Priority > higherPriority)
                 higherPriority = element.Priority;
@@ -400,7 +443,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     {
         var lowerPriority = int.MaxValue;
 
-        Parent?.Children.ForeachElement(element =>
+        Parent?.Children.ForeachElementRecursively(element =>
         {
             if (element != this && !element.ParentHierarchyHasPrioritySnap() && element.Priority < lowerPriority)
                 lowerPriority = element.Priority;

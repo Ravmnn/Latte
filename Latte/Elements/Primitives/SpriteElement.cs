@@ -9,7 +9,8 @@ namespace Latte.Elements.Primitives;
 
 public class SpriteElement : Element
 {
-    public override Transformable Transformable => SfmlSprite;
+    public override Transformable SfmlTransformable => SfmlSprite;
+    public override Drawable SfmlDrawable => SfmlSprite;
 
     public Sprite SfmlSprite { get; }
     public Texture SfmlTexture => SfmlSprite.Texture;
@@ -64,19 +65,14 @@ public class SpriteElement : Element
     // targetScale = (currentScale * targetSize) / currentSize
 
 
-    public override void Draw(RenderTarget target)
-    {
-        BeginDraw();
-        target.Draw(SfmlSprite);
-        EndDraw();
-
-        base.Draw(target);
-    }
+    public override void BorderLessSimpleDraw(RenderTarget target) => SimpleDraw(target);
 
 
-    public override FloatRect GetBounds() => new FloatRect(AbsolutePosition, Size.Value);
+    public override FloatRect GetBounds()
+        => new FloatRect(AbsolutePosition, Size.Value);
 
-    public override FloatRect GetRelativeBounds() => new FloatRect(RelativePosition.Value, Size.Value);
+    public override FloatRect GetRelativeBounds()
+        => new FloatRect(RelativePosition.Value, Size.Value);
 
 
     public override void ApplySizePolicy()

@@ -57,7 +57,7 @@ public class Section : IUpdateable, IDrawable
     }
 
     private void AddElementsHierarchy(IEnumerable<Element> elements)
-        => elements.ForeachElement(AddSingleElement);
+        => elements.ForeachElementRecursively(AddSingleElement);
 
     private void AddSingleElement(Element element)
     {

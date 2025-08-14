@@ -98,11 +98,13 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     public WindowElement(string title, Vec2f position, Vec2f size, WindowElementStyles styles = WindowElementStyles.Default)
         : base(null, position, size)
     {
-        Title = new TextElement(this, new Vec2f(), 20, title);
-        Title.Alignment.Set(Behavior.Alignment.HorizontalCenter | Behavior.Alignment.Top);
-        Title.AlignmentMargin.Set(new Vec2f(0, 10));
+        Title = new TextElement(this, new Vec2f(), 20, title)
+        {
+            Color = { Value = SFML.Graphics.Color.Black },
 
-        Color.Set(new ColorRGBA(50, 50, 50, 220));
+            Alignment = { Value = Behavior.Alignment.HorizontalCenter | Behavior.Alignment.Top },
+            AlignmentMargin = { Value = new Vec2f(0, 10)}
+        };
 
         CloseButton = new WindowCloseButtonElement(this);
 

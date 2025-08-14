@@ -15,7 +15,8 @@ public class ProgressBarElement : Element
     private bool _wasCompleted;
 
 
-    public override Transformable Transformable => Foreground.Transformable;
+    public override Transformable SfmlTransformable => Foreground.SfmlTransformable;
+    public override Drawable SfmlDrawable => Foreground.SfmlDrawable;
 
     protected RectangleElement Foreground { get; }
     protected RectangleElement Background { get; }
@@ -65,8 +66,8 @@ public class ProgressBarElement : Element
 
     private void UpdateSizeBasedOnProgress()
         => Foreground.Size.Set(new Vec2f(Background.Size.Value.X * CalculateNormalizedProgress(), Background.Size.Value.Y));
-
-
+    
+    
     private float CalculateNormalizedProgress()
         => (Progress.Value - MinValue.Value) / (MaxValue.Value - MinValue.Value);
 
@@ -74,6 +75,12 @@ public class ProgressBarElement : Element
     private void KeepProgressBetweenLimits()
         => Progress.Set(Math.Clamp(Progress.Value, MinValue.Value, MaxValue.Value));
 
+
+    public override void BorderLessSimpleDraw(RenderTarget target)
+    {
+        Foreground.BorderLessSimpleDraw(target);
+    }
+    
 
     public override FloatRect GetBounds()
         => Background.GetBounds(); // only foreground change its size; use background then

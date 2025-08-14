@@ -11,7 +11,8 @@ namespace Latte.Elements.Primitives.Shapes;
 
 public abstract class ShapeElement : Element
 {
-    public override Transformable Transformable => SfmlShape;
+    public override Transformable SfmlTransformable => SfmlShape;
+    public override Drawable SfmlDrawable => SfmlShape;
 
     public Shape SfmlShape { get; }
 
@@ -42,13 +43,11 @@ public abstract class ShapeElement : Element
     }
 
 
-    public override void Draw(RenderTarget target)
+    public override void BorderLessSimpleDraw(RenderTarget target)
     {
-        BeginDraw();
-        target.Draw(SfmlShape);
-        EndDraw();
-
-        base.Draw(target);
+        SfmlShape.OutlineThickness = 0f;
+        SimpleDraw(target);
+        SfmlShape.OutlineThickness = BorderSize.Value;
     }
 
 
