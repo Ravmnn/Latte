@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
         <PackageId>MarvinMarjan.Latte</PackageId>
-        <Version>0.0.1</Version>
+        <Version>0.1.0</Version>
         <Title>An immediate mode GUI for SFML.Net</Title>
         <PackageTags>imgui gui ui sfml graphics rendering interface</PackageTags>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

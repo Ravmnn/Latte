@@ -39,6 +39,12 @@ class Program
         App.Debugger.EnableKeyShortcuts = true;
 
 
+        var window = new WindowElement("Window", new Vec2f(), new Vec2f(300, 200));
+
+
+        App.AddElement(window);
+
+
         while (!App.ShouldQuit)
         {
             App.Update();
