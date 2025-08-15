@@ -138,9 +138,8 @@ public static class App
         HasInitialized = true;
     }
 
-    // TODO: create a constant for ContextSettings.
 
-    public static void Init(VideoMode mode, string title, Font defaultFont, Styles style = Styles.Default, ContextSettings settings = default)
+    public static void Init(VideoMode mode, string title, Font defaultFont, Styles style = Styles.Default, ContextSettings? settings = null)
     {
         Init(defaultFont);
         InitWindow(new Window(mode, title, style, settings));

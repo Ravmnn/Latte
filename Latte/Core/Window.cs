@@ -8,7 +8,8 @@ using Latte.Core.Type;
 namespace Latte.Core;
 
 
-public class Window : RenderWindow, IUpdateable, IDrawable
+public class Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings? settings = null)
+    : RenderWindow(mode, title, style, settings ?? DefaultSettings), IUpdateable, IDrawable
 {
     // Usually, an error message "X Error of failed request:  BadCursor (invalid Cursor parameter)"
     // from the X window compositor (Linux only) was being shown
@@ -17,7 +18,7 @@ public class Window : RenderWindow, IUpdateable, IDrawable
     // setting it as the Window cursor.
     // Basically... to solve it, the below field needs to exist.
 
-    private Cursor _cursor;
+    private Cursor _cursor = new Cursor(Cursor.CursorType.Arrow);
 
 
     public Cursor Cursor
@@ -36,20 +37,25 @@ public class Window : RenderWindow, IUpdateable, IDrawable
     public IntRect WindowRect => new IntRect(new Vector2i(0, 0), (Vector2i)Size);
 
 
-    public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings settings = new ContextSettings()) : base(mode, title, style,
-        settings)
+    public static ContextSettings DefaultSettings { get; }
+
+
+    static Window()
     {
-        _cursor = new Cursor(Cursor.CursorType.Arrow);
+        DefaultSettings = new ContextSettings
+        {
+            AntialiasingLevel = 2,
+            DepthBits = 24,
+            StencilBits = 8,
+            MinorVersion = 3
+        };
     }
 
 
-    public virtual void Update()
-    {
-        DispatchEvents();
-    }
-
+    public virtual void Update() => DispatchEvents();
 
     public void Draw() => Draw(this);
+
 
     public virtual void Draw(RenderTarget target)
     {}
