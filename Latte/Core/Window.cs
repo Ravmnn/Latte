@@ -18,6 +18,8 @@ public class Window(VideoMode mode, string title, Styles style = Styles.Default,
     // setting it as the Window cursor.
     // Basically... to solve it, the below field needs to exist.
 
+    // TODO: create a cursor class that manages the cursor type better
+
     private Cursor _cursor = new Cursor(Cursor.CursorType.Arrow);
 
 

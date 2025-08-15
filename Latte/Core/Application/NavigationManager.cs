@@ -43,6 +43,7 @@ public static class NavigationManager
     }
 
 
+    // TODO: this may be cleaned
     public static void NextElement()
     {
         var targets = GetElementsOrderedByNavigationPriority().ToArray();

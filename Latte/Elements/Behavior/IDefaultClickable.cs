@@ -6,10 +6,18 @@ using SFML.Window;
 namespace Latte.Elements.Behavior;
 
 
+// TODO: remove default interfaces and implement the default behavior in the base interfaces instead
+
 public interface IDefaultClickable : IClickable
 {
     void UpdateMouseState()
     {
+        if (IgnoreMouseInput)
+        {
+            MouseState.SetAllToFalse();
+            return;
+        }
+
         MouseState.WasMouseOver = MouseState.IsMouseOver;
         MouseState.WasMouseHover = MouseState.IsMouseHover;
         MouseState.WasMouseDown = MouseState.IsMouseDown;

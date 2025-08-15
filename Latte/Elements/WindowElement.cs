@@ -100,6 +100,8 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
     {
         Title = new TextElement(this, new Vec2f(), 20, title)
         {
+            IgnoreMouseInput = true,
+
             Color = { Value = SFML.Graphics.Color.Black },
 
             Alignment = { Value = Behavior.Alignment.HorizontalCenter | Behavior.Alignment.Top },
@@ -129,7 +131,9 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
         {
             (this as IDefaultResizable).UpdateCornersToResize();
             (this as IDefaultResizable).ProcessResizingEvents();
-            App.Window.Cursor = Window.GetCursorTypeFromCorners(CornerToResize);
+
+            if (MouseState.IsMouseHover)
+                App.Window.Cursor = Window.GetCursorTypeFromCorners(CornerToResize);
         }
 
         if (IsMoveable)

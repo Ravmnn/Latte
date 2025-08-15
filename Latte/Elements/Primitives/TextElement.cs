@@ -9,13 +9,14 @@ using Latte.Elements.Behavior;
 using Latte.Elements.Properties;
 
 
+using Cursor = SFML.Window.Cursor;
 using Math = System.Math;
 
 
 namespace Latte.Elements.Primitives;
 
 
-public class TextElement : Element
+public class TextElement : Element, IDefaultClickable
 {
     private float _lastFitSize;
 
@@ -25,8 +26,22 @@ public class TextElement : Element
 
     public Text SfmlText { get; }
 
+    public TextSelectionElement Selection { get; protected set; }
+
+    public MouseClickState MouseState { get; }
+    public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
+
+    public event EventHandler? MouseEnterEvent;
+    public event EventHandler? MouseLeaveEvent;
+    public event EventHandler? MouseDownEvent;
+    public event EventHandler? MouseUpEvent;
+
+    public event EventHandler? MouseClickEvent;
+
     public Property<string> Text { get; }
     public Property<Text.Styles> Style { get; }
+
+    public Property<bool> Selectable { get; }
 
     public Property<uint> Size { get; }
     public AnimatableProperty<Float> LetterSpacing { get; }
@@ -38,11 +53,22 @@ public class TextElement : Element
     public AnimatableProperty<ColorRGBA> BorderColor { get; }
 
 
+    public readonly struct Character(uint index, char @char, FloatRect geometry)
+    {
+        public uint Index { get; } = index;
+        public char Char { get; } = @char;
+
+        public FloatRect Geometry { get; } = geometry;
+    }
+
+
     public TextElement(Element? parent, Vec2f position, uint? size, string text, Font? font = null) : base(parent)
     {
-        IgnoreMouseInput = true;
-
         SfmlText = new Text(text, font ?? App.DefaultFont);
+
+        Selection = new TextSelectionElement(this);
+
+        MouseState = new MouseClickState();
 
         RelativePosition.Set(position);
 
@@ -54,6 +80,8 @@ public class TextElement : Element
         Text = new Property<string>(this, nameof(Text), text);
         Style = new Property<Text.Styles>(this, nameof(Style), SFML.Graphics.Text.Styles.Regular);
 
+        Selectable = new Property<bool>(this, nameof(Selectable), true);
+
         Size = new Property<uint>(this, nameof(Size), size ?? 7);
         LetterSpacing = new AnimatableProperty<Float>(this, nameof(LetterSpacing), 1f);
         LineSpacing = new AnimatableProperty<Float>(this, nameof(LineSpacing), 1f);
@@ -62,6 +90,26 @@ public class TextElement : Element
 
         Color = new AnimatableProperty<ColorRGBA>(this, nameof(Color), SFML.Graphics.Color.White);
         BorderColor = new AnimatableProperty<ColorRGBA>(this, nameof(BorderColor), SFML.Graphics.Color.Black);
+    }
+
+
+    public override void Update()
+    {
+        UpdateSelection();
+
+        Console.WriteLine($"selection: {Selection.GetSelectedText()}");
+
+        (this as IDefaultClickable).UpdateMouseState();
+        (this as IDefaultClickable).ProcessMouseEvents();
+
+        base.Update();
+    }
+
+
+    private void UpdateSelection()
+    {
+        if (Selection.IsSelecting)
+            Selection.End = CharacterAtMousePosition();
     }
 
 
@@ -159,4 +207,103 @@ public class TextElement : Element
 
         return bounds;
     }
+
+
+    public Character? CharacterAtPoint(Vec2f point)
+    {
+        if (!IsPointOverBounds(point))
+            return null;
+
+        for (var i = 0u; i < Text.Value.Length; i++)
+        {
+            var character = Text.Value[(int)i];
+
+            var position = GetAbsolutePositionOfCharacter(i);
+            var size = new Vec2f(GetWidthOfCharacter(i), GetBounds().Height);
+
+            var rect = new FloatRect(position, size);
+
+            if (point.IsPointOverRect(rect))
+                return new Character(i, character, rect);
+        }
+
+        return null;
+    }
+
+
+    public Character? CharacterAtMousePosition()
+        => CharacterAtPoint(MouseInput.PositionInElementView);
+
+
+    private Vec2f GetAbsolutePositionOfCharacter(uint index)
+    {
+        if (index >= Text.Value.Length)
+            return SfmlText.FindCharacterPos(index);
+
+        var positionX = MapToAbsolute(SfmlText.FindCharacterPos(index)).X;
+        var positionY = GetBounds().Top;
+
+        return new Vec2f(positionX, positionY);
+    }
+
+
+    private float GetWidthOfCharacter(uint index)
+    {
+        if (index >= Text.Value.Length)
+            return 0f;
+
+        var character = Text.Value[(int)index];
+        var glyph = SfmlText.Font.GetGlyph(character, Size, false, BorderSize.Value);
+
+        return glyph.Advance;
+    }
+
+
+    public void OnMouseEnter()
+    {
+        if (Selectable)
+            App.Window.Cursor = new Cursor(Cursor.CursorType.Text);
+
+        MouseEnterEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    public void OnMouseLeave()
+    {
+        // TODO: changing manually may not be a good idea. Create methods like Cursor.Set and Cursor.Unset.
+        // Set changes the cursor, while Unset resets the cursor to the type before Set was called.
+
+        if (Selectable)
+            App.Window.Cursor = new Cursor(Cursor.CursorType.Arrow);
+
+        MouseLeaveEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    public void OnMouseDown()
+    {
+        if (Selectable && CharacterAtMousePosition() is { } character)
+            Selection.Start = character;
+
+        MouseDownEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    // TODO: selection should stay while this is on focus
+    public void OnMouseUp()
+    {
+        Selection.Start = Selection.End = null;
+
+        MouseUpEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    public void OnMouseClick()
+    {
+        MouseClickEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    public bool IsPointOver(Vec2f point)
+        => IsPointOverBounds(point);
 }

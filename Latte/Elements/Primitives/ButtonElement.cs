@@ -41,6 +41,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTar
     public event EventHandler? FocusEvent;
     public event EventHandler? UnfocusEvent;
 
+    // TODO: implement this in the interface
     public bool Focused
     {
         get => _focused;
@@ -55,10 +56,10 @@ public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTar
             var oldFocused = _focused;
             _focused = value;
 
-            if (value == oldFocused)
+            if (_focused == oldFocused)
                 return;
 
-            if (value)
+            if (_focused)
                 OnFocus();
             else
                 OnUnfocus();
@@ -68,6 +69,7 @@ public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTar
     public bool CanFocus => Visible && !DisableFocus;
     public bool DisableFocus { get; set; }
 
+    // TODO: put this in an interface
     public bool FocusOnClick { get; set; }
 
     public ButtonElement(Element? parent, Vec2f position, Vec2f size, string? text) : base(parent, position, size)
@@ -75,6 +77,8 @@ public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTar
         if (text is not null)
             Text = new TextElement(this, new Vec2f(), null, text)
             {
+                IgnoreMouseInput = true,
+
                 Alignment = { Value = Behavior.Alignment.Center },
 
                 Color = { Value = SFML.Graphics.Color.Black }

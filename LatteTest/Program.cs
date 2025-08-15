@@ -35,20 +35,28 @@ class Program
 
         var rect = new RectangleElement(window, new Vec2f(), new Vec2f(200, 200))
         {
-            Color = { Value = Color.Green },
+            Color = { Value = new ColorRGBA(230, 230, 230) },
             BorderSize = { Value = 2f },
             BorderColor = { Value = Color.Red },
 
             Radius = { Value = 4f },
 
-            Alignment = { Value = Alignment.VerticalCenter | Alignment.Left },
-            AlignmentMargin = { Value = new Vec2f(-50) }
+            Alignment = { Value = Alignment.Center }
         };
 
-        var button = new ButtonElement(rect, new Vec2f(), new Vec2f(80, 80), "Button")
+        new TextElement(rect, new Vec2f(), 30, "This is a text.")
         {
-            Alignment = { Value = Alignment.TopLeft },
-            AlignmentMargin = { Value = new Vec2f(-15, -15) }
+            Color = { Value = Color.Black },
+
+            Alignment = { Value = Alignment.Center }
+        };
+
+        new TextElement(window, new Vec2f(), 15, "This is a very, very long text.")
+        {
+            Color = { Value = Color.Black },
+
+            Alignment = { Value = Alignment.HorizontalCenter | Alignment.Bottom },
+            AlignmentMargin = { Value = new Vec2f(0, -10) }
         };
 
 

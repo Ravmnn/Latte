@@ -111,7 +111,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public AnimatableProperty<Vec2f> RelativePosition { get; }
     public Vec2f AbsolutePosition
     {
-        get => Parent is not null ? RelativePosition + Parent.AbsolutePosition : RelativePosition;
+        get => Parent is not null ? Parent.MapToAbsolute(RelativePosition) : RelativePosition;
         set => RelativePosition.Set(Parent is not null ? value - Parent.AbsolutePosition : value);
     }
 
@@ -259,7 +259,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         BeginDraw(target);
         target.Draw(SfmlDrawable);
         EndDraw();
-        
+
         DrawEvent?.Invoke(this, EventArgs.Empty);
     }
 
@@ -268,7 +268,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         => target.Draw(SfmlDrawable);
 
     public abstract void BorderLessSimpleDraw(RenderTarget target);
-        
+
 
     protected virtual void BeginDraw(RenderTarget target)
     {
@@ -296,7 +296,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     // The clip area is a rectangle. It represents the borderless bounds of
     // the parent of an element. It is not used to directly clip the element,
     // stencil buffer is used instead.
-    
+
     public IntRect GetIntersectedClipArea() => Clipping.OverlapElementClipAreaToParents(this) ?? new IntRect();
     public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.Window.WindowRect;
     public virtual IntRect GetThisClipArea() => GetBorderLessBounds().ToWindowCoordinates();
@@ -350,6 +350,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public FloatRect GetSizePolicyRect()
         => GetSizePolicyRect(SizePolicy).ShrinkRect(SizePolicyMargin);
+
+
+    public Vec2f MapToAbsolute(Vec2f position)
+        => position + AbsolutePosition;
+
+    public Vec2f MapToRelative(Vec2f position)
+        => position - AbsolutePosition;
 
 
     public IEnumerable<Element> GetParents()
