@@ -12,10 +12,12 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
-public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTarget
+public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 {
     private bool _focused;
 
+
+    protected IClickable ThisClickable => this;
 
     public TextElement? Text { get; set; }
 
@@ -93,8 +95,8 @@ public class ButtonElement : RectangleElement, IDefaultClickable, INavigationTar
 
     public override void Update()
     {
-        (this as IDefaultClickable).UpdateMouseState();
-        (this as IDefaultClickable).ProcessMouseEvents();
+        ThisClickable.UpdateMouseState();
+        ThisClickable.ProcessMouseEvents();
 
         base.Update();
     }

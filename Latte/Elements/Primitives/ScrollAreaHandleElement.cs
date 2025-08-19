@@ -10,8 +10,10 @@ namespace Latte.Elements.Primitives;
 
 
 [IgnoreScroll]
-public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
+public class ScrollAreaHandleElement : ButtonElement, IDraggable
 {
+    protected IDraggable ThisDraggable => this;
+
     public new ScrollAreaElement Parent => (base.Parent as ScrollAreaElement)!;
 
     public ScrollDirection Orientation { get; }
@@ -57,7 +59,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDefaultDraggable
 
     public override void Update()
     {
-        (this as IDefaultDraggable).ProcessDraggingEvents();
+        ThisDraggable.ProcessDraggingEvents();
 
         UpdateSize();
 

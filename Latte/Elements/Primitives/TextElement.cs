@@ -16,10 +16,12 @@ using Math = System.Math;
 namespace Latte.Elements.Primitives;
 
 
-public class TextElement : Element, IDefaultClickable
+public class TextElement : Element, IClickable
 {
     private float _lastFitSize;
 
+
+    protected IClickable ThisClickable => this;
 
     public override Transformable SfmlTransformable => SfmlText;
     public override Drawable SfmlDrawable => SfmlText;
@@ -98,8 +100,8 @@ public class TextElement : Element, IDefaultClickable
     {
         UpdateSelection();
 
-        (this as IDefaultClickable).UpdateMouseState();
-        (this as IDefaultClickable).ProcessMouseEvents();
+        ThisClickable.UpdateMouseState();
+        ThisClickable.ProcessMouseEvents();
 
         base.Update();
     }

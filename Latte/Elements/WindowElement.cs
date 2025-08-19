@@ -48,8 +48,12 @@ public class WindowCloseButtonElement : ButtonElement
 }
 
 
-public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResizable
+public class WindowElement : RectangleElement, IDraggable, IResizable
 {
+    protected IClickable ThisClickable => this;
+    protected IDraggable ThisDraggable => this;
+    protected IResizable ThisResizable => this;
+
     public TextElement Title { get; protected set; }
 
     public WindowCloseButtonElement CloseButton { get; protected set; }
@@ -124,20 +128,20 @@ public class WindowElement : RectangleElement, IDefaultDraggable, IDefaultResiza
 
     public override void Update()
     {
-        (this as IDefaultClickable).UpdateMouseState();
-        (this as IDefaultClickable).ProcessMouseEvents();
+        ThisClickable.UpdateMouseState();
+        ThisClickable.ProcessMouseEvents();
 
         if (IsResizable)
         {
-            (this as IDefaultResizable).UpdateCornersToResize();
-            (this as IDefaultResizable).ProcessResizingEvents();
+            ThisResizable.UpdateCornersToResize();
+            ThisResizable.ProcessResizingEvents();
 
             if (MouseState.IsMouseHover)
                 App.Window.Cursor = Window.GetCursorTypeFromCorners(CornerToResize);
         }
 
         if (IsMoveable)
-            (this as IDefaultDraggable).ProcessDraggingEvents();
+            ThisDraggable.ProcessDraggingEvents();
 
         CloseButton.Visible = IsCloseable;
 
