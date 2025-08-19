@@ -6,6 +6,9 @@ using Latte.Core.Type;
 namespace Latte.Elements.Behavior;
 
 
+// TODO: IClickable should be INavigation
+
+
 public interface IClickable : IMouseInputTarget
 {
     MouseClickState MouseState { get; }

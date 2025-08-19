@@ -41,14 +41,18 @@ public class ElementAttributeManager
             InheritedAttributes = Element.Parent.Attributes.InheritedAttributes;
 
         foreach (var attribute in GetCachedElementAttributes())
-        {
-            if (attribute.Inherit)
-                InheritedAttributes.Add(attribute);
-            else
-                attribute.Process(Element);
-        }
+            ProcessAttributeOrStoreIfInherited(attribute);
 
         foreach (var attribute in InheritedAttributes)
+            attribute.Process(Element);
+    }
+
+
+    private void ProcessAttributeOrStoreIfInherited(ElementAttribute attribute)
+    {
+        if (attribute.Inherit)
+            InheritedAttributes.Add(attribute);
+        else
             attribute.Process(Element);
     }
 

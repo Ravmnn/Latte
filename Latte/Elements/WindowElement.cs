@@ -42,8 +42,8 @@ public class WindowCloseButtonElement : ButtonElement
 
     public override void OnMouseClick()
     {
-        base.OnMouseUp();
         Parent.Close();
+        base.OnMouseClick();
     }
 }
 

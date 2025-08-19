@@ -13,6 +13,9 @@ public interface IFocusable
     bool CanFocus { get; }
     bool DisableFocus { get; set; }
 
+    void Focus() => Focused = true;
+    void Unfocus() => Focused = false;
+
     void OnFocus();
     void OnUnfocus();
 }

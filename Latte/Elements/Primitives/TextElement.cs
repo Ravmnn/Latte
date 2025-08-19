@@ -27,6 +27,7 @@ public class TextElement : Element, IDefaultClickable
     public Text SfmlText { get; }
 
     public TextSelectionElement Selection { get; protected set; }
+    public string SelectedText => Selection.GetSelectedText();
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
@@ -96,8 +97,6 @@ public class TextElement : Element, IDefaultClickable
     public override void Update()
     {
         UpdateSelection();
-
-        Console.WriteLine($"selection: {Selection.GetSelectedText()}");
 
         (this as IDefaultClickable).UpdateMouseState();
         (this as IDefaultClickable).ProcessMouseEvents();

@@ -33,8 +33,6 @@ public abstract class InspectionObjectFormatter<T>
 
 public static class InspectionObjectFormatter
 {
-    // TODO: add formatters for other types
-
     public static (string, bool) Format(object? @object, int indent = 0)
         => @object switch
         {

@@ -37,7 +37,7 @@ public static class FocusManager
         ElementWithFocus = element;
 
         if (!focusable.Focused)
-            focusable.Focused = true;
+            focusable.Focus();
     }
 
 
@@ -45,14 +45,14 @@ public static class FocusManager
     {
         foreach (var element in App.Elements)
             if (element != ElementWithFocus && element is IFocusable focusable)
-                focusable.Focused = false;
+                focusable.Unfocus();
     }
 
     private static void UnfocusElementsWhichCannotBeFocused()
     {
         foreach (var element in App.Elements)
             if (element is IFocusable { CanFocus: false } focusable)
-                focusable.Focused = false;
+                focusable.Unfocus();
     }
 
 

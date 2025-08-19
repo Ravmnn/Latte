@@ -1,5 +1,3 @@
-using System;
-using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
 
@@ -7,36 +5,13 @@ using Latte.Elements.Primitives.Shapes;
 namespace Latte.Elements.Primitives;
 
 
-// TODO: create attribute ConstantParentAttribute, which prohibits the element parent to be changed
-
 public class TextSelectionElement : RectangleElement
 {
-    private TextElement.Character? _start;
-    private TextElement.Character? _end;
-
-
+    // parent must not change
     public new TextElement Parent => (base.Parent as TextElement)!;
 
-    public TextElement.Character? Start
-    {
-        get => _start;
-        set
-        {
-            _start = value;
-            SwapCharactersIfStartIsGreater(ref _start, ref _end);
-        }
-    }
-
-    public TextElement.Character? End
-    {
-        get => _end;
-        set
-        {
-            // TODO: not working
-            _end = value;
-            SwapCharactersIfStartIsGreater(ref _start, ref _end);
-        }
-    }
+    public TextElement.Character? Start { get; set; }
+    public TextElement.Character? End { get; set; }
 
     public bool IsSelecting => Start is not null;
 
@@ -64,6 +39,8 @@ public class TextSelectionElement : RectangleElement
 
     protected void Select(TextElement.Character start, TextElement.Character end)
     {
+        SwapCharactersIfStartIsGreater(ref start, ref end);
+
         AbsolutePosition = start.Geometry.Position;
         Size.Set(end.Geometry.Position + end.Geometry.Size - start.Geometry.Position);
         Visible = true;
@@ -83,13 +60,18 @@ public class TextSelectionElement : RectangleElement
         if (Start is null || End is null)
             return string.Empty;
 
-        return Parent.Text.Value[(int)Start.Value.Index .. ((int)End.Value.Index + 1)];
+        var start = Start.Value;
+        var end = End.Value;
+
+        SwapCharactersIfStartIsGreater(ref start, ref end);
+
+        return Parent.Text.Value[(int)start.Index .. ((int)end.Index + 1)];
     }
 
 
-    private static void SwapCharactersIfStartIsGreater(ref TextElement.Character? start, ref TextElement.Character? end)
+    private static void SwapCharactersIfStartIsGreater(ref TextElement.Character start, ref TextElement.Character end)
     {
-        if (start is not null && end is not null && end.Value.Index < start.Value.Index)
+        if (end.Index < start.Index)
             (start, end) = (end, start);
     }
 }

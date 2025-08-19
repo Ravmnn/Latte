@@ -10,9 +10,6 @@ using Latte.Elements.Primitives;
 namespace Latte.Elements.Behavior;
 
 
-// BUG: clip not 100% accurate... 1 pixel error margin.
-
-
 public static class Clipping
 {
     public static void ClipEnable()
