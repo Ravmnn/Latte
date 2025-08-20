@@ -14,12 +14,18 @@ namespace Latte.Elements.Primitives;
 
 public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 {
-    private bool _focused;
-
-
     protected IClickable ThisClickable => this;
+    protected IFocusable ThisFocusable => this;
 
     public TextElement? Text { get; set; }
+
+    public bool Focused { get; set; }
+    public bool DisableFocus { get; set; }
+
+    public event EventHandler? FocusEvent;
+    public event EventHandler? UnfocusEvent;
+
+    public bool FocusOnMouseDown { get; set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
@@ -40,39 +46,6 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 
     public bool IgnoreKeyboardInput { get; set; }
 
-    public event EventHandler? FocusEvent;
-    public event EventHandler? UnfocusEvent;
-
-    // TODO: implement this in the interface
-    public bool Focused
-    {
-        get => _focused;
-        set
-        {
-            if (!CanFocus)
-            {
-                _focused = false;
-                return;
-            }
-
-            var oldFocused = _focused;
-            _focused = value;
-
-            if (_focused == oldFocused)
-                return;
-
-            if (_focused)
-                OnFocus();
-            else
-                OnUnfocus();
-        }
-    }
-
-    public bool CanFocus => Visible && !DisableFocus;
-    public bool DisableFocus { get; set; }
-
-    // TODO: put this in an interface
-    public bool FocusOnClick { get; set; }
 
     public ButtonElement(Element? parent, Vec2f position, Vec2f size, string? text) : base(parent, position, size)
     {
@@ -116,12 +89,7 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 
 
     public virtual void OnMouseClick()
-    {
-        if (FocusOnClick)
-            Focused = true;
-
-        MouseClickEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => MouseClickEvent?.Invoke(this, EventArgs.Empty);
 
 
     public virtual bool IsPointOver(Vec2f point)

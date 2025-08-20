@@ -87,7 +87,7 @@ public static class NavigationManager
     private static IEnumerable<INavigationTarget> GetElementsOrderedByNavigationPriority()
         => from element in App.Elements
             let navigationTarget = element as INavigationTarget
-            where navigationTarget is { CanFocus: true }
+            where navigationTarget is { DisableFocus: false }
             orderby navigationTarget.NavigationPriority
             select navigationTarget;
 

@@ -45,13 +45,13 @@ public static class KeyboardInput
 
     private static void OnKeyPressed(KeyEventArgs key)
     {
-        if (FocusManager.ElementWithFocus is IKeyboardInputTarget inputTarget)
+        if (FocusManager.CurrentFocused is IKeyboardInputTarget inputTarget)
             inputTarget.OnKeyDown(key);
     }
 
     private static void OnKeyReleased(KeyEventArgs key)
     {
-        if (FocusManager.ElementWithFocus is IKeyboardInputTarget inputTarget)
+        if (FocusManager.CurrentFocused is IKeyboardInputTarget inputTarget)
             inputTarget.OnKeyUp(key);
     }
 }

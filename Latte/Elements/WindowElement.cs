@@ -50,6 +50,7 @@ public class WindowCloseButtonElement : ButtonElement
 
 public class WindowElement : RectangleElement, IDraggable, IResizable
 {
+    protected IFocusable ThisFocusable => this;
     protected IClickable ThisClickable => this;
     protected IDraggable ThisDraggable => this;
     protected IResizable ThisResizable => this;
@@ -65,6 +66,14 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
 
     public bool Resizing { get; protected set; }
     public bool WasResizing { get; protected set; }
+
+    public bool Focused { get; set; }
+    public bool DisableFocus { get; set; }
+
+    public event EventHandler? FocusEvent;
+    public event EventHandler? UnfocusEvent;
+
+    public bool FocusOnMouseDown { get; set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
@@ -115,6 +124,8 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         CloseButton = new WindowCloseButtonElement(this);
 
         Styles = styles;
+
+        DisableFocus = true;
 
         MouseState = new MouseClickState();
         DisableTruePressOnlyWhenMouseIsUp = true;
@@ -225,6 +236,13 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         Hide();
         ClosedEvent?.Invoke(this, EventArgs.Empty);
     }
+
+
+    public void OnFocus()
+        => FocusEvent?.Invoke(this, EventArgs.Empty);
+
+    public void OnUnfocus()
+        => UnfocusEvent?.Invoke(this, EventArgs.Empty);
 
 
     public virtual void OnMouseEnter()

@@ -7,7 +7,7 @@ namespace Latte.Core.Application;
 
 public static class FocusManager
 {
-    public static Element? ElementWithFocus { get; private set; }
+    public static IFocusable? CurrentFocused { get; private set; }
 
 
     static FocusManager()
@@ -18,44 +18,43 @@ public static class FocusManager
 
     public static void Update()
     {
-        if (ElementWithFocus is IFocusable { Focused: false })
-            ElementWithFocus = null;
+        if (!CurrentFocused?.Focused ?? false)
+            CurrentFocused = null;
 
         UnfocusAllOtherElements();
         UnfocusElementsWhichCannotBeFocused();
     }
 
 
-    public static void FocusOn(Element? element)
+    public static void FocusOn(IFocusable? focusable)
     {
-        if (element is null)
-            ElementWithFocus = null;
-
-        if (element is not IFocusable focusable)
+        if (focusable is null)
+        {
+            CurrentFocused = null;
             return;
+        }
 
-        ElementWithFocus = element;
+        CurrentFocused = focusable;
 
-        if (!focusable.Focused)
-            focusable.Focus();
+        focusable.Focus();
     }
 
 
     private static void UnfocusAllOtherElements()
     {
         foreach (var element in App.Elements)
-            if (element != ElementWithFocus && element is IFocusable focusable)
+            if (element != CurrentFocused && element is IFocusable focusable)
                 focusable.Unfocus();
     }
 
     private static void UnfocusElementsWhichCannotBeFocused()
     {
         foreach (var element in App.Elements)
-            if (element is IFocusable { CanFocus: false } focusable)
+            if (element is IFocusable { DisableFocus: true } focusable)
                 focusable.Unfocus();
     }
 
 
     private static void OnCurrentNavigationTargetChanged()
-        => FocusOn(NavigationManager.CurrentTarget as Element);
+        => FocusOn(NavigationManager.CurrentTarget);
 }

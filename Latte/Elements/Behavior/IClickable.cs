@@ -9,11 +9,10 @@ using Latte.Core.Type;
 namespace Latte.Elements.Behavior;
 
 
-// TODO: IClickable should be INavigation
-
-
-public interface IClickable : IMouseInputTarget
+public interface IClickable : IMouseInputTarget, IFocusable
 {
+    bool FocusOnMouseDown { get; }
+
     MouseClickState MouseState { get; }
     bool DisableTruePressOnlyWhenMouseIsUp { get; }
 
@@ -60,7 +59,12 @@ public interface IClickable : IMouseInputTarget
         var unpressed = !MouseState.IsTruePressed && MouseState.WasTruePressed;
 
         if (pressed)
+        {
+            if (FocusOnMouseDown)
+                Focus();
+
             OnMouseDown();
+        }
 
         else if (unpressed)
         {
@@ -77,6 +81,8 @@ public interface IClickable : IMouseInputTarget
             OnMouseLeave();
     }
 
+
+    // TODO: check if it isn't possible to make event calling in default implementations
 
     void OnMouseEnter();
     void OnMouseLeave();

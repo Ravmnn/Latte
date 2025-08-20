@@ -22,6 +22,7 @@ public class TextElement : Element, IClickable
 
 
     protected IClickable ThisClickable => this;
+    protected IFocusable ThisFocusable => this;
 
     public override Transformable SfmlTransformable => SfmlText;
     public override Drawable SfmlDrawable => SfmlText;
@@ -30,6 +31,14 @@ public class TextElement : Element, IClickable
 
     public TextSelectionElement Selection { get; protected set; }
     public string SelectedText => Selection.GetSelectedText();
+
+    public bool Focused { get; set; }
+    public bool DisableFocus { get; set; }
+
+    public event EventHandler? FocusEvent;
+    public event EventHandler? UnfocusEvent;
+
+    public bool FocusOnMouseDown { get; set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
@@ -71,6 +80,7 @@ public class TextElement : Element, IClickable
 
         Selection = new TextSelectionElement(this);
 
+        FocusOnMouseDown = true;
         MouseState = new MouseClickState();
 
         RelativePosition.Set(position);
@@ -260,6 +270,22 @@ public class TextElement : Element, IClickable
     }
 
 
+    public void OnFocus()
+    {
+        if (Selectable && CharacterAtMousePosition() is { } character)
+            Selection.Start = character;
+
+        FocusEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void OnUnfocus()
+    {
+        Selection.Start = Selection.End = null;
+
+        UnfocusEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
     public void OnMouseEnter()
     {
         if (Selectable)
@@ -282,27 +308,17 @@ public class TextElement : Element, IClickable
 
 
     public void OnMouseDown()
-    {
-        if (Selectable && CharacterAtMousePosition() is { } character)
-            Selection.Start = character;
+        => MouseDownEvent?.Invoke(this, EventArgs.Empty);
 
-        MouseDownEvent?.Invoke(this, EventArgs.Empty);
-    }
 
 
     // TODO: selection should stay while this is on focus
     public void OnMouseUp()
-    {
-        Selection.Start = Selection.End = null;
-
-        MouseUpEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => MouseUpEvent?.Invoke(this, EventArgs.Empty);
 
 
     public void OnMouseClick()
-    {
-        MouseClickEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => MouseClickEvent?.Invoke(this, EventArgs.Empty);
 
 
     public bool IsPointOver(Vec2f point)
