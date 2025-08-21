@@ -9,7 +9,6 @@ using Latte.Elements.Behavior;
 using Latte.Elements.Properties;
 
 
-using Cursor = SFML.Window.Cursor;
 using Math = System.Math;
 
 
@@ -53,8 +52,6 @@ public class TextElement : Element, IClickable
     public Property<string> Text { get; }
     public Property<Text.Styles> Style { get; }
 
-    public Property<bool> Selectable { get; }
-
     public Property<uint> Size { get; }
     public AnimatableProperty<Float> LetterSpacing { get; }
     public AnimatableProperty<Float> LineSpacing { get; }
@@ -93,8 +90,6 @@ public class TextElement : Element, IClickable
         Text = new Property<string>(this, nameof(Text), text);
         Style = new Property<Text.Styles>(this, nameof(Style), SFML.Graphics.Text.Styles.Regular);
 
-        Selectable = new Property<bool>(this, nameof(Selectable), true);
-
         Size = new Property<uint>(this, nameof(Size), size ?? 7);
         LetterSpacing = new AnimatableProperty<Float>(this, nameof(LetterSpacing), 1f);
         LineSpacing = new AnimatableProperty<Float>(this, nameof(LineSpacing), 1f);
@@ -108,19 +103,10 @@ public class TextElement : Element, IClickable
 
     public override void Update()
     {
-        UpdateSelection();
-
         ThisClickable.UpdateMouseState();
         ThisClickable.ProcessMouseEvents();
 
         base.Update();
-    }
-
-
-    private void UpdateSelection()
-    {
-        if (Selection.IsSelecting)
-            Selection.End = CharacterAtMousePosition();
     }
 
 
@@ -271,40 +257,18 @@ public class TextElement : Element, IClickable
 
 
     public void OnFocus()
-    {
-        if (Selectable && CharacterAtMousePosition() is { } character)
-            Selection.Start = character;
-
-        FocusEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => FocusEvent?.Invoke(this, EventArgs.Empty);
 
     public void OnUnfocus()
-    {
-        Selection.Start = Selection.End = null;
-
-        UnfocusEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => UnfocusEvent?.Invoke(this, EventArgs.Empty);
 
 
     public void OnMouseEnter()
-    {
-        if (Selectable)
-            App.Window.Cursor = new Cursor(Cursor.CursorType.Text);
-
-        MouseEnterEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => MouseEnterEvent?.Invoke(this, EventArgs.Empty);
 
 
     public void OnMouseLeave()
-    {
-        // TODO: changing manually may not be a good idea. Create methods like Cursor.Set and Cursor.Unset.
-        // Set changes the cursor, while Unset resets the cursor to the type before Set was called.
-
-        if (Selectable)
-            App.Window.Cursor = new Cursor(Cursor.CursorType.Arrow);
-
-        MouseLeaveEvent?.Invoke(this, EventArgs.Empty);
-    }
+        => MouseLeaveEvent?.Invoke(this, EventArgs.Empty);
 
 
     public void OnMouseDown()
@@ -312,7 +276,6 @@ public class TextElement : Element, IClickable
 
 
 
-    // TODO: selection should stay while this is on focus
     public void OnMouseUp()
         => MouseUpEvent?.Invoke(this, EventArgs.Empty);
 

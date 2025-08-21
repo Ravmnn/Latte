@@ -48,7 +48,9 @@ class Program
         {
             Color = { Value = Color.Black },
 
-            Alignment = { Value = Alignment.Center }
+            Alignment = { Value = Alignment.Center },
+
+            Selection = { CanSelect = true }
         };
 
         new TextElement(window, new Vec2f(), 15, "This is a very, very long text.")

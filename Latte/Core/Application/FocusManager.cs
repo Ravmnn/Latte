@@ -1,5 +1,6 @@
+using System;
+
 using Latte.Elements.Behavior;
-using Latte.Elements.Primitives;
 
 
 namespace Latte.Core.Application;
@@ -52,6 +53,24 @@ public static class FocusManager
         foreach (var element in App.Elements)
             if (element is IFocusable { DisableFocus: true } focusable)
                 focusable.Unfocus();
+    }
+
+
+
+    public static void AddFocusListenerTo(IFocusable focusable)
+        => focusable.FocusEvent += OnFocusableFocus;
+
+    public static void RemoveFocusListenerOf(IFocusable focusable)
+        => focusable.FocusEvent -= OnFocusableFocus;
+
+
+
+    private static void OnFocusableFocus(object? sender, EventArgs _)
+    {
+        if (sender is not IFocusable focusable)
+            return;
+
+        FocusOn(focusable);
     }
 
 

@@ -12,7 +12,7 @@ using Latte.Elements.Attributes;
 namespace Latte.Core.Application.Debugging.Inspection;
 
 
-[DebuggerIgnoreShowBounds, DebuggerIgnoreShowBoundsDimensions, DebuggerIgnoreShowClipArea, DebuggerIgnoreShowPriority]
+[DebuggerIgnoreShowBounds, DebuggerIgnoreShowBoundsDimensionsAndPosition, DebuggerIgnoreShowClipArea, DebuggerIgnoreShowPriority]
 [DebuggerIgnoreInspection]
 public class InspectionWindow : WindowElement
 {

@@ -99,6 +99,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     }
 
     public bool Clip { get; set; }
+    public int ClipLayerIndex { get; protected set; }
+    public int ClipLayerIndexOffset { get; set; }
 
     protected int LastPriority { get; private set; }
 
@@ -112,7 +114,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public Vec2f AbsolutePosition
     {
         get => Parent is not null ? Parent.MapToAbsolute(RelativePosition) : RelativePosition;
-        set => RelativePosition.Set(Parent is not null ? value - Parent.AbsolutePosition : value);
+        set => RelativePosition.Set(Parent is not null ? Parent.MapToRelative(value) : value);
     }
 
     public AnimatableProperty<Vec2f> Origin { get; }
@@ -201,6 +203,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Attributes.ProcessAttributes();
 
         UpdatePriority();
+        UpdateClipLayerIndex();
         UpdateGeometry();
         UpdateSfmlProperties();
 
@@ -232,6 +235,11 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
                 LowerToParentBottom();
                 break;
         }
+    }
+
+    private void UpdateClipLayerIndex()
+    {
+        ClipLayerIndex = Clipping.GetClipLayerIndexOf(this);
     }
 
     private void UpdateGeometry()
@@ -281,7 +289,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
             return;
 
         Clipping.SetClipToParents(target, this);
-        Clipping.Clip(Clipping.GetClipLayerIndexOf(this));
+        Clipping.Clip(ClipLayerIndex + ClipLayerIndexOffset);
     }
 
     protected virtual void EndDraw()

@@ -4,6 +4,8 @@ using System;
 namespace Latte.Elements.Behavior;
 
 
+// TODO: focus logic only in App, use IFocusable.FocusEvent; App should use it for processing when an element gets focused
+
 public interface IFocusable
 {
     event EventHandler FocusEvent;
@@ -33,7 +35,10 @@ public interface IFocusable
     }
 
     void Unfocus()
-        => Focused = false;
+    {
+        Focused = false;
+        OnUnfocus();
+    }
 
     void OnFocus();
     void OnUnfocus();

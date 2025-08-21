@@ -27,7 +27,7 @@ public enum DebugOption
     OnlyTrueHoveredElement = 1 << 2,
 
     ShowBounds = 1 << 3,
-    ShowBoundsDimensions = 1 << 4,
+    ShowBoundsDimensionsAndPosition = 1 << 4,
     ShowClipArea = 1 << 5,
     ShowPriority = 1 << 6,
     ShowFocus = 1 << 7
@@ -39,7 +39,7 @@ public class DebuggerIgnoreShowBoundsAttribute(bool inherit = true) : ElementAtt
 
 
 [AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowBoundsDimensionsAttribute(bool inherit = true) : ElementAttribute(inherit);
+public class DebuggerIgnoreShowBoundsDimensionsAndPositionAttribute(bool inherit = true) : ElementAttribute(inherit);
 
 
 [AttributeUsage(AttributeTargets.Class)]
@@ -112,7 +112,7 @@ public sealed class Debugger : IUpdateable, IDrawable
                 break;
 
             case Keyboard.Scancode.F5:
-                ToggleDebugOption(DebugOption.ShowBoundsDimensions);
+                ToggleDebugOption(DebugOption.ShowBoundsDimensionsAndPosition);
                 break;
 
             case Keyboard.Scancode.F6:
@@ -167,14 +167,17 @@ public sealed class Debugger : IUpdateable, IDrawable
 
         var clip = Options.HasFlag(DebugOption.Clip);
 
-        // if (clip)
-        //     ClipArea.BeginClip(element.GetFinalClipArea());
+        if (clip)
+        {
+            Clipping.ClipEnable();
+            Clipping.SetClipToParents(target, element);
+        }
 
         if (Options.HasFlag(DebugOption.ShowBounds) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsAttribute>())
             DrawElementBounds(target, element, Color.Red);
 
-        if (Options.HasFlag(DebugOption.ShowBoundsDimensions) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsDimensionsAttribute>())
-            DrawElementBoundsDimensions(target, element);
+        if (Options.HasFlag(DebugOption.ShowBoundsDimensionsAndPosition) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsDimensionsAndPositionAttribute>())
+            DrawElementBoundsDimensionsAndPosition(target, element);
 
         if (Options.HasFlag(DebugOption.ShowClipArea) && !element.HasCachedElementAttribute<DebuggerIgnoreShowClipAreaAttribute>())
             DrawElementClipArea(target, element);
@@ -194,16 +197,20 @@ public sealed class Debugger : IUpdateable, IDrawable
     public static void DrawElementBounds(RenderTarget target, Element element, ColorRGBA color)
         => Debugging.Draw.LineRect(target, element.GetBounds(), color);
 
-    public static void DrawElementBoundsDimensions(RenderTarget target, Element element)
+    public static void DrawElementBoundsDimensionsAndPosition(RenderTarget target, Element element)
     {
         var bounds = element.GetBounds();
         var borderLessBounds = element.GetBorderLessBounds();
 
         var backgroundColor = new Color(255, 255, 255, 220);
 
-        var width = bounds.Width.ToString(CultureInfo.InvariantCulture);
-        var height = bounds.Height.ToString(CultureInfo.InvariantCulture);
+        var x = $"{bounds.Left:F1}";
+        var y = $"{bounds.Top:F1}";
+        var width = $"{bounds.Width:F1}";
+        var height = $"{bounds.Height:F1}";
 
+        Debugging.Draw.Text(target, borderLessBounds with { Left = borderLessBounds.Left - 40, Width = 10 }, Alignment.TopLeft, x, backgroundColor: backgroundColor);
+        Debugging.Draw.Text(target, borderLessBounds with { Top = borderLessBounds.Top - 20, Height = 10 }, Alignment.TopLeft, y, backgroundColor: backgroundColor);
         Debugging.Draw.Text(target, borderLessBounds with { Top = borderLessBounds.Top + borderLessBounds.Height + 10 }, Alignment.HorizontalCenter | Alignment.Top, width, backgroundColor: backgroundColor);
         Debugging.Draw.Text(target, borderLessBounds with { Left = borderLessBounds.Left + borderLessBounds.Width + 10 }, Alignment.VerticalCenter | Alignment.Left, height, backgroundColor: backgroundColor);
     }

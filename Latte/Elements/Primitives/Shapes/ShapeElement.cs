@@ -2,7 +2,6 @@ using SFML.Graphics;
 
 using Latte.Core;
 using Latte.Core.Type;
-using Latte.Elements.Behavior;
 using Latte.Elements.Properties;
 
 

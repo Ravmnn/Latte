@@ -28,9 +28,29 @@ public static class Clipping
     }
 
 
+    // The clipping logic is based on stencil bits to determine where
+    // it is allowed to draw something. If the pixel stencil bit is
+    // not 0, drawing is allowed.
+
+    // The above approach would work perfectly if this framework didn't
+    // use hierarchy to structure the elements. But, since it does,
+    // it would not be possible to specify if an element could be drawn
+    // in a location, while another one could not.
+    // For instance, a text inside a button cannot be drawn outside the
+    // button's content. This would work if the button hadn't a parent.
+    // If it does, everywhere inside the top-most parent would be considered
+    // drawable for all elements, since all its area would have a stencil bit of 1.
+    // To solve that problem, stencil bits from 1 to 255 are used to map
+    // different drawable layers. Layer index is the same as stencil bit.
+    // In the example of the button I mentioned above, the parent of the button
+    // would have a layer index of 1; the button, 2; the text inside the button, 3.
+    // The button can only be drawn inside a layer with index 1 or more, and the text can only
+    // be drawn in a layer of index 2 or more.
+
+
     public static void Clip(int layerIndex)
     {
-        GL.StencilFunc(StencilFunction.Equal, layerIndex, 0xff);
+        GL.StencilFunc(StencilFunction.Lequal, layerIndex, 0xff);
         GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Keep);
     }
 
@@ -39,14 +59,18 @@ public static class Clipping
     {
         DisableColorMask();
 
+        // now, every drawing operation will set the stencil bit to 1
         GL.StencilFunc(StencilFunction.Always, 1, 0xff);
         GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Replace);
 
         var parents = element.GetParents().Reverse().ToArray();
 
+        // the first drawing sets the initial stencil bit to 1
         if (parents.Length > 0)
             parents.First().BorderLessSimpleDraw(target);
 
+        // now, drawings are only allowed where the stencil bit is not 0.
+        // if the pixel has a stencil bit > 0, increment it
         GL.StencilFunc(StencilFunction.Notequal, 0, 0xff);
         GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Incr);
 

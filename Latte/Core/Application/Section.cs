@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Latte.Elements.Behavior;
 using SFML.Graphics;
 
 using Latte.Elements.Primitives;
@@ -43,13 +43,6 @@ public class Section : IUpdateable, IDrawable
         => _elements = _elements.OrderBy(element => element.Priority).ToList();
 
 
-    private void OnElementChildAdded(object? _, ElementEventArgs e)
-    {
-        if (e.Element is not null)
-            AddElement(e.Element);
-    }
-
-
     public void AddElement(Element element)
     {
         AddSingleElement(element);
@@ -66,7 +59,7 @@ public class Section : IUpdateable, IDrawable
 
         _elements.Add(element);
 
-        element.ChildAddedEvent += OnElementChildAdded;
+        AddEventListenersTo(element);
 
         ElementAddedEvent?.Invoke(null, new ElementEventArgs(element));
     }
@@ -92,7 +85,7 @@ public class Section : IUpdateable, IDrawable
     {
         var result = _elements.Remove(element);
 
-        element.ChildAddedEvent -= OnElementChildAdded;
+        RemoveEventListenersOf(element);
 
         ElementRemovedEvent?.Invoke(null, new ElementEventArgs(element));
 
@@ -102,4 +95,37 @@ public class Section : IUpdateable, IDrawable
 
     public bool HasElement(Element element)
         => _elements.Contains(element);
+
+
+
+    public void AddEventListenersTo(Element element)
+    {
+        AddChildAddedListenerTo(element);
+
+        if (element is IFocusable focusable)
+            FocusManager.AddFocusListenerTo(focusable);
+    }
+
+    public void RemoveEventListenersOf(Element element)
+    {
+        RemoveChildAddedListenerOf(element);
+
+        if (element is IFocusable focusable)
+            FocusManager.RemoveFocusListenerOf(focusable);
+    }
+
+
+    private void AddChildAddedListenerTo(Element element)
+        => element.ChildAddedEvent += OnElementChildAdded;
+
+    private void RemoveChildAddedListenerOf(Element element)
+        => element.ChildAddedEvent -= OnElementChildAdded;
+
+
+
+    private void OnElementChildAdded(object? _, ElementEventArgs e)
+    {
+        if (e.Element is not null)
+            AddElement(e.Element);
+    }
 }
