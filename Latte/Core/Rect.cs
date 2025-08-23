@@ -1,11 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 
 using SFML.Graphics;
 
 using Latte.Core.Type;
-using Latte.Core.Application;
+using Latte.Application;
 
 
 namespace Latte.Core;

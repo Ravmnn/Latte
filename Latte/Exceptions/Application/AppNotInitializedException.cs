@@ -1,6 +1,6 @@
 using System;
 
-using Latte.Core.Application;
+using Latte.Application;
 
 
 namespace Latte.Exceptions.Application;

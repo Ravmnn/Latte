@@ -3,7 +3,7 @@ using System.Numerics;
 
 using SFML.System;
 
-using Latte.Core.Animation;
+using Latte.Animation;
 
 
 namespace Latte.Core.Type;

@@ -1,5 +1,6 @@
 using System;
 
+
 namespace Latte.Exceptions.Element;
 
 

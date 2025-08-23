@@ -1,4 +1,4 @@
-using Latte.Core.Animation;
+using Latte.Animation;
 
 
 namespace Latte.Core.Type;

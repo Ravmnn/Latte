@@ -1,12 +1,11 @@
-﻿using SFML.Window;
+﻿using Latte.Application;
+using Latte.Application.Elements;
+using Latte.Application.Elements.Behavior;
+using Latte.Application.Elements.Primitives;
+using Latte.Application.Elements.Primitives.Shapes;
+using SFML.Window;
 using SFML.Graphics;
-
-using Latte.Core.Application;
 using Latte.Core.Type;
-using Latte.Elements;
-using Latte.Elements.Behavior;
-using Latte.Elements.Primitives;
-using Latte.Elements.Primitives.Shapes;
 
 
 namespace Latte.Test;
