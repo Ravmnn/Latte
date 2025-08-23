@@ -110,8 +110,6 @@ public class InspectionWindow : WindowElement
             var frame = new InspectionFrameElement(inspectionData);
             DataGrid.AddElementAtEnd(frame);
             _frames.Add(frame);
-
-            App.AddElement(frame);
         }
 
         _lastInspectedElement = MouseInput.TrueElementWhichCaughtMouseInput;

@@ -56,6 +56,8 @@ public class ScrollAreaElement : ButtonElement
 
         ScrollOffsetStep = 10f;
         Direction = ScrollDirection.Vertical;
+
+        DisableFocus = true;
     }
 
 

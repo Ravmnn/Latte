@@ -43,27 +43,16 @@ public static class NavigationManager
     }
 
 
-    // TODO: this may be cleaned
     public static void NextElement()
-    {
-        var targets = GetElementsOrderedByNavigationPriority().ToArray();
-
-        if (CurrentTarget is null)
-            CurrentTarget = targets.FirstOrDefault();
-
-        else
-        {
-            for (var i = 0; i < targets.Length; i++)
-                if (targets[i] == CurrentTarget)
-                {
-                    CurrentTarget = i + 1 >= targets.Length ? targets.First() : targets.ElementAt(i + 1);
-                    break;
-                }
-        }
-    }
-
+        => SelectElementFromCurrentTarget((index, targets) =>
+            index + 1 >= targets.Length ? targets.First() : targets.ElementAt(index + 1));
 
     public static void PreviousElement()
+        => SelectElementFromCurrentTarget((index, targets) =>
+            index - 1 < 0 ? targets.Last() : targets.ElementAt(index - 1));
+
+
+    private static void SelectElementFromCurrentTarget(Func<int, INavigationTarget[], INavigationTarget> func)
     {
         var targets = GetElementsOrderedByNavigationPriority().ToArray();
 
@@ -75,19 +64,19 @@ public static class NavigationManager
             for (var i = 0; i < targets.Length; i++)
                 if (targets[i] == CurrentTarget)
                 {
-                    CurrentTarget = i - 1 < 0 ? targets.Last() : targets.ElementAt(i - 1);
+                    CurrentTarget = func(i, targets);
                     break;
                 }
         }
     }
 
 
-    // TODO: create a property Element.Active and replace it from Element.Visible in some cases.
+    // TODO: add Element.Active, which is Active = Visible && _active
 
     private static IEnumerable<INavigationTarget> GetElementsOrderedByNavigationPriority()
         => from element in App.Elements
             let navigationTarget = element as INavigationTarget
-            where navigationTarget is { DisableFocus: false }
+            where element is { Visible: true } && navigationTarget is { DisableFocus: false }
             orderby navigationTarget.NavigationPriority
             select navigationTarget;
 

@@ -36,6 +36,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
 
         InitFromOrientation(Orientation);
 
+        DisableFocus = true;
         DisableTruePressOnlyWhenMouseIsUp = true;
     }
 
