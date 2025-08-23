@@ -22,6 +22,8 @@ public interface IClickable : IMouseInputTarget, IFocusable
     event EventHandler? MouseDownEvent;
     event EventHandler? MouseUpEvent;
 
+    event EventHandler? MouseHoverEvent;
+
     event EventHandler? MouseClickEvent;
 
 
@@ -62,6 +64,9 @@ public interface IClickable : IMouseInputTarget, IFocusable
         if (MouseState.IsMouseDown && !MouseState.IsMouseHover && UnfocusOnMouseDownOutside)
             Unfocus();
 
+        if (MouseState.IsMouseHover)
+            OnMouseHover();
+
         if (pressed)
         {
             if (FocusOnMouseDown)
@@ -92,6 +97,8 @@ public interface IClickable : IMouseInputTarget, IFocusable
     void OnMouseLeave();
     void OnMouseDown();
     void OnMouseUp();
+
+    void OnMouseHover();
 
     void OnMouseClick();
 

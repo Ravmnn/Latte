@@ -14,6 +14,8 @@ using Latte.Elements.Primitives;
 using Latte.Exceptions.Application;
 
 
+using static SFML.Window.Cursor;
+
 using Debugger = Latte.Core.Application.Debugging.Debugger;
 
 
@@ -170,6 +172,8 @@ public static class App
         UpdateDeltaTime();
 
         Window.Update();
+        SetCursorToDefault();
+
 
         SetElementRenderView();
 
@@ -186,6 +190,7 @@ public static class App
 
         UnsetElementRenderView();
 
+
         KeyboardInput.ClearKeyBuffers();
     }
 
@@ -193,6 +198,11 @@ public static class App
     {
         DeltaTime = s_deltaTimeStopwatch.Elapsed;
         s_deltaTimeStopwatch.Restart();
+    }
+
+    private static void SetCursorToDefault()
+    {
+        Window.Cursor.Type = CursorType.Arrow;
     }
 
     private static void UpdateElementsAndCheckForNewElements()

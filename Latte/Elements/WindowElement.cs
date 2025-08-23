@@ -98,6 +98,8 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
     public event EventHandler? MouseDownEvent;
     public event EventHandler? MouseUpEvent;
 
+    public event EventHandler? MouseHoverEvent;
+
     public event EventHandler? MouseClickEvent;
 
     public event EventHandler? DragBeginEvent;
@@ -147,9 +149,6 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         {
             ThisResizable.UpdateCornersToResize();
             ThisResizable.ProcessResizingEvents();
-
-            if (MouseState.IsMouseHover)
-                App.Window.Cursor = Window.GetCursorTypeFromCorners(CornerToResize);
         }
 
         if (IsMoveable)
@@ -266,6 +265,15 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         Resizing = false;
 
         MouseUpEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    public virtual void OnMouseHover()
+    {
+        if (IsResizable && Window.GetCursorTypeFromCorners(CornerToResize) is { } cursorType)
+            App.Window.Cursor.Type = cursorType;
+
+        MouseHoverEvent?.Invoke(this, EventArgs.Empty);
     }
 
 

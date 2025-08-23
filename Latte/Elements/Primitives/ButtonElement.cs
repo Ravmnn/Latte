@@ -36,6 +36,8 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
     public event EventHandler? MouseDownEvent;
     public event EventHandler? MouseUpEvent;
 
+    public event EventHandler? MouseHoverEvent;
+
     public event EventHandler? MouseClickEvent;
 
     public int NavigationPriority { get; set; }
@@ -89,6 +91,9 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 
     public virtual void OnMouseUp()
         => MouseUpEvent?.Invoke(this, EventArgs.Empty);
+
+    public void OnMouseHover()
+        => MouseHoverEvent?.Invoke(this, EventArgs.Empty);
 
 
     public virtual void OnMouseClick()

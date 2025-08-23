@@ -1,10 +1,11 @@
 using System;
 
-using SFML.Window;
-
 using Latte.Core.Application;
 using Latte.Core.Type;
 using Latte.Elements.Primitives.Shapes;
+
+
+using static SFML.Window.Cursor;
 
 
 namespace Latte.Elements.Primitives;
@@ -63,8 +64,7 @@ public class TextSelectionElement : RectangleElement
     private void AddEventListeners(TextElement element)
     {
         element.UnfocusEvent += OnParentUnfocus;
-        element.MouseEnterEvent += OnParentMouseEnter;
-        element.MouseLeaveEvent += OnParentMouseLeave;
+        element.MouseHoverEvent += OnParentMouseHover;
         element.MouseDownEvent += OnParentMouseDown;
         element.MouseUpEvent += OnParentMouseUp;
     }
@@ -143,21 +143,10 @@ public class TextSelectionElement : RectangleElement
     }
 
 
-
-    private void OnParentMouseEnter(object? _, EventArgs __)
+    private void OnParentMouseHover(object? _, EventArgs __)
     {
         if (CanSelect)
-            App.Window.Cursor = new Cursor(Cursor.CursorType.Text);
-    }
-
-
-    private void OnParentMouseLeave(object? _, EventArgs __)
-    {
-        // TODO: changing manually may not be a good idea. Create methods like Cursor.Set and Cursor.Unset.
-        // Set changes the cursor, while Unset resets the cursor to the type before Set was called.
-
-        if (CanSelect)
-            App.Window.Cursor = new Cursor(Cursor.CursorType.Arrow);
+            App.Window.Cursor.Type = CursorType.Text;
     }
 
 
@@ -168,7 +157,6 @@ public class TextSelectionElement : RectangleElement
 
         IsSelecting = true;
     }
-
 
     private void OnParentMouseUp(object? _, EventArgs __)
     {

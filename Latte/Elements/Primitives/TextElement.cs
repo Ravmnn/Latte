@@ -48,6 +48,8 @@ public class TextElement : Element, IClickable
     public event EventHandler? MouseDownEvent;
     public event EventHandler? MouseUpEvent;
 
+    public event EventHandler? MouseHoverEvent;
+
     public event EventHandler? MouseClickEvent;
 
     public Property<string> Text { get; }
@@ -265,22 +267,21 @@ public class TextElement : Element, IClickable
     public void OnUnfocus()
         => UnfocusEvent?.Invoke(this, EventArgs.Empty);
 
-
     public void OnMouseEnter()
         => MouseEnterEvent?.Invoke(this, EventArgs.Empty);
-
 
     public void OnMouseLeave()
         => MouseLeaveEvent?.Invoke(this, EventArgs.Empty);
 
-
     public void OnMouseDown()
         => MouseDownEvent?.Invoke(this, EventArgs.Empty);
 
-
-
     public void OnMouseUp()
         => MouseUpEvent?.Invoke(this, EventArgs.Empty);
+
+
+    public void OnMouseHover()
+        => MouseHoverEvent?.Invoke(this, EventArgs.Empty);
 
 
     public void OnMouseClick()
