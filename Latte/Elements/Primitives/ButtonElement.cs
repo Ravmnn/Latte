@@ -50,7 +50,7 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
     public bool IgnoreKeyboardInput { get; set; }
 
 
-    public ButtonElement(Element? parent, Vec2f position, Vec2f size, string? text) : base(parent, position, size)
+    public ButtonElement(Element? parent, Vec2f? position, Vec2f size, string? text) : base(parent, position, size)
     {
         if (text is not null)
             Text = new TextElement(this, new Vec2f(), null, text)

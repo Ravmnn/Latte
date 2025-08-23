@@ -386,6 +386,15 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     }
 
 
+    protected void SetRelativePositionOrAlignment(Vec2f? position)
+    {
+        if (position is null)
+            Alignment.Set(Behavior.Alignment.Center);
+        else
+            RelativePosition.Set(position);
+    }
+
+
     public virtual void ApplyAlignment()
         => RelativePosition.Set(GetAlignmentRelativePosition() + AlignmentMargin);
 

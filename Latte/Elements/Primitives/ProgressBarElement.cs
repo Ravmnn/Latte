@@ -34,14 +34,14 @@ public class ProgressBarElement : Element
     public event EventHandler? CompletedEvent;
 
 
-    public ProgressBarElement(Element? parent, Vec2f position, Vec2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
+    public ProgressBarElement(Element? parent, Vec2f? position, Vec2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
     {
         MinValue = new Property<Float>(this, nameof(MinValue), minValue);
         MaxValue = new Property<Float>(this, nameof(MaxValue), maxValue);;
 
         Progress = new AnimatableProperty<Float>(this, nameof(Progress), 0f);
 
-        RelativePosition.Set(position);
+        SetRelativePositionOrAlignment(position);
 
         Background = new RectangleElement(this, new Vec2f(), size);
         Background.Color.Set(Color.Black);
@@ -66,8 +66,8 @@ public class ProgressBarElement : Element
 
     private void UpdateSizeBasedOnProgress()
         => Foreground.Size.Set(new Vec2f(Background.Size.Value.X * CalculateNormalizedProgress(), Background.Size.Value.Y));
-    
-    
+
+
     private float CalculateNormalizedProgress()
         => (Progress.Value - MinValue.Value) / (MaxValue.Value - MinValue.Value);
 
@@ -80,7 +80,7 @@ public class ProgressBarElement : Element
     {
         Foreground.BorderLessSimpleDraw(target);
     }
-    
+
 
     public override FloatRect GetBounds()
         => Background.GetBounds(); // only foreground change its size; use background then

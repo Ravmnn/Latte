@@ -23,10 +23,10 @@ public class RectangleElement : ShapeElement
 
     // TODO: when position or size is null in the constructor, use alignment (center horizontal or vertical) as default
 
-    public RectangleElement(Element? parent, Vec2f position, Vec2f size, float radius = 0f)
+    public RectangleElement(Element? parent, Vec2f? position, Vec2f size, float radius = 0f)
         : base(parent, new RoundedRectangleShape(size, radius, DefaultPointCount))
     {
-        RelativePosition.Set(position);
+        SetRelativePositionOrAlignment(position);
 
         Size = new AnimatableProperty<Vec2f>(this, nameof(Size), size);
         Radius = new AnimatableProperty<Float>(this, nameof(Radius), radius);

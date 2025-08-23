@@ -40,7 +40,7 @@ public class CheckBoxElement : ButtonElement
     public bool Selected { get; set; }
 
 
-    public CheckBoxElement(Element? parent, Vec2f position, bool selected = false) : base(parent, position, new Vec2f(20, 20), null)
+    public CheckBoxElement(Element? parent, Vec2f? position, bool selected = false) : base(parent, position, new Vec2f(20, 20), null)
     {
         SelectedIndicator = new CheckBoxSelectedIndicatorElement(this);
 

@@ -22,7 +22,7 @@ public class SpriteElement : Element
     public AnimatableProperty<Vec2f> Size { get; }
 
 
-    public SpriteElement(Element? parent, string imagePath, Vec2f position, Vec2f size) : base(parent)
+    public SpriteElement(Element? parent, string imagePath, Vec2f? position, Vec2f size) : base(parent)
     {
         SfmlSprite = new Sprite(new Texture(imagePath));
 
@@ -32,7 +32,7 @@ public class SpriteElement : Element
 
         Size = new AnimatableProperty<Vec2f>(this, nameof(Size), size);
 
-        RelativePosition.Set(position);
+        SetRelativePositionOrAlignment(position);
     }
 
 

@@ -137,5 +137,6 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     }
 
 
-    public Vec2f GetProgress() => RelativePosition.Value / (Parent.Size.Value - Size.Value);
+    public Vec2f GetProgress()
+        => RelativePosition.Value / (Parent.Size.Value - Size.Value);
 }

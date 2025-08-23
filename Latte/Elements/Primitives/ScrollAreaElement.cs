@@ -42,7 +42,7 @@ public class ScrollAreaElement : ButtonElement
     public event EventHandler<Vec2f>? ScrollEvent;
 
 
-    public ScrollAreaElement(Element? parent, Vec2f position, Vec2f size, bool verticalScrollHandle = true, bool horizontalScrollHandle = false)
+    public ScrollAreaElement(Element? parent, Vec2f? position, Vec2f size, bool verticalScrollHandle = true, bool horizontalScrollHandle = false)
             : base(parent, position, size, null)
     {
         if (verticalScrollHandle)

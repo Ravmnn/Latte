@@ -74,7 +74,7 @@ public class TextElement : Element, IClickable
     }
 
 
-    public TextElement(Element? parent, Vec2f position, uint? size, string text, Font? font = null) : base(parent)
+    public TextElement(Element? parent, Vec2f? position, uint? size, string text, Font? font = null) : base(parent)
     {
         SfmlText = new Text(text, font ?? App.DefaultFont);
 
@@ -85,7 +85,7 @@ public class TextElement : Element, IClickable
 
         MouseState = new MouseClickState();
 
-        RelativePosition.Set(position);
+        SetRelativePositionOrAlignment(position);
 
         if (size is null)
             SizePolicy.Set(Behavior.SizePolicy.FitParent);

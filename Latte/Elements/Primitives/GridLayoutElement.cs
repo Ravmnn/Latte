@@ -96,7 +96,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     public bool RecreationRequired { get; set; }
 
 
-    public GridLayoutElement(Element? parent, Vec2f position, uint rows, uint columns, float cellWidth, float cellHeight)
+    public GridLayoutElement(Element? parent, Vec2f? position, uint rows, uint columns, float cellWidth, float cellHeight)
         : base(parent, position, new Vec2f())
     {
         _rows = rows;

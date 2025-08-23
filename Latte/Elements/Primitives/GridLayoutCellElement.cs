@@ -23,7 +23,7 @@ public class GridLayoutCellElement : RectangleElement
     }
 
 
-    public GridLayoutCellElement(GridLayoutElement parent, Vec2f position, Vec2f size) : base(parent, position, size)
+    public GridLayoutCellElement(GridLayoutElement parent, Vec2f? position, Vec2f size) : base(parent, position, size)
     {
         Color.Value = SFML.Graphics.Color.Transparent;
     }
