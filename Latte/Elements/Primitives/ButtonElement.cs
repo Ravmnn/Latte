@@ -26,6 +26,7 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
     public event EventHandler? UnfocusEvent;
 
     public bool FocusOnMouseDown { get; set; }
+    public bool UnfocusOnMouseDownOutside { get; set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
@@ -58,6 +59,8 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 
                 Color = { Value = SFML.Graphics.Color.Black }
             };
+
+        UnfocusOnMouseDownOutside = true;
 
         BorderColor.Set(new ColorRGBA(100, 100, 100));
         BorderSize.Set(1f);

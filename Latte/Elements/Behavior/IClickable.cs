@@ -12,6 +12,7 @@ namespace Latte.Elements.Behavior;
 public interface IClickable : IMouseInputTarget, IFocusable
 {
     bool FocusOnMouseDown { get; }
+    bool UnfocusOnMouseDownOutside { get; }
 
     MouseClickState MouseState { get; }
     bool DisableTruePressOnlyWhenMouseIsUp { get; }
@@ -57,6 +58,9 @@ public interface IClickable : IMouseInputTarget, IFocusable
 
         var pressed = MouseState.IsTruePressed && !MouseState.WasTruePressed;
         var unpressed = !MouseState.IsTruePressed && MouseState.WasTruePressed;
+
+        if (MouseState.IsMouseDown && !MouseState.IsMouseHover && UnfocusOnMouseDownOutside)
+            Unfocus();
 
         if (pressed)
         {

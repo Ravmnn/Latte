@@ -4,8 +4,6 @@ using System;
 namespace Latte.Elements.Behavior;
 
 
-// TODO: focus logic only in App, use IFocusable.FocusEvent; App should use it for processing when an element gets focused
-
 public interface IFocusable
 {
     event EventHandler FocusEvent;
@@ -26,10 +24,6 @@ public interface IFocusable
             return;
 
         Focused = true;
-
-        // TODO: detect the current focused object from FocusManager.
-        // mixing application logic with element logic is bad, so do not use FocusManager.FocusOn to
-        // set the current global focused object.
 
         OnFocus();
     }

@@ -62,7 +62,7 @@ public class TextSelectionElement : RectangleElement
 
     private void AddEventListeners(TextElement element)
     {
-        element.UnfocusEvent -= OnParentUnfocus;
+        element.UnfocusEvent += OnParentUnfocus;
         element.MouseEnterEvent += OnParentMouseEnter;
         element.MouseLeaveEvent += OnParentMouseLeave;
         element.MouseDownEvent += OnParentMouseDown;

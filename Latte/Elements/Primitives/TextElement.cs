@@ -38,6 +38,7 @@ public class TextElement : Element, IClickable
     public event EventHandler? UnfocusEvent;
 
     public bool FocusOnMouseDown { get; set; }
+    public bool UnfocusOnMouseDownOutside { get; set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
@@ -78,6 +79,8 @@ public class TextElement : Element, IClickable
         Selection = new TextSelectionElement(this);
 
         FocusOnMouseDown = true;
+        UnfocusOnMouseDownOutside = true;
+
         MouseState = new MouseClickState();
 
         RelativePosition.Set(position);

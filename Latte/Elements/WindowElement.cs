@@ -74,6 +74,7 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
     public event EventHandler? UnfocusEvent;
 
     public bool FocusOnMouseDown { get; set; }
+    public bool UnfocusOnMouseDownOutside { get; set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
