@@ -22,9 +22,6 @@ using Debugger = Latte.Debugging.Debugger;
 namespace Latte.Application;
 
 
-// TODO: add math infrastructure which calculates the position and size of each individual letter.
-// TODO: add the ability to select text with the cursor (property which can be disabled or enabled).
-
 // TODO: add text inputs
 // TODO: add dropdown
 // TODO: add radial buttons

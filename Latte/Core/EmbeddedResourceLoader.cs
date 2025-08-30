@@ -10,7 +10,7 @@ public static class EmbeddedResourceLoader
 {
     public static byte[] GetBytes(this Assembly assembly, string resourceName)
     {
-        var stream = assembly.GetManifestResourceStream("VanillaTest.Fonts.NationalPark.ttf");
+        var stream = assembly.GetManifestResourceStream(resourceName);
         var bytes = new byte[stream!.Length];
         stream.ReadExactly(bytes, 0, bytes.Length);
 

@@ -18,4 +18,8 @@
       <PackageReference Include="SFML.Net" Version="2.6.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="Resources/**/*" />
+    </ItemGroup>
+
 </Project>

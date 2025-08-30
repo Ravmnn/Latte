@@ -1,11 +1,13 @@
-﻿using Latte.Application;
+﻿using SFML.Window;
+using SFML.Graphics;
+
+using Latte.Core;
+using Latte.Core.Type;
+using Latte.Application;
 using Latte.Application.Elements;
 using Latte.Application.Elements.Behavior;
 using Latte.Application.Elements.Primitives;
 using Latte.Application.Elements.Primitives.Shapes;
-using SFML.Window;
-using SFML.Graphics;
-using Latte.Core.Type;
 
 
 namespace Latte.Test;
@@ -15,12 +17,7 @@ class Program
 {
     private static void Main()
     {
-
-        // TODO: embed into Latte
-        var font = new Font("resources/Roboto-Regular.ttf");
-        font.SetSmooth(false);
-
-        App.Init(VideoMode.DesktopMode, "Latte Test", font);
+        App.Init(VideoMode.DesktopMode, "Latte Test", EmbeddedResources.DefaultFont());
         App.Debugger.EnableKeyShortcuts = true;
 
 
