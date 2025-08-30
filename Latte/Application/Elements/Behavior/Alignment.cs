@@ -26,8 +26,12 @@ public enum Alignment
     HorizontalCenter = 1 << 4,
     VerticalCenter = 1 << 5,
 
+    // TODO: add more, like TopCenter and LeftCenter
+
     Center = HorizontalCenter | VerticalCenter
 }
+
+// TODO: alignment not working properly
 
 
 public interface IAlignable

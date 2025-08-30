@@ -351,10 +351,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         => (from child in Children select child.GetBorderLessRelativeBounds()).GetBoundsOfRects();
 
     public virtual Vec2f GetAlignmentPosition(Alignment alignment)
-        => AlignmentCalculator.GetAlignedPositionOfChild(GetBorderLessBounds(), GetParentBorderLessBounds(), alignment);
+        => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), GetParentBorderLessBounds(), alignment);
 
     public virtual Vec2f GetAlignmentRelativePosition(Alignment alignment)
-        => AlignmentCalculator.GetAlignedRelativePositionOfChild(GetBorderLessRelativeBounds(), GetParentBorderLessRelativeBounds(), alignment);
+        => AlignmentCalculator.GetAlignedRelativePositionOfChild(GetRelativeBounds(), GetParentBorderLessRelativeBounds(), alignment);
 
 
     public Vec2f GetAlignmentPosition() => GetAlignmentPosition(Alignment);

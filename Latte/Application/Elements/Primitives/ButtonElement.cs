@@ -43,6 +43,7 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 
     public event EventHandler<KeyEventArgs>? KeyDownEvent;
     public event EventHandler<KeyEventArgs>? KeyUpEvent;
+    public event EventHandler<TextEventArgs>? TextEnteredEvent;
     public event EventHandler<KeyEventArgs>? SubmitKeyDownEvent;
     public event EventHandler<KeyEventArgs>? SubmitKeyUpEvent;
 
@@ -131,6 +132,10 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 
         KeyUpEvent?.Invoke(this, key);
     }
+
+
+    public virtual void OnTextEntered(TextEventArgs text)
+        => TextEnteredEvent?.Invoke(this, text);
 
 
     public virtual void OnSubmitKeyDown(KeyEventArgs key)

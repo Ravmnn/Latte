@@ -4,6 +4,12 @@ using Latte.Animation;
 namespace Latte.Core.Type;
 
 
+// TODO: add Clamped<number>, a numeric value that is inside a limit
+// TODO: add Circular<number>, a numeric value that wraps-around
+
+// TODO: use these in GridLayout and TextInput
+
+
 public struct Float(float value) : IAnimatable<Float>
 {
     public float Value { get; set; } = value;

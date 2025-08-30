@@ -219,7 +219,7 @@ public class TextElement : Element, IClickable
         {
             var character = Text.Value[(int)i];
 
-            var position = GetAbsolutePositionOfCharacter(i);
+            var position = MapToAbsolute(GetRelativePositionOfCharacter(i));
             var size = new Vec2f(GetWidthOfCharacter(i), GetBounds().Height);
 
             var rect = new FloatRect(position, size);
@@ -236,13 +236,13 @@ public class TextElement : Element, IClickable
         => CharacterAtPoint(MouseInput.PositionInElementView);
 
 
-    private Vec2f GetAbsolutePositionOfCharacter(uint index)
+    public Vec2f GetRelativePositionOfCharacter(uint index)
     {
         if (index >= Text.Value.Length)
             return SfmlText.FindCharacterPos(index);
 
-        var positionX = MapToAbsolute(SfmlText.FindCharacterPos(index)).X;
-        var positionY = GetBounds().Top;
+        var positionX = SfmlText.FindCharacterPos(index).X;
+        var positionY = MapToRelative(GetBounds().Position).Y;
 
         return new Vec2f(positionX, positionY);
     }

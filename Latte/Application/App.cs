@@ -22,6 +22,8 @@ using Debugger = Latte.Debugging.Debugger;
 namespace Latte.Application;
 
 
+// TODO: add time-based performance analyzer, with FPS calculator
+
 // TODO: add text inputs
 // TODO: add dropdown
 // TODO: add radial buttons
@@ -152,7 +154,9 @@ public static class App
         Window.Resized += (_, args) => OnWindowResize(new Vec2u(args.Width, args.Height));
 
         MouseInput.AddScrollListener(Window);
-        KeyboardInput.AddKeyListener(Window);
+        KeyboardInput.AddKeyListeners(Window);
+
+        // TODO: add deinit method
 
         MainView = new View(Window.GetView());
         ElementView = new View(MainView);

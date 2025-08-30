@@ -12,26 +12,27 @@ public static class KeyboardInput
 {
     public static event EventHandler<KeyEventArgs>? KeyPressedEvent;
     public static event EventHandler<KeyEventArgs>? KeyReleasedEvent;
+    public static event EventHandler<TextEventArgs>? TextEnteredEvent;
+
     public static KeyEventArgs? PressedKey { get; private set; }
     public static KeyEventArgs? ReleasedKey { get; private set; }
+    public static TextEventArgs? EnteredText { get; private set; }
     public static Keyboard.Scancode? PressedKeyCode => PressedKey?.Scancode;
     public static Keyboard.Scancode? ReleasedKeyCode => ReleasedKey?.Scancode;
 
 
-    static KeyboardInput()
+    public static void AddKeyListeners(Window window)
     {
-        KeyPressedEvent += (_, args) => OnKeyPressed(args);
-        KeyReleasedEvent += (_, args) => OnKeyReleased(args);
+        window.KeyPressed += OnKeyPressed;
+        window.KeyReleased += OnKeyReleased;
+        window.TextEntered += OnTextEntered;
     }
 
-
-    public static void AddKeyListener(Window window)
+    public static void RemoveKeyListeners(Window window)
     {
-        window.KeyPressed += (sender, args) => KeyPressedEvent?.Invoke(sender, args);
-        window.KeyReleased += (sender, args) => KeyReleasedEvent?.Invoke(sender, args);
-
-        KeyPressedEvent += (_, args) => PressedKey = args;
-        KeyReleasedEvent += (_, args) => ReleasedKey = args;
+        window.KeyPressed -= OnKeyPressed;
+        window.KeyReleased -= OnKeyReleased;
+        window.TextEntered -= OnTextEntered;
     }
 
 
@@ -39,18 +40,38 @@ public static class KeyboardInput
     {
         PressedKey = null;
         ReleasedKey = null;
+        EnteredText = null;
     }
 
 
-    private static void OnKeyPressed(KeyEventArgs key)
+    private static void OnKeyPressed(object? sender, KeyEventArgs args)
     {
+        PressedKey = args;
+
         if (FocusManager.CurrentFocused is IKeyboardInputTarget inputTarget)
-            inputTarget.OnKeyDown(key);
+            inputTarget.OnKeyDown(args);
+
+        KeyPressedEvent?.Invoke(sender, args);
     }
 
-    private static void OnKeyReleased(KeyEventArgs key)
+    private static void OnKeyReleased(object? sender, KeyEventArgs args)
     {
+        ReleasedKey = args;
+
         if (FocusManager.CurrentFocused is IKeyboardInputTarget inputTarget)
-            inputTarget.OnKeyUp(key);
+            inputTarget.OnKeyUp(args);
+
+        KeyReleasedEvent?.Invoke(sender, args);
+    }
+    
+
+    private static void OnTextEntered(object? sender, TextEventArgs args)
+    {
+        EnteredText = args;
+
+        if (FocusManager.CurrentFocused is IKeyboardInputTarget inputTarget)
+            inputTarget.OnTextEntered(args);
+
+        TextEnteredEvent?.Invoke(sender, args);
     }
 }

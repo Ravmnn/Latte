@@ -1,7 +1,6 @@
 ﻿using SFML.Window;
 using SFML.Graphics;
 
-using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application;
 using Latte.Application.Elements;
@@ -21,11 +20,11 @@ class Program
         App.Debugger.EnableKeyShortcuts = true;
 
 
-        var window = new WindowElement("Window", new Vec2f(), new Vec2f(300, 300))
+        var window = new WindowElement("Window", new Vec2f(), new Vec2f(600, 300))
         {
             Radius = { Value = 10f },
 
-            BorderSize = { Value = 2f },
+            BorderSize = { Value = 0f },
             BorderColor = { Value = Color.Magenta }
         };
 
@@ -37,7 +36,8 @@ class Program
 
             Radius = { Value = 4f },
 
-            Alignment = { Value = Alignment.Center }
+            Alignment = { Value = Alignment.VerticalCenter | Alignment.Left },
+            //AlignmentMargin = { Value = new Vec2f(30) }
         };
 
         new TextElement(rect, new Vec2f(), 30, "This is a text.")
@@ -55,6 +55,14 @@ class Program
 
             Alignment = { Value = Alignment.HorizontalCenter | Alignment.Bottom },
             AlignmentMargin = { Value = new Vec2f(0, -10) }
+        };
+
+        new TextInputElement(window, null, new Vec2f(150, 50))
+        {
+            BorderSize = { Value = 5f },
+
+            Alignment = { Value = Alignment.VerticalCenter | Alignment.Right },
+            AlignmentMargin = { Value = new Vec2f() }
         };
 
 
