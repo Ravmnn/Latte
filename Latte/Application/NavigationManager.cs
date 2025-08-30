@@ -38,7 +38,7 @@ public static class NavigationManager
 
     public static void Update()
     {
-        if (CurrentTarget is Element { Visible: false })
+        if (CurrentTarget is Element { Active: false })
             CurrentTarget = null;
     }
 
@@ -71,12 +71,10 @@ public static class NavigationManager
     }
 
 
-    // TODO: add Element.Active, which is Active = Visible && _active
-
     private static IEnumerable<INavigationTarget> GetElementsOrderedByNavigationPriority()
         => from element in App.Elements
             let navigationTarget = element as INavigationTarget
-            where element is { Visible: true } && navigationTarget is { DisableFocus: false }
+            where element is { Active: true } && navigationTarget is { DisableFocus: false }
             orderby navigationTarget.NavigationPriority
             select navigationTarget;
 

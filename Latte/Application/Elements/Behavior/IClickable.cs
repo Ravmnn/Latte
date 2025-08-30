@@ -90,8 +90,6 @@ public interface IClickable : IMouseInputTarget, IFocusable
     }
 
 
-    // TODO: check if it isn't possible to make event calling in default implementations
-
     void OnMouseEnter();
     void OnMouseLeave();
     void OnMouseDown();

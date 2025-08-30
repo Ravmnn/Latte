@@ -39,6 +39,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     private readonly List<Property> _properties;
 
     private bool _visible;
+    private bool _active;
 
     private int _priority;
 
@@ -78,6 +79,12 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
             _visible = value;
             OnVisibilityChange();
         }
+    }
+
+    public bool Active
+    {
+        get => _active && Visible;
+        set => _active = value;
     }
 
     protected bool ParentVisible => Parent?.Visible ?? true;
@@ -142,6 +149,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     protected Element(Element? parent)
     {
         _properties = [];
+        _active = true;
+
 
         Children = [];
         Parent = parent;

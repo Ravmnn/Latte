@@ -228,7 +228,7 @@ public static class App
 
         foreach (var element in Elements.ToArray())
         {
-            if (element.Visible && !constantUpdateOnly)
+            if (element.Active && !constantUpdateOnly)
                 element.Update();
 
             element.ConstantUpdate();
