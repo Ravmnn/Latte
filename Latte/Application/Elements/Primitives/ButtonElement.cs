@@ -80,6 +80,13 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
     }
 
 
+    public virtual bool IsPointOver(Vec2f point)
+        => IsPointOverClipArea(point) && IsPointOverThis(point);
+
+    protected bool IsPointOverThis(Vec2f point)
+        => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius.Value);
+
+
     public virtual void OnMouseEnter()
         => MouseEnterEvent?.Invoke(this, EventArgs.Empty);
 
@@ -92,19 +99,12 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
     public virtual void OnMouseUp()
         => MouseUpEvent?.Invoke(this, EventArgs.Empty);
 
-    public void OnMouseHover()
+    public virtual void OnMouseHover()
         => MouseHoverEvent?.Invoke(this, EventArgs.Empty);
 
 
     public virtual void OnMouseClick()
         => MouseClickEvent?.Invoke(this, EventArgs.Empty);
-
-
-    public virtual bool IsPointOver(Vec2f point)
-        => IsPointOverClipArea(point) && IsPointOverThis(point);
-
-    protected bool IsPointOverThis(Vec2f point)
-        => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius.Value);
 
 
     public virtual void OnFocus()

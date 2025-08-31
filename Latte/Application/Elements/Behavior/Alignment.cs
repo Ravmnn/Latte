@@ -1,7 +1,8 @@
 using System;
-using Latte.Core;
+
 using SFML.Graphics;
 
+using Latte.Core;
 using Latte.Core.Type;
 
 

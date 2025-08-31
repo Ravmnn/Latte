@@ -6,8 +6,7 @@ using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application.Elements.Behavior;
 using Latte.Application.Elements.Properties;
-
-
+using SFML.System;
 using Math = System.Math;
 
 
@@ -64,12 +63,12 @@ public class TextElement : Element, IClickable
     public AnimatableProperty<ColorRGBA> BorderColor { get; }
 
 
-    public readonly struct Character(uint index, char @char, FloatRect geometry)
+    public readonly struct Character(int index, char @char, FloatRect absoluteGeometry)
     {
-        public uint Index { get; } = index;
+        public int Index { get; } = index;
         public char Char { get; } = @char;
 
-        public FloatRect Geometry { get; } = geometry;
+        public FloatRect AbsoluteGeometry { get; } = absoluteGeometry;
     }
 
 
@@ -159,10 +158,16 @@ public class TextElement : Element, IClickable
 
 
     public override Vec2f GetAlignmentPosition(Alignment alignment)
-        => AlignmentCalculator.GetTextAlignedPositionOfChild(SfmlText, GetParentBorderLessBounds(), alignment);
+    {
+        var position = AlignmentCalculator.GetTextAlignedPositionOfChild(SfmlText, GetParentBorderLessBounds(), alignment);
+        return AlignmentCalculator.ApplyBorderOffset(position, BorderSize.Value, alignment);
+    }
 
     public override Vec2f GetAlignmentRelativePosition(Alignment alignment)
-        => AlignmentCalculator.GetTextAlignedRelativePositionOfChild(SfmlText, GetParentBorderLessBounds(), alignment);
+    {
+        var position = AlignmentCalculator.GetTextAlignedRelativePositionOfChild(SfmlText, GetParentBorderLessBounds(), alignment);
+        return AlignmentCalculator.ApplyBorderOffset(position, BorderSize.Value, alignment);
+    }
 
 
     public override void ApplySizePolicy()
@@ -177,13 +182,13 @@ public class TextElement : Element, IClickable
 
     private (float, uint) CalculateFitSize(FloatRect targetRect, FloatRect bounds)
     {
-        // first find the size based on the height...
+        // first find the size based on the height.
 
         var floatFitSize = CalculateSizePolicyTextSize(targetRect.Height, bounds.Height);
         var fitSize = (uint)Math.Round(floatFitSize);
 
         // if the calculated text size (bounds) width is greater than the target width, then
-        // calculates using the width instead
+        // calculates using the width instead.
         if (CalculateBoundsOfTextWithSize(SfmlText, fitSize).Width > targetRect.Width)
         {
             floatFitSize = CalculateSizePolicyTextSize(targetRect.Width, bounds.Width);
@@ -213,47 +218,70 @@ public class TextElement : Element, IClickable
     public Character? CharacterAtPoint(Vec2f point)
     {
         if (!IsPointOverBounds(point))
-            return null;
+            return OutsideCharacterFromX(point.X);
 
-        for (var i = 0u; i < Text.Value.Length; i++)
+        for (var i = 0; i < Text.Value.Length; i++)
         {
-            var character = Text.Value[(int)i];
+            var character = CharacterAtIndex(i);
 
-            var position = MapToAbsolute(GetRelativePositionOfCharacter(i));
-            var size = new Vec2f(GetWidthOfCharacter(i), GetBounds().Height);
-
-            var rect = new FloatRect(position, size);
-
-            if (point.IsPointOverRect(rect))
-                return new Character(i, character, rect);
+            if (point.IsPointOverRect(character.AbsoluteGeometry))
+                return character;
         }
 
         return null;
     }
 
+    private Character? OutsideCharacterFromX(float x)
+    {
+        var bounds = GetBounds();
+        var vertices = bounds.RectToVertices();
+
+        if (x < vertices.TopLeft.X)
+            return new Character(-1, '\0', bounds with { Width = 0 });
+
+        if (x > vertices.TopRight.X)
+            return new Character(Text.Value.Length, '\0', bounds with { Left = vertices.TopRight.X, Width = 0 });
+
+        return null;
+    }
 
     public Character? CharacterAtMousePosition()
         => CharacterAtPoint(MouseInput.PositionInElementView);
 
 
-    public Vec2f GetRelativePositionOfCharacter(uint index)
+    public Character CharacterAtIndex(int index)
     {
-        if (index >= Text.Value.Length)
-            return SfmlText.FindCharacterPos(index);
+        var character = Text.Value[index];
+        var rect = GetAbsoluteGeometryOfCharacter(index);
 
-        var positionX = SfmlText.FindCharacterPos(index).X;
-        var positionY = MapToRelative(GetBounds().Position).Y;
-
-        return new Vec2f(positionX, positionY);
+        return new Character(index, character, rect);
     }
 
 
-    private float GetWidthOfCharacter(uint index)
+    public FloatRect GetRelativeGeometryOfCharacter(int index)
+        => new FloatRect
+        {
+            Left = SfmlText.FindCharacterPos((uint)index).X,
+            Top = GetRelativeBounds().Position.Y,
+            Width = GetWidthOfCharacter(index),
+            Height = GetBounds().Height
+        };
+
+    public FloatRect GetAbsoluteGeometryOfCharacter(int index)
+    {
+        var relativeGeometry = GetRelativeGeometryOfCharacter(index);
+        var absolutePosition = MapToAbsolute(relativeGeometry.Position);
+
+        return new FloatRect(absolutePosition, relativeGeometry.Size);
+    }
+
+
+    private float GetWidthOfCharacter(int index)
     {
         if (index >= Text.Value.Length)
             return 0f;
 
-        var character = Text.Value[(int)index];
+        var character = Text.Value[index];
         var glyph = SfmlText.Font.GetGlyph(character, Size, false, BorderSize.Value);
 
         return glyph.Advance;

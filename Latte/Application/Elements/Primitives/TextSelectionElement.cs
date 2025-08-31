@@ -2,8 +2,7 @@ using System;
 
 using Latte.Core.Type;
 using Latte.Application.Elements.Primitives.Shapes;
-
-
+using Latte.Core;
 using static SFML.Window.Cursor;
 
 
@@ -89,10 +88,25 @@ public class TextSelectionElement : RectangleElement
         if (!ShouldUpdateSelection)
             return;
 
+        var fromEnd = end.Index < start.Index;
+
         SwapCharactersIfStartIsGreater(ref start, ref end);
 
-        AbsolutePosition = start.Geometry.Position;
-        Size.Set(end.Geometry.Position + end.Geometry.Size - start.Geometry.Position);
+        var startGeometry = start.AbsoluteGeometry;
+        var endGeometry = end.AbsoluteGeometry;
+
+        var startPosition = startGeometry.Position;
+        var endPosition = endGeometry.Position;
+
+        if (fromEnd)
+        {
+            startPosition.X += startGeometry.Width;
+            endPosition.X += endGeometry.Width;
+        }
+
+
+        AbsolutePosition = startPosition;
+        Size.Set(new Vec2f(endPosition.X - startPosition.X, endGeometry.Height));
         Visible = true;
 
         ShouldUpdateSelection = false;
@@ -115,9 +129,14 @@ public class TextSelectionElement : RectangleElement
         var start = Start.Value;
         var end = End.Value;
 
+        var fromEnd = end.Index < start.Index;
+
         SwapCharactersIfStartIsGreater(ref start, ref end);
 
-        return Parent.Text.Value[(int)start.Index .. ((int)end.Index + 1)];
+        var startIndex = start.Index + (fromEnd ? 1 : 0);
+        var endIndex = end.Index + 1 - (fromEnd ? 0 : 1);
+
+        return Parent.Text.Value[(int)startIndex .. (int)endIndex];
     }
 
 
