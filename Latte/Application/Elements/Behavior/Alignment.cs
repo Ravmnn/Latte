@@ -106,12 +106,22 @@ public static class AlignmentCalculator
     public static Vec2f ApplyBorderOffset(Vec2f position, float borderSize, Alignment alignment)
     {
         var newPosition = position.Copy();
+        var ignoreCenter = false;
 
         if (alignment.HasAnyFlag(Alignment.Top, Alignment.Bottom))
+        {
             newPosition.Y += borderSize;
+            ignoreCenter = true;
+        }
 
         if (alignment.HasAnyFlag(Alignment.Left, Alignment.Right))
+        {
             newPosition.X += borderSize;
+            ignoreCenter = true;
+        }
+
+        if (!ignoreCenter && alignment.HasAnyFlag(Alignment.HorizontalCenter, Alignment.VerticalCenter))
+            newPosition += new Vec2f(borderSize, borderSize);
 
         return newPosition;
     }
