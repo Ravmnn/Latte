@@ -33,6 +33,7 @@ public abstract class AnimationData(double time, Easing easing = Easing.Linear, 
             return;
 
         ElapsedTime += App.DeltaTimeInSeconds;
+        ElapsedTime = Math.Min(ElapsedTime, Time);
 
         UpdateProgress();
 
@@ -64,6 +65,10 @@ public abstract class AnimationData(double time, Easing easing = Easing.Linear, 
         EasedProgress = 0;
         HasAborted = false;
     }
+
+
+    public override string ToString()
+        => $"{(HasAborted ? "[aborted]" : "")}{ElapsedTime} | {Time} ({Progress * 100}%)";
 
 
     protected virtual void OnUpdated()

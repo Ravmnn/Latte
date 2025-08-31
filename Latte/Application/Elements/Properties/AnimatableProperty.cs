@@ -7,9 +7,6 @@ namespace Latte.Application.Elements.Properties;
 
 public abstract class AnimatableProperty(Element owner, string name, object value) : Property(owner, name, value)
 {
-    private object _lastTarget;
-
-
     public new IAnimatable Value
     {
         get => (IAnimatable)base.Value;
@@ -21,8 +18,6 @@ public abstract class AnimatableProperty(Element owner, string name, object valu
 
     public FloatAnimation Animate(object to, double time, Easing easing = Easing.Linear)
     {
-        _lastTarget = to;
-
         Animation?.Abort();
 
         Animation = Value.AnimateThis(to, time, easing);

@@ -30,6 +30,9 @@ public interface IFocusable
 
     void Unfocus()
     {
+        if (!Focused)
+            return;
+
         Focused = false;
         OnUnfocus();
     }

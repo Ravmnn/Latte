@@ -1,6 +1,3 @@
-using System.Linq;
-
-
 namespace Latte.Animation;
 
 
@@ -29,14 +26,6 @@ public class FloatAnimation(float[] startValues, float[] endValues, double time,
     public float[] EndValues { get; } = endValues;
     public float[] CurrentValues { get; private set; } = new float[startValues.Length];
 
-
-    public override void Update()
-    {
-        if (CurrentValues.SequenceEqual(EndValues) && !HasFinished)
-            Abort();
-
-        base.Update();
-    }
 
     private void UpdateCurrentValues()
     {
