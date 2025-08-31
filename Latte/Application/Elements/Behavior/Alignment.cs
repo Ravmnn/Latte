@@ -1,5 +1,5 @@
 using System;
-
+using Latte.Core;
 using SFML.Graphics;
 
 using Latte.Core.Type;
@@ -93,7 +93,6 @@ public static class AlignmentCalculator
         return position;
     }
 
-
     // text local bounds work quite different
     // https://learnsfml.com/basics/graphics/how-to-center-text/#set-a-string
 
@@ -102,4 +101,18 @@ public static class AlignmentCalculator
 
     public static Vec2f GetTextAlignedRelativePositionOfChild(Text text, FloatRect parent, Alignment alignment)
         => GetAlignedRelativePositionOfChild(text.GetGlobalBounds(), parent, alignment) - text.GetLocalBounds().Position;
+
+
+    public static Vec2f ApplyBorderOffset(Vec2f position, float borderSize, Alignment alignment)
+    {
+        var newPosition = position.Copy();
+
+        if (alignment.HasAnyFlag(Alignment.Top, Alignment.Bottom))
+            newPosition.Y += borderSize;
+
+        if (alignment.HasAnyFlag(Alignment.Left, Alignment.Right))
+            newPosition.X += borderSize;
+
+        return newPosition;
+    }
 }

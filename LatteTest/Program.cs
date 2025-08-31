@@ -36,7 +36,7 @@ class Program
 
             Radius = { Value = 4f },
 
-            Alignment = { Value = Alignment.VerticalCenter | Alignment.Left },
+            Alignment = { Value = Alignment.Top | Alignment.Left },
             //AlignmentMargin = { Value = new Vec2f(30) }
         };
 

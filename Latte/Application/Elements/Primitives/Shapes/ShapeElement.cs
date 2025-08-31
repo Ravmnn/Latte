@@ -1,3 +1,4 @@
+using Latte.Application.Elements.Behavior;
 using SFML.Graphics;
 
 using Latte.Core;
@@ -55,4 +56,11 @@ public abstract class ShapeElement : Element
 
     public override FloatRect GetBorderLessRelativeBounds()
         => GetRelativeBounds().ShrinkRect(BorderSize.Value);
+
+
+    public override Vec2f GetAlignmentPosition(Alignment alignment)
+        => AlignmentCalculator.ApplyBorderOffset(base.GetAlignmentPosition(alignment), BorderSize.Value, alignment);
+
+    public override Vec2f GetAlignmentRelativePosition(Alignment alignment)
+        => AlignmentCalculator.ApplyBorderOffset(base.GetAlignmentRelativePosition(alignment), BorderSize.Value, alignment);
 }
