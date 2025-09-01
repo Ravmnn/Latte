@@ -3,6 +3,7 @@ using System;
 using SFML.Window;
 using SFML.Graphics;
 
+using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application;
 using Latte.Application.Elements.Attributes;
@@ -62,6 +63,9 @@ public sealed class Debugger : IUpdateable, IDrawable
     public DebugOption Options { get; set; }
     public bool EnableKeyShortcuts { get; set; }
 
+    public event EventHandler? UpdateEvent;
+    public event EventHandler? DrawEvent;
+
 
     public Debugger()
     {
@@ -76,7 +80,12 @@ public sealed class Debugger : IUpdateable, IDrawable
     }
 
 
-    public void Update() => ProcessDebugShortcuts();
+    public void Update()
+    {
+        ProcessDebugShortcuts();
+
+        UpdateEvent?.Invoke(this, EventArgs.Empty);
+    }
 
     private void ProcessDebugShortcuts()
     {
@@ -152,6 +161,8 @@ public sealed class Debugger : IUpdateable, IDrawable
 
         foreach (var element in App.Elements)
             DebugElement(target, element);
+
+        DrawEvent?.Invoke(this, EventArgs.Empty);
     }
 
     public void DebugElement(RenderTarget target, Element element)

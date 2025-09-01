@@ -2,10 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LatteTest", "LatteTest\LatteTest.csproj", "{268DC99F-64DE-4DF4-9CA7-6E3CA0BD1E22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LatteVanilla", "..\LatteVanilla\LatteVanilla\LatteVanilla.csproj", "{611F8BF1-6ACC-43FC-89CC-FB06688E2ED6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanillaTest", "..\LatteVanilla\VanillaTest\VanillaTest.csproj", "{E641BB08-4166-4FB2-82B5-0B8B8B6F598C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Latte", "Latte\Latte.csproj", "{C506580A-A57A-456F-9D11-EA0893E8B266}"
 EndProject
 Global
@@ -18,14 +14,6 @@ Global
 		{268DC99F-64DE-4DF4-9CA7-6E3CA0BD1E22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{268DC99F-64DE-4DF4-9CA7-6E3CA0BD1E22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{268DC99F-64DE-4DF4-9CA7-6E3CA0BD1E22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{611F8BF1-6ACC-43FC-89CC-FB06688E2ED6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{611F8BF1-6ACC-43FC-89CC-FB06688E2ED6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{611F8BF1-6ACC-43FC-89CC-FB06688E2ED6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{611F8BF1-6ACC-43FC-89CC-FB06688E2ED6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E641BB08-4166-4FB2-82B5-0B8B8B6F598C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E641BB08-4166-4FB2-82B5-0B8B8B6F598C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E641BB08-4166-4FB2-82B5-0B8B8B6F598C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E641BB08-4166-4FB2-82B5-0B8B8B6F598C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C506580A-A57A-456F-9D11-EA0893E8B266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C506580A-A57A-456F-9D11-EA0893E8B266}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C506580A-A57A-456F-9D11-EA0893E8B266}.Release|Any CPU.ActiveCfg = Release|Any CPU

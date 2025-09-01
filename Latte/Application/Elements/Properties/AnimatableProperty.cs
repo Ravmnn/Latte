@@ -21,9 +21,9 @@ public abstract class AnimatableProperty(Element owner, string name, object valu
         Animation?.Abort();
 
         Animation = Value.AnimateThis(to, time, easing);
-        Animation.UpdatedEvent += (_, _) => Value = Value.AnimationValuesToThis(Animation.CurrentValues);
-        Animation.FinishedEvent += (_, _) => Animation = null;
-        Animation.AbortedEvent += (_, _) => Animation = null;
+        Animation.UpdateEvent += (_, _) => Value = Value.AnimationValuesToThis(Animation.CurrentValues);
+        Animation.FinishEvent += (_, _) => Animation = null;
+        Animation.AbortEvent += (_, _) => Animation = null;
 
         return Animation;
     }

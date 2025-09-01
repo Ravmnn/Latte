@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using SFML.Graphics;
 
+using Latte.Core;
 using Latte.Application.Elements.Behavior;
 using Latte.Application.Elements.Primitives;
 
@@ -23,6 +24,9 @@ public class Section : IUpdateable, IDrawable
     public event EventHandler<ElementEventArgs>? ElementRemovedEvent;
     public event EventHandler<ElementEventArgs>? ElementListModifiedEvent;
 
+    public event EventHandler? UpdateEvent;
+    public event EventHandler? DrawEvent;
+
 
     public Section()
     {
@@ -36,8 +40,15 @@ public class Section : IUpdateable, IDrawable
     public virtual void Initialize() { }
     public virtual void Deinitialize() { }
 
-    public virtual void Update() => SortElementListByPriority();
-    public virtual void Draw(RenderTarget target) { }
+    public virtual void Update()
+    {
+        SortElementListByPriority();
+
+        UpdateEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+    public virtual void Draw(RenderTarget target)
+        => DrawEvent?.Invoke(this, EventArgs.Empty);
 
 
     private void SortElementListByPriority()

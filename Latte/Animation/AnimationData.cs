@@ -1,6 +1,10 @@
 using System;
 
+using Latte.Core;
 using Latte.Application;
+
+
+using Math = System.Math;
 
 
 namespace Latte.Animation;
@@ -22,9 +26,9 @@ public abstract class AnimationData(double time, Easing easing = Easing.Linear, 
 
     protected bool ShouldIgnoreUpdate => !IsRunning || HasFinished || HasAborted;
 
-    public event EventHandler? UpdatedEvent;
-    public event EventHandler? FinishedEvent;
-    public event EventHandler? AbortedEvent;
+    public event EventHandler? UpdateEvent;
+    public event EventHandler? FinishEvent;
+    public event EventHandler? AbortEvent;
 
 
     public virtual void Update()
@@ -36,8 +40,6 @@ public abstract class AnimationData(double time, Easing easing = Easing.Linear, 
         ElapsedTime = Math.Min(ElapsedTime, Time);
 
         UpdateProgress();
-
-        OnUpdated();
 
         if (HasFinished)
             OnFinished();
@@ -71,12 +73,9 @@ public abstract class AnimationData(double time, Easing easing = Easing.Linear, 
         => $"{(HasAborted ? "[aborted]" : "")}{ElapsedTime} | {Time} ({Progress * 100}%)";
 
 
-    protected virtual void OnUpdated()
-        => UpdatedEvent?.Invoke(this, EventArgs.Empty);
-
     protected virtual void OnFinished()
-        => FinishedEvent?.Invoke(this, EventArgs.Empty);
+        => FinishEvent?.Invoke(this, EventArgs.Empty);
 
     protected virtual void OnAborted()
-        => AbortedEvent?.Invoke(this, EventArgs.Empty);
+        => AbortEvent?.Invoke(this, EventArgs.Empty);
 }

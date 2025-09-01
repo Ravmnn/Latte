@@ -1,3 +1,8 @@
+using System;
+
+using Latte.Core;
+
+
 using SfmlCursor = SFML.Window.Cursor;
 
 
@@ -23,6 +28,8 @@ public class Cursor : IUpdateable
 
     public SfmlCursor.CursorType Type { get; set; }
 
+    public event EventHandler? UpdateEvent;
+
 
     public Cursor(Window window)
     {
@@ -36,7 +43,11 @@ public class Cursor : IUpdateable
 
 
     public void Update()
-        => SfmlCursor = new SfmlCursor(Type);
+    {
+        SfmlCursor = new SfmlCursor(Type);
+
+        UpdateEvent?.Invoke(this, EventArgs.Empty);
+    }
 
 
     private void SetThisToWindow()

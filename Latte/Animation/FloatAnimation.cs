@@ -27,20 +27,20 @@ public class FloatAnimation(float[] startValues, float[] endValues, double time,
     public float[] CurrentValues { get; private set; } = new float[startValues.Length];
 
 
-    private void UpdateCurrentValues()
+    public override void Update()
     {
-        for (uint i = 0; i < StartValues.Length; i++)
-            CurrentValues[i] = StartValues[i] + (EndValues[i] - StartValues[i]) * EasedProgress;
-    }
+        base.Update();
 
-
-    protected override void OnUpdated()
-    {
         UpdateCurrentValues();
 
         if (HasFinished)
             CurrentValues = EndValues;
+    }
 
-        base.OnUpdated();
+
+    private void UpdateCurrentValues()
+    {
+        for (uint i = 0; i < StartValues.Length; i++)
+            CurrentValues[i] = StartValues[i] + (EndValues[i] - StartValues[i]) * EasedProgress;
     }
 }

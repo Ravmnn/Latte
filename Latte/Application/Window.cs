@@ -1,3 +1,4 @@
+using System;
 using SFML.System;
 using SFML.Window;
 using SFML.Graphics;
@@ -28,6 +29,9 @@ public class Window : RenderWindow, IUpdateable, IDrawable
 
     public IntRect WindowRect => new IntRect(new Vector2i(0, 0), (Vector2i)Size);
 
+    public event EventHandler? UpdateEvent;
+    public event EventHandler? DrawEvent;
+
 
     public static ContextSettings DefaultSettings { get; }
 
@@ -55,13 +59,15 @@ public class Window : RenderWindow, IUpdateable, IDrawable
     {
         DispatchEvents();
         Cursor.Update();
+
+        UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
 
     public void Draw() => Draw(this);
 
 
     public virtual void Draw(RenderTarget target)
-    {}
+        => DrawEvent?.Invoke(this, EventArgs.Empty);
 
 
     public static SfmlCursor.CursorType? GetCursorTypeFromCorners(Corner corner)
