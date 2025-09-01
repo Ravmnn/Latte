@@ -57,15 +57,15 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
             {
                 IgnoreMouseInput = true,
 
-                Alignment = { Value = Behavior.Alignment.Center },
+                Alignment = Behavior.Alignment.Center,
 
-                Color = { Value = SFML.Graphics.Color.Black }
+                Color = SFML.Graphics.Color.Black
             };
 
         UnfocusOnMouseDownOutside = true;
 
-        BorderColor.Set(new ColorRGBA(100, 100, 100));
-        BorderSize.Set(1f);
+        BorderColor = new ColorRGBA(100, 100, 100);
+        BorderSize = 1f;
 
         MouseState = new MouseClickState();
     }
@@ -84,7 +84,7 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
         => IsPointOverClipArea(point) && IsPointOverThis(point);
 
     protected bool IsPointOverThis(Vec2f point)
-        => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius.Value);
+        => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius);
 
 
     public virtual void OnMouseEnter()

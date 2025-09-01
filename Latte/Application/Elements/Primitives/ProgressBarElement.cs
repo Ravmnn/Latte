@@ -4,7 +4,6 @@ using SFML.Graphics;
 
 using Latte.Core.Type;
 using Latte.Application.Elements.Primitives.Shapes;
-using Latte.Application.Elements.Properties;
 
 
 namespace Latte.Application.Elements.Primitives;
@@ -21,13 +20,13 @@ public class ProgressBarElement : Element
     protected RectangleElement Foreground { get; }
     protected RectangleElement Background { get; }
 
-    public AnimatableProperty<Float> Progress { get; }
+    public float Progress { get; set; }
 
-    public bool IsAtMax => Progress.Value >= MaxValue.Value;
-    public bool IsAtMin => Progress.Value <= MinValue.Value;
+    public bool IsAtMax => Progress >= MaxValue;
+    public bool IsAtMin => Progress <= MinValue;
 
-    public Property<Float> MinValue { get; }
-    public Property<Float> MaxValue { get; }
+    public float MinValue { get; set; }
+    public float MaxValue { get; set; }
 
     public bool Completed => IsAtMax;
 
@@ -36,18 +35,20 @@ public class ProgressBarElement : Element
 
     public ProgressBarElement(Element? parent, Vec2f? position, Vec2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
     {
-        MinValue = new Property<Float>(this, nameof(MinValue), minValue);
-        MaxValue = new Property<Float>(this, nameof(MaxValue), maxValue);;
-
-        Progress = new AnimatableProperty<Float>(this, nameof(Progress), 0f);
+        MinValue = minValue;
+        MaxValue = maxValue;
 
         SetRelativePositionOrAlignment(position);
 
-        Background = new RectangleElement(this, new Vec2f(), size);
-        Background.Color.Set(Color.Black);
+        Background = new RectangleElement(this, new Vec2f(), size)
+        {
+            Color = Color.Black
+        };
 
-        Foreground = new RectangleElement(this, new Vec2f(), size);
-        Foreground.Color.Set(Color.White);
+        Foreground = new RectangleElement(this, new Vec2f(), size)
+        {
+            Color = Color.White
+        };
     }
 
 
@@ -65,15 +66,15 @@ public class ProgressBarElement : Element
     }
 
     private void UpdateSizeBasedOnProgress()
-        => Foreground.Size.Set(new Vec2f(Background.Size.Value.X * CalculateNormalizedProgress(), Background.Size.Value.Y));
+        => Foreground.Size = new Vec2f(Background.Size.X * CalculateNormalizedProgress(), Background.Size.Y);
 
 
     private float CalculateNormalizedProgress()
-        => (Progress.Value - MinValue.Value) / (MaxValue.Value - MinValue.Value);
+        => (Progress - MinValue) / (MaxValue - MinValue);
 
 
     private void KeepProgressBetweenLimits()
-        => Progress.Set(Math.Clamp(Progress.Value, MinValue.Value, MaxValue.Value));
+        => Progress = Math.Clamp(Progress, MinValue, MaxValue);
 
 
     public override void BorderLessSimpleDraw(RenderTarget target)

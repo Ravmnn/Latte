@@ -106,7 +106,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
         GrowDirection = GridLayoutGrowDirection.Horizontal;
 
-        Color.Value = SFML.Graphics.Color.Transparent;
+        Color = SFML.Graphics.Color.Transparent;
 
         Cells = new GridLayoutCellElement[0, 0];
         CreateCells();
@@ -250,7 +250,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
             UpdateCellGeometry(row, col);
         }
 
-        Size.Value = new Vec2f(Columns * CellWidth, Rows * CellHeight);
+        Size = new Vec2f(Columns * CellWidth, Rows * CellHeight);
 
         RecreationRequired = false;
     }
@@ -265,8 +265,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     private void UpdateCellGeometry(uint row, uint col)
     {
-        Cells[row, col].RelativePosition.Value = new Vec2f(col * CellWidth, row * CellHeight);
-        Cells[row, col].Size.Value = new Vec2f(CellWidth, CellHeight);
+        Cells[row, col].RelativePosition = new Vec2f(col * CellWidth, row * CellHeight);
+        Cells[row, col].Size = new Vec2f(CellWidth, CellHeight);
     }
 
 

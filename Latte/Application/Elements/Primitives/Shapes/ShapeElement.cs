@@ -1,9 +1,8 @@
-using Latte.Application.Elements.Behavior;
 using SFML.Graphics;
 
 using Latte.Core;
 using Latte.Core.Type;
-using Latte.Application.Elements.Properties;
+using Latte.Application.Elements.Behavior;
 
 
 namespace Latte.Application.Elements.Primitives.Shapes;
@@ -16,20 +15,18 @@ public abstract class ShapeElement : Element
 
     public Shape SfmlShape { get; }
 
-    public AnimatableProperty<Float> BorderSize { get; }
+    public float BorderSize { get; set; }
 
-    public AnimatableProperty<ColorRGBA> Color { get; }
-    public AnimatableProperty<ColorRGBA> BorderColor { get; }
+    public ColorRGBA Color { get; set; }
+    public ColorRGBA BorderColor { get; set; }
 
 
     protected ShapeElement(Element? parent, Shape shape) : base(parent)
     {
         SfmlShape = shape;
 
-        BorderSize = new AnimatableProperty<Float>(this, nameof(BorderSize), 0f);
-
-        Color = new AnimatableProperty<ColorRGBA>(this, nameof(Color), SFML.Graphics.Color.White);
-        BorderColor = new AnimatableProperty<ColorRGBA>(this, nameof(BorderColor), SFML.Graphics.Color.White);
+        Color = SFML.Graphics.Color.White;
+        BorderColor = SFML.Graphics.Color.White;
     }
 
 
@@ -37,9 +34,9 @@ public abstract class ShapeElement : Element
     {
         base.UpdateSfmlProperties();
 
-        SfmlShape.OutlineThickness = BorderSize.Value;
-        SfmlShape.FillColor = Color.Value;
-        SfmlShape.OutlineColor = BorderColor.Value;
+        SfmlShape.OutlineThickness = BorderSize;
+        SfmlShape.FillColor = Color;
+        SfmlShape.OutlineColor = BorderColor;
     }
 
 
@@ -47,20 +44,20 @@ public abstract class ShapeElement : Element
     {
         SfmlShape.OutlineThickness = 0f;
         SimpleDraw(target);
-        SfmlShape.OutlineThickness = BorderSize.Value;
+        SfmlShape.OutlineThickness = BorderSize;
     }
 
 
     public override FloatRect GetBorderLessBounds()
-        => GetBounds().ShrinkRect(BorderSize.Value);
+        => GetBounds().ShrinkRect(BorderSize);
 
     public override FloatRect GetBorderLessRelativeBounds()
-        => GetRelativeBounds().ShrinkRect(BorderSize.Value);
+        => GetRelativeBounds().ShrinkRect(BorderSize);
 
 
     public override Vec2f GetAlignmentPosition(Alignment alignment)
-        => AlignmentCalculator.ApplyBorderOffset(base.GetAlignmentPosition(alignment), BorderSize.Value, alignment);
+        => AlignmentCalculator.ApplyBorderOffset(base.GetAlignmentPosition(alignment), BorderSize, alignment);
 
     public override Vec2f GetAlignmentRelativePosition(Alignment alignment)
-        => AlignmentCalculator.ApplyBorderOffset(base.GetAlignmentRelativePosition(alignment), BorderSize.Value, alignment);
+        => AlignmentCalculator.ApplyBorderOffset(base.GetAlignmentRelativePosition(alignment), BorderSize, alignment);
 }

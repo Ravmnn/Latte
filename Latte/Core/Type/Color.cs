@@ -1,8 +1,6 @@
 using System.Numerics;
-
+using Latte.Tweening;
 using SFML.Graphics;
-
-using Latte.Animation;
 
 
 namespace Latte.Core.Type;
@@ -11,7 +9,7 @@ namespace Latte.Core.Type;
 /// <summary>
 /// Represents the four channels of color: red, green, blue and alpha (transparency)
 /// </summary>
-public struct ColorRGBA : IAnimatable<ColorRGBA>,
+public struct ColorRGBA : IFloatArrayModifiable,
     IAdditionOperators<ColorRGBA, byte, ColorRGBA>,
     ISubtractionOperators<ColorRGBA, byte, ColorRGBA>
 {
@@ -58,6 +56,10 @@ public struct ColorRGBA : IAnimatable<ColorRGBA>,
     public ColorRGBA Get() => this;
 
 
+    public void ModifyFrom(float[] values)
+        => (R, G, B, A) = ((byte)values[0], (byte)values[1], (byte)values[2], (byte)values[3]);
+
+
     public static implicit operator Color(ColorRGBA color) => new Color(color.R, color.G, color.B, color.A);
     public static implicit operator ColorRGBA(Color color) => new ColorRGBA(color.R, color.G, color.B, color.A);
 
@@ -79,11 +81,6 @@ public struct ColorRGBA : IAnimatable<ColorRGBA>,
 
         return left;
     }
-
-
-    public FloatAnimation AnimateThis(ColorRGBA to, double time, Easing easing = Easing.Linear) => Animate.Color(this, to, time, easing);
-
-    public readonly IAnimatable AnimationValuesToThis(float[] values) => values.ToColor();
 
 
     public readonly override string ToString() => $"rgba({R}, {G}, {B}, {A})";

@@ -4,7 +4,7 @@ using SFML.Graphics;
 using Latte.Core.Type;
 
 
-namespace Latte.Animation;
+namespace Latte.Tweening;
 
 
 /// <summary>

@@ -1,6 +1,5 @@
 using Latte.Core.Type;
 using Latte.Application.Elements.Primitives.Shapes;
-using Latte.Application.Elements.Properties;
 
 
 namespace Latte.Application.Elements.Primitives;
@@ -21,27 +20,27 @@ public class TextInputCaretElement : RectangleElement
             if (value < 0)
                 return;
 
-            if (value > Parent.Text.Text.Value.Length)
+            if (value > Parent.Text.Text.Length)
                 return;
 
             _index = value;
         }
     }
 
-    public AnimatableProperty<Float> HeightFactor { get; }
+    public float HeightFactor { get; set; }
 
 
     public TextInputCaretElement(TextInputElement parent)
         : base(parent, new Vec2f(), new Vec2f(5, 30))
     {
-        Color.Set(new ColorRGBA(0, 0, 0, 200));
-        Alignment.Set(Behavior.Alignment.VerticalCenter);
+        Color = new ColorRGBA(0, 0, 0, 200);
+        Alignment = Behavior.Alignment.VerticalCenter;
 
-        Size.Value.X = 2f;
+        Size.X = 2f;
 
         Visible = false;
 
-        HeightFactor = new AnimatableProperty<Float>(this, nameof(HeightFactor), 1.35f);
+        HeightFactor = 1.35f;
     }
 
 
@@ -55,10 +54,10 @@ public class TextInputCaretElement : RectangleElement
     private void UpdateGeometry()
     {
         var absoluteGeometry = Parent.Text.GetAbsoluteGeometryOfCharacter(Index);
-        absoluteGeometry.Height *= HeightFactor.Value;
+        absoluteGeometry.Height *= HeightFactor;
 
         AbsolutePosition = absoluteGeometry.Position;
-        Size.Set(new Vec2f(Size.Value.X, absoluteGeometry.Height));
+        Size = new Vec2f(Size.X, absoluteGeometry.Height);
     }
 
 

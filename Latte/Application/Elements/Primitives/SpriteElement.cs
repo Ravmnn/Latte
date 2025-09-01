@@ -1,7 +1,6 @@
 using SFML.Graphics;
 
 using Latte.Core.Type;
-using Latte.Application.Elements.Properties;
 
 
 namespace Latte.Application.Elements.Primitives;
@@ -15,22 +14,21 @@ public class SpriteElement : Element
     public Sprite SfmlSprite { get; }
     public Texture SfmlTexture => SfmlSprite.Texture;
 
-    public Property<Texture> Texture { get; }
-    public Property<bool> Smooth { get; }
-    public Property<bool> Repeat { get; }
+    public Texture Texture { get; set; }
+    public bool Smooth { get; set; }
+    public bool Repeat { get; set; }
 
-    public AnimatableProperty<Vec2f> Size { get; }
+    public Vec2f Size { get; set; }
 
 
     public SpriteElement(Element? parent, string imagePath, Vec2f? position, Vec2f size) : base(parent)
     {
         SfmlSprite = new Sprite(new Texture(imagePath));
 
-        Texture = new Property<Texture>(this, nameof(Texture), SfmlTexture);
-        Smooth = new Property<bool>(this, nameof(Smooth), true);
-        Repeat = new Property<bool>(this, nameof(Repeat), false);
+        Texture = SfmlTexture;
+        Smooth = true;
 
-        Size = new AnimatableProperty<Vec2f>(this, nameof(Size), size);
+        Size = size;
 
         SetRelativePositionOrAlignment(position);
     }
@@ -38,7 +36,7 @@ public class SpriteElement : Element
 
     public override void ConstantUpdate()
     {
-        Scale.Set(CalculateScaleBasedOnSize(Size));
+        Scale = CalculateScaleBasedOnSize(Size);
 
         base.ConstantUpdate();
     }
@@ -48,14 +46,14 @@ public class SpriteElement : Element
     {
         base.UpdateSfmlProperties();
 
-        SfmlSprite.Texture = Texture.Value;
-        SfmlTexture.Smooth = Smooth.Value;
-        SfmlTexture.Repeated = Repeat.Value;
+        SfmlSprite.Texture = Texture;
+        SfmlTexture.Smooth = Smooth;
+        SfmlTexture.Repeated = Repeat;
     }
 
 
     private Vec2f CalculateScaleBasedOnSize(Vec2f targetSize)
-        => Scale.Value * targetSize / (Vec2f)GetBounds().Size;
+        => Scale * targetSize / (Vec2f)GetBounds().Size;
 
     // currentScale = currentSize
     // targetScale = targetSize
@@ -69,16 +67,16 @@ public class SpriteElement : Element
 
 
     public override FloatRect GetBounds()
-        => new FloatRect(AbsolutePosition, Size.Value);
+        => new FloatRect(AbsolutePosition, Size);
 
     public override FloatRect GetRelativeBounds()
-        => new FloatRect(RelativePosition.Value, Size.Value);
+        => new FloatRect(RelativePosition, Size);
 
 
     public override void ApplySizePolicy()
     {
         var rect = GetSizePolicyRect();
         AbsolutePosition = rect.Position;
-        Size.Set(rect.Size);
+        Size = rect.Size;
     }
 }

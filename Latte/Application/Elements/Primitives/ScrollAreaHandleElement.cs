@@ -34,8 +34,8 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
         Orientation = orientation;
 
         PrioritySnap = PrioritySnap.AlwaysOnParentTop;
-        Radius.Set(2f);
-        BorderSize.Set(0f);
+        Radius = 2f;
+        BorderSize = 0f;
 
         InitFromOrientation(Orientation);
 
@@ -49,13 +49,13 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
         switch (orientation)
         {
             case ScrollDirection.Vertical:
-                Alignment.Set(Behavior.Alignment.Right);
-                Size.Value.X = 10;
+                Alignment = Alignment.Right;
+                Size.X = 10;
                 break;
 
             case ScrollDirection.Horizontal:
-                Alignment.Set(Behavior.Alignment.Bottom);
-                Size.Value.Y = 10;
+                Alignment = Alignment.Bottom;
+                Size.Y = 10;
                 break;
         }
     }
@@ -78,20 +78,20 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     protected void UpdateSize()
     {
         var bounds = Parent.GetClampedChildrenBounds();
-        var parentSize = Parent.Size.Value;
+        var parentSize = Parent.Size;
 
         var sizeRatio = new Vec2f(parentSize.X / bounds.Width, parentSize.Y / bounds.Height);
         Vec2f size = parentSize * sizeRatio;
 
         if (Orientation == ScrollDirection.Vertical)
-            Size.Value.Y = size.Y;
+            Size.Y = size.Y;
         else
-            Size.Value.X = size.X;
+            Size.X = size.X;
     }
 
     protected void UpdateScrollAreaScrollOffset()
     {
-        Vec2f scrollOffset = ((Vec2f)Parent.GetClampedChildrenBounds().Size - Parent.Size.Value) * GetProgress();
+        Vec2f scrollOffset = ((Vec2f)Parent.GetClampedChildrenBounds().Size - Parent.Size) * GetProgress();
 
         if (Orientation == ScrollDirection.Vertical)
             Parent.ScrollOffset.Y = scrollOffset.Y;
@@ -102,18 +102,18 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     protected void ClampPosition()
     {
         if (Orientation == ScrollDirection.Vertical)
-            RelativePosition.Value.Y = Math.Clamp(RelativePosition.Value.Y, 0, Parent.Size.Value.Y - Size.Value.Y);
+            RelativePosition.Y = Math.Clamp(RelativePosition.Y, 0, Parent.Size.Y - Size.Y);
         else
-            RelativePosition.Value.X = Math.Clamp(RelativePosition.Value.X, 0, Parent.Size.Value.X - Size.Value.X);
+            RelativePosition.X = Math.Clamp(RelativePosition.X, 0, Parent.Size.X - Size.X);
     }
 
 
     public void ProcessDragging()
     {
         if (Orientation == ScrollDirection.Vertical)
-            RelativePosition.Value.Y += MouseInput.PositionDeltaInElementView.Y;
+            RelativePosition.Y += MouseInput.PositionDeltaInElementView.Y;
         else
-            RelativePosition.Value.X += MouseInput.PositionDeltaInElementView.X;
+            RelativePosition.X += MouseInput.PositionDeltaInElementView.X;
     }
 
 
@@ -142,5 +142,5 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
 
 
     public Vec2f GetProgress()
-        => RelativePosition.Value / (Parent.Size.Value - Size.Value);
+        => RelativePosition / (Parent.Size - Size);
 }

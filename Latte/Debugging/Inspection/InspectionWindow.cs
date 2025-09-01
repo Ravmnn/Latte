@@ -43,11 +43,11 @@ public class InspectionWindow : WindowElement
 
         ScrollArea = new ScrollAreaElement(this, new Vec2f(), new Vec2f(380, 340))
         {
-            Alignment = { Value = Application.Elements.Behavior.Alignment.Center },
-            AlignmentMargin = { Value = new Vec2f(0, 20) },
+            Alignment = Application.Elements.Behavior.Alignment.Center,
+            AlignmentMargin = new Vec2f(0, 20),
 
-            Color = { Value = new ColorRGBA(150, 150, 150, 100) },
-            Radius = { Value = 3f }
+            Color = new ColorRGBA(150, 150, 150, 100),
+            Radius = 3f
         };
 
         DataGrid = new GridLayoutElement(ScrollArea, new Vec2f(), 0, 0, 380, 380)
@@ -56,12 +56,12 @@ public class InspectionWindow : WindowElement
             MinColumns = 1
         };
 
-        Radius.Set(5f);
+        Radius = 5f;
 
-        BorderSize.Set(1f);
+        BorderSize = 1f;
 
-        Color.Set(new ColorRGBA(100, 100, 100, 100));
-        BorderColor.Set(new ColorRGBA(255, 255, 255, 200));
+        Color = new ColorRGBA(100, 100, 100, 100);
+        BorderColor = new ColorRGBA(255, 255, 255, 200);
 
         PrioritySnap = PrioritySnap.AlwaysOnTop;
         PrioritySnapOffset = 2;

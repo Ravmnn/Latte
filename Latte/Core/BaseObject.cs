@@ -1,12 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 using SFML.Graphics;
 
 using Latte.Core.Type;
-using Latte.Application.Elements.Properties;
-using Latte.Exceptions.Element;
 
 
 namespace Latte.Core;
@@ -16,13 +12,10 @@ public abstract class BaseObject : IUpdateable, IDrawable
 {
     private int _priority;
     private bool _visible;
-    private readonly List<Property> _properties;
 
 
     public abstract Transformable SfmlTransformable { get; }
     public abstract Drawable SfmlDrawable { get; }
-
-    public IEnumerable<Property> Properties => _properties;
 
     public bool Initialized { get; private set; }
 
@@ -39,7 +32,7 @@ public abstract class BaseObject : IUpdateable, IDrawable
         }
     }
 
-    public bool CanDraw => Initialized && Visible;
+    public virtual bool CanDraw => Initialized && Visible;
 
     public int Priority
     {
@@ -56,10 +49,10 @@ public abstract class BaseObject : IUpdateable, IDrawable
 
     protected int LastPriority { get; private set; }
 
-    public AnimatableProperty<Vec2f> Position { get; }
-    public AnimatableProperty<Vec2f> Origin { get; }
-    public AnimatableProperty<Float> Rotation { get; }
-    public AnimatableProperty<Vec2f> Scale { get; }
+    public Vec2f Position { get; set; }
+    public Vec2f Origin { get; set; }
+    public float Rotation { get; set; }
+    public Vec2f Scale { get; set; }
 
     public event EventHandler? SetupEvent;
     public event EventHandler? ConstantUpdateEvent;
@@ -72,14 +65,11 @@ public abstract class BaseObject : IUpdateable, IDrawable
 
     public BaseObject()
     {
-        _properties = [];
-
         Visible = true;
 
-        Position = new AnimatableProperty<Vec2f>(this, nameof(Position), new Vec2f());
-        Origin = new AnimatableProperty<Vec2f>(this, nameof(Origin), new Vec2f());
-        Rotation = new AnimatableProperty<Float>(this, nameof(Rotation), 0f);
-        Scale = new AnimatableProperty<Vec2f>(this, nameof(Scale), new Vec2f(1f, 1f));
+        Position = new Vec2f();
+        Origin = new Vec2f();
+        Scale = new Vec2f(1f, 1f);
     }
 
 
@@ -108,10 +98,10 @@ public abstract class BaseObject : IUpdateable, IDrawable
 
     protected virtual void UpdateSfmlProperties()
     {
-        SfmlTransformable.Position = Position.Value;
-        SfmlTransformable.Origin = Origin.Value;
-        SfmlTransformable.Rotation = Rotation.Value;
-        SfmlTransformable.Scale = Scale.Value;
+        SfmlTransformable.Position = Position;
+        SfmlTransformable.Origin = Origin;
+        SfmlTransformable.Rotation = Rotation;
+        SfmlTransformable.Scale = Scale;
     }
 
 
@@ -122,7 +112,11 @@ public abstract class BaseObject : IUpdateable, IDrawable
 
     // same as Update, but should be used for drawings
     public virtual void Draw(RenderTarget target)
-        => DrawEvent?.Invoke(this, EventArgs.Empty);
+    {
+        target.Draw(SfmlDrawable);
+
+        DrawEvent?.Invoke(this, EventArgs.Empty);
+    }
 
 
     public Vec2f MapToAbsolute(Vec2f position)
@@ -138,32 +132,6 @@ public abstract class BaseObject : IUpdateable, IDrawable
 
     public void Raise(uint amount = 1) => Priority += (int)amount;
     public void Lower(uint amount = 1) => Priority -= (int)amount;
-
-
-    public void AddProperty(Property property) => _properties.Add(property);
-    public bool RemoveProperty(Property property) => _properties.Remove(property);
-    public bool HasProperty(Property property) => _properties.Contains(property);
-
-    public Property GetProperty(string name)
-        => _properties.Find(property => property.Name == name)
-           ?? throw new ElementPropertyNotFoundException(name);
-
-    public bool TryGetProperty(string name, [MaybeNullWhen(false)] out Property property)
-    {
-        try
-        {
-            property = GetProperty(name);
-            return true;
-        }
-        catch
-        {
-            property = null;
-            return false;
-        }
-    }
-
-
-    public Property this[string name] => GetProperty(name);
 
 
     protected virtual void OnVisibilityChange()

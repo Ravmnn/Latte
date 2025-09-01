@@ -1,4 +1,13 @@
-namespace Latte.Animation;
+using System;
+
+
+namespace Latte.Tweening;
+
+
+public class FloatsTweenAnimationEventArgs(float[] values) : EventArgs
+{
+    public float[] Values { get; } = values;
+}
 
 
 /// <summary>
@@ -19,12 +28,14 @@ namespace Latte.Animation;
 /// <param name="startValues"> The start values. </param>
 /// <param name="endValues"> The final values. </param>
 /// <param name="time"> The time the animation will take to finish. </param>
-public class FloatAnimation(float[] startValues, float[] endValues, double time, Easing easing = Easing.Linear, bool start = true)
-    : AnimationData(time, easing, start)
+public class FloatsTweenAnimation(float[] startValues, float[] endValues, double time, Easing easing = Easing.Linear, bool start = true)
+    : TweenAnimation(time, easing, start)
 {
     public float[] StartValues { get; } = startValues;
     public float[] EndValues { get; } = endValues;
     public float[] CurrentValues { get; private set; } = new float[startValues.Length];
+
+    public EventHandler<FloatsTweenAnimationEventArgs>? ProgressEvent;
 
 
     public override void Update()
@@ -35,6 +46,8 @@ public class FloatAnimation(float[] startValues, float[] endValues, double time,
 
         if (HasFinished)
             CurrentValues = EndValues;
+
+        OnProgressEvent(CurrentValues);
     }
 
 
@@ -43,4 +56,8 @@ public class FloatAnimation(float[] startValues, float[] endValues, double time,
         for (uint i = 0; i < StartValues.Length; i++)
             CurrentValues[i] = StartValues[i] + (EndValues[i] - StartValues[i]) * EasedProgress;
     }
+
+
+    protected virtual void OnProgressEvent(float[] values)
+        => ProgressEvent?.Invoke(this, new FloatsTweenAnimationEventArgs(values));
 }

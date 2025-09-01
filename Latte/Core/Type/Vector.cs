@@ -1,9 +1,7 @@
 using System;
 using System.Numerics;
-
+using Latte.Tweening;
 using SFML.System;
-
-using Latte.Animation;
 
 
 namespace Latte.Core.Type;
@@ -63,52 +61,31 @@ public class Vec2<T>(T x, T y) : ICloneable where T :
 }
 
 
-public class Vec2f(float x = default, float y = default) : Vec2<float>(x, y), IAnimatable<Vec2f>
+public class Vec2f(float x = default, float y = default) : Vec2<float>(x, y), IFloatArrayModifiable
 {
     public static implicit operator Vec2f(Vector2f vec2) => new Vec2f(vec2.X, vec2.Y);
 
 
-    public Vec2f Get() => this;
-
-
-    public FloatAnimation AnimateThis(Vec2f to, double time, Easing easing = Easing.Linear)
-        => Animate.Vec2f(this, to, time, easing);
-
-
-    public IAnimatable AnimationValuesToThis(float[] values)
-        => values.ToVec2f();
+    public void ModifyFrom(float[] values)
+        => (X, Y) = (values[0], values[1]);
 }
 
 
-public class Vec2i(int x = default, int y = default) : Vec2<int>(x, y), IAnimatable<Vec2i>
+public class Vec2i(int x = default, int y = default) : Vec2<int>(x, y), IFloatArrayModifiable
 {
     public static implicit operator Vec2i(Vector2i vec2) => new Vec2i(vec2.X, vec2.Y);
 
 
-    public Vec2i Get() => this;
-
-
-    public FloatAnimation AnimateThis(Vec2i to, double time, Easing easing = Easing.Linear)
-        => Animate.Vec2i(this, to, time, easing);
-
-
-    public IAnimatable AnimationValuesToThis(float[] values)
-        => values.ToVec2i();
+    public void ModifyFrom(float[] values)
+        => (X, Y) = ((int)values[0], (int)values[1]);
 }
 
 
-public class Vec2u(uint x = default, uint y = default) : Vec2<uint>(x, y), IAnimatable<Vec2u>
+public class Vec2u(uint x = default, uint y = default) : Vec2<uint>(x, y), IFloatArrayModifiable
 {
     public static implicit operator Vec2u(Vector2u vec2) => new Vec2u(vec2.X, vec2.Y);
 
 
-    public Vec2u Get() => this;
-
-
-    public FloatAnimation AnimateThis(Vec2u to, double time, Easing easing = Easing.Linear)
-        => Animate.Vec2u(this, to, time, easing);
-
-
-    public IAnimatable AnimationValuesToThis(float[] values)
-        => values.ToVec2u();
+    public void ModifyFrom(float[] values)
+        => (X, Y) = ((uint)values[0], (uint)values[1]);
 }

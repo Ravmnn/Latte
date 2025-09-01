@@ -32,10 +32,10 @@ public class WindowCloseButtonElement : ButtonElement
 
     public WindowCloseButtonElement(WindowElement parent) : base(parent, new Vec2f(), new Vec2f(15, 15), null)
     {
-        Color.Set(new ColorRGBA(255, 100, 100));
+        Color = new ColorRGBA(255, 100, 100);
 
-        Alignment.Set(Behavior.Alignment.TopRight);
-        AlignmentMargin.Set(new Vec2f(-7, 8));
+        Alignment = Alignment.TopRight;
+        AlignmentMargin = new Vec2f(-7, 8);
     }
 
 
@@ -79,7 +79,7 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
 
     public Corner CornerToResize { get; set; }
-    public FloatRect Rect => new FloatRect(RelativePosition.Value, Size.Value);
+    public FloatRect Rect => new FloatRect(RelativePosition, Size);
     public float CornerResizeAreaSize { get; protected set; }
 
     public Vec2f? MinSize { get; set; }
@@ -117,10 +117,10 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         {
             IgnoreMouseInput = true,
 
-            Color = { Value = SFML.Graphics.Color.Black },
+            Color = SFML.Graphics.Color.Black,
 
-            Alignment = { Value = Behavior.Alignment.HorizontalCenter | Behavior.Alignment.Top },
-            AlignmentMargin = { Value = new Vec2f(0, 10)}
+            Alignment = Alignment.HorizontalCenter | Alignment.Top,
+            AlignmentMargin = new Vec2f(0, 10)
         };
 
         CloseButton = new WindowCloseButtonElement(this);
@@ -164,7 +164,7 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
 
     public void ProcessDragging()
     {
-        RelativePosition.Value += MouseInput.PositionDeltaInElementView;
+        RelativePosition += MouseInput.PositionDeltaInElementView;
     }
 
 
@@ -190,28 +190,28 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         ResizeCornersBy(left, top, right, bottom);
 
         if (ShouldResizeCornersToMinSize())
-            ResizeCornersToSizeLimit(MinSize! - Size.Value, left != 0f, top != 0f, right != 0f, bottom != 0f);
+            ResizeCornersToSizeLimit(MinSize! - Size, left != 0f, top != 0f, right != 0f, bottom != 0f);
 
         if (ShouldResizeCornersToMaxSize())
-            ResizeCornersToSizeLimit(MaxSize! - Size.Value, left != 0f, top != 0f, right != 0f, bottom != 0f);
+            ResizeCornersToSizeLimit(MaxSize! - Size, left != 0f, top != 0f, right != 0f, bottom != 0f);
     }
 
     private void ResizeCornersBy(float left = 0f, float top = 0f, float right = 0f, float bottom = 0f)
     {
-        RelativePosition.Value.X += left;
-        RelativePosition.Value.Y += top;
-        Size.Value.X += right;
-        Size.Value.Y += bottom;
+        RelativePosition.X += left;
+        RelativePosition.Y += top;
+        Size.X += right;
+        Size.Y += bottom;
     }
 
     private void ResizeCornersToSizeLimit(Vec2f value, bool left = false, bool top = false, bool right = false, bool bottom = false)
         => ResizeCornersBy(left ? -value.X : 0f, top ? -value.Y : 0f, right ? value.X : 0f, bottom ? value.Y : 0f);
 
     private bool ShouldResizeCornersToMinSize()
-        => MinSize is not null && (Size.Value.X < MinSize.X || Size.Value.Y < MinSize.Y);
+        => MinSize is not null && (Size.X < MinSize.X || Size.Y < MinSize.Y);
 
     private bool ShouldResizeCornersToMaxSize()
-        => MaxSize is not null && (Size.Value.X > MaxSize.X || Size.Value.Y > MaxSize.Y);
+        => MaxSize is not null && (Size.X > MaxSize.X || Size.Y > MaxSize.Y);
 
 
     public void Open() => OnOpen();
@@ -304,5 +304,5 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         => IsPointOverClipArea(point) && IsPointOverThis(point);
 
     protected bool IsPointOverThis(Vec2f point)
-        => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius.Value);
+        => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius);
 }

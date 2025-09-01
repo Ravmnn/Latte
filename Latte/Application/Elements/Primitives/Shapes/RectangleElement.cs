@@ -2,7 +2,6 @@ using SFML.Graphics;
 
 using Latte.Core;
 using Latte.Core.Type;
-using Latte.Application.Elements.Properties;
 using Latte.Sfml;
 
 
@@ -16,9 +15,9 @@ public class RectangleElement : ShapeElement
 
     public new RoundedRectangleShape SfmlShape => (base.SfmlShape as RoundedRectangleShape)!;
 
-    public AnimatableProperty<Vec2f> Size { get; }
+    public Vec2f Size { get; set; }
 
-    public AnimatableProperty<Float> Radius { get; }
+    public float Radius { get; set; }
 
 
     public RectangleElement(Element? parent, Vec2f? position, Vec2f size, float radius = 0f)
@@ -26,8 +25,8 @@ public class RectangleElement : ShapeElement
     {
         SetRelativePositionOrAlignment(position);
 
-        Size = new AnimatableProperty<Vec2f>(this, nameof(Size), size);
-        Radius = new AnimatableProperty<Float>(this, nameof(Radius), radius);
+        Size = size;
+        Radius = radius;
     }
 
 
@@ -35,22 +34,22 @@ public class RectangleElement : ShapeElement
     {
         base.UpdateSfmlProperties();
 
-        SfmlShape.Size = Size.Value;
-        SfmlShape.Radius = Radius.Value;
+        SfmlShape.Size = Size;
+        SfmlShape.Radius = Radius;
     }
 
 
     public override FloatRect GetBounds()
-        => new FloatRect(AbsolutePosition, Size.Value * Scale.Value).ExpandRect(BorderSize.Value);
+        => new FloatRect(AbsolutePosition, Size * Scale).ExpandRect(BorderSize);
 
     public override FloatRect GetRelativeBounds()
-        => new FloatRect(RelativePosition.Value, Size.Value * Scale.Value).ExpandRect(BorderSize.Value);
+        => new FloatRect(RelativePosition, Size * Scale).ExpandRect(BorderSize);
 
 
     public override void ApplySizePolicy()
     {
         var rect = GetSizePolicyRect();
         AbsolutePosition = rect.Position;
-        Size.Set(rect.Size);
+        Size = rect.Size;
     }
 }

@@ -12,8 +12,7 @@ using SFML.Window;
 using Latte.Core.Type;
 using Latte.Application.Elements.Primitives;
 using Latte.Exceptions.Application;
-
-
+using Latte.Tweening;
 using static SFML.Window.Cursor;
 
 using Debugger = Latte.Debugging.Debugger;
@@ -48,6 +47,8 @@ public static class App
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
     private static bool s_elementWasAddedAndNotUpdated;
+
+    private static readonly List<TweenAnimation> s_tweenAnimations;
 
 
     public static Debugger? Debugger { get; private set; }
@@ -105,6 +106,8 @@ public static class App
         HasInitialized = false;
         s_deltaTimeStopwatch = new Stopwatch();
         s_elementWasAddedAndNotUpdated = false;
+
+        s_tweenAnimations = [];
 
         RenderMode = RenderMode.Pinned;
 
@@ -187,6 +190,7 @@ public static class App
         Section.Update();
         Debugger?.Update(); // update before elements
 
+        UpdateTweenAnimations();
         UpdateElementsAndCheckForNewElements();
 
         UnsetElementRenderView();
@@ -199,6 +203,12 @@ public static class App
     {
         DeltaTime = s_deltaTimeStopwatch.Elapsed;
         s_deltaTimeStopwatch.Restart();
+    }
+
+    private static void UpdateTweenAnimations()
+    {
+        foreach (var animation in s_tweenAnimations.ToArray())
+            animation.Update();
     }
 
     private static void SetCursorToDefault()
@@ -276,6 +286,40 @@ public static class App
     public static void AddElement(Element element) => Section.AddElement(element);
     public static bool RemoveElement(Element element) => Section.RemoveElement(element);
     public static bool HasElement(Element element) => Section.HasElement(element);
+
+
+    // TODO: maybe move this logic to something like AnimationManager
+    public static TweenAnimation AddTweenAnimation(TweenAnimation animation)
+    {
+        if (s_tweenAnimations.Contains(animation))
+            return animation;
+
+        animation.AbortEvent += OnAnimationEnd;
+        animation.FinishEvent += OnAnimationEnd;
+
+        s_tweenAnimations.Add(animation);
+
+        return animation;
+    }
+
+    public static TweenAnimation RemoveTweenAnimation(TweenAnimation animation)
+    {
+        s_tweenAnimations.Remove(animation);
+
+        animation.AbortEvent -= OnAnimationEnd;
+        animation.FinishEvent -= OnAnimationEnd;
+
+        return animation;
+    }
+
+
+    private static void OnAnimationEnd(object? sender, EventArgs _)
+    {
+        if (sender is not TweenAnimation animation)
+            return;
+
+        RemoveTweenAnimation(animation);
+    }
 
 
     private static void OnWindowResize(Vec2u newSize)

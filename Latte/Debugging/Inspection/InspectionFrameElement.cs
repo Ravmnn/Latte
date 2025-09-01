@@ -20,8 +20,8 @@ public class InspectionFrameElement : ScrollAreaElement
         {
             _data = value;
 
-            NameText.Text.Set(_data.Name);
-            DataText.Text.Set(_data.Data);
+            NameText.Text = _data.Name;
+            DataText.Text = _data.Data;
         }
     }
 
@@ -33,15 +33,15 @@ public class InspectionFrameElement : ScrollAreaElement
 
         NameText = new TextElement(this, new Vec2f(), 10, data.Name)
         {
-            Alignment = { Value = Application.Elements.Behavior.Alignment.HorizontalCenter | Application.Elements.Behavior.Alignment.Top },
-            AlignmentMargin = { Value = new Vec2f(0, 10) }
+            Alignment = Application.Elements.Behavior.Alignment.HorizontalCenter | Application.Elements.Behavior.Alignment.Top,
+            AlignmentMargin = new Vec2f(0, 10)
         };
 
         DataText = new TextElement(this, new Vec2f(5, 20), 13, data.Data);
 
-        Alignment.Set(Application.Elements.Behavior.Alignment.Center);
+        Alignment = Application.Elements.Behavior.Alignment.Center;
 
-        Color.Set(new ColorRGBA(100, 100, 100, 150));
-        Radius.Set(5f);
+        Color = new ColorRGBA(100, 100, 100, 150);
+        Radius = 5f;
     }
 }

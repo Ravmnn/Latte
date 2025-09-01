@@ -8,7 +8,6 @@ using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application.Elements.Attributes;
 using Latte.Application.Elements.Behavior;
-using Latte.Application.Elements.Properties;
 
 
 namespace Latte.Application.Elements.Primitives;
@@ -60,7 +59,11 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         set => _active = value;
     }
 
-    protected bool ParentVisible => Parent?.Visible ?? true;
+    protected bool ParentVisible => Parent?.VisibleAndParentVisible ?? true;
+
+    public bool VisibleAndParentVisible => Visible && ParentVisible;
+
+    public override bool CanDraw => base.CanDraw && VisibleAndParentVisible;
 
     public bool Clip { get; set; }
     public int ClipLayerIndex { get; protected set; }
@@ -73,20 +76,24 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     public bool CaughtMouseInput { get; set; }
 
     // TODO: there may be a better way of animating these... try to remove the property system
-    public AnimatableProperty<Vec2f> RelativePosition { get; }
+    public Vec2f RelativePosition
+    {
+        get => Parent is not null ? Parent.MapToRelative(Position) : AbsolutePosition;
+        set => Position = Parent is not null ? Parent.MapToAbsolute(value) : value;
+    }
 
     // TODO: changing this should modify relative position and vice versa
     public Vec2f AbsolutePosition
     {
-        get => Position.Value;
-        set => Position.Set(value);
+        get => Position;
+        set => Position = value;
     }
 
-    public Property<Alignment> Alignment { get; }
-    public AnimatableProperty<Vec2f> AlignmentMargin { get; }
+    public Alignment Alignment { get; set; }
+    public Vec2f AlignmentMargin { get; set; }
 
-    public Property<SizePolicy> SizePolicy { get; }
-    public AnimatableProperty<Vec2f> SizePolicyMargin { get; }
+    public SizePolicy SizePolicy { get; set; }
+    public Vec2f SizePolicyMargin { get; set; }
 
     public event EventHandler<ElementEventArgs>? ParentChangedEvent;
     public event EventHandler<ElementEventArgs>? ChildAddedEvent;
@@ -107,13 +114,13 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         PrioritySnap = PrioritySnap.None;
         PrioritySnapOffset = 1;
 
-        RelativePosition = new AnimatableProperty<Vec2f>(this, nameof(RelativePosition), new Vec2f());
+        RelativePosition = new Vec2f();
 
-        Alignment = new Property<Alignment>(this, nameof(Alignment), Behavior.Alignment.None);
-        AlignmentMargin = new AnimatableProperty<Vec2f>(this, nameof(AlignmentMargin), new Vec2f());
+        Alignment = Alignment.None;
+        AlignmentMargin = new Vec2f();
 
-        SizePolicy = new Property<SizePolicy>(this, nameof(SizePolicy), Behavior.SizePolicy.None);
-        SizePolicyMargin = new AnimatableProperty<Vec2f>(this, nameof(SizePolicyMargin), new Vec2f());
+        SizePolicy = SizePolicy.None;
+        SizePolicyMargin = new Vec2f();
 
         if (Parent is null)
             return;
@@ -168,10 +175,10 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     private void UpdateGeometry()
     {
-        if (SizePolicy.Value != Behavior.SizePolicy.None)
+        if (SizePolicy != SizePolicy.None)
             ApplySizePolicy();
 
-        if (Alignment.Value != Behavior.Alignment.None)
+        if (Alignment != Alignment.None)
             ApplyAlignment();
     }
 
@@ -179,15 +186,13 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     public override void Draw(RenderTarget target)
     {
         BeginDraw(target);
-        target.Draw(SfmlDrawable);
+        SimpleDraw(target);
         EndDraw();
-
-        base.Draw(target);
     }
 
 
     public void SimpleDraw(RenderTarget target)
-        => target.Draw(SfmlDrawable);
+        => base.Draw(target);
 
     public abstract void BorderLessSimpleDraw(RenderTarget target);
 
@@ -296,14 +301,14 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     protected void SetRelativePositionOrAlignment(Vec2f? position)
     {
         if (position is null)
-            Alignment.Set(Behavior.Alignment.Center);
+            Alignment = Alignment.Center;
         else
-            RelativePosition.Set(position);
+            RelativePosition = position;
     }
 
 
     public virtual void ApplyAlignment()
-        => RelativePosition.Set(GetAlignmentRelativePosition() + AlignmentMargin);
+        => RelativePosition = GetAlignmentRelativePosition() + AlignmentMargin;
 
     public abstract void ApplySizePolicy();
 
@@ -377,12 +382,6 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         if (Parent is not null)
             Priority += Parent.Priority - Parent.LastPriority;
     }
-
-
-    public IEnumerable<AnimatableProperty> GetAnimatableProperties()
-        => from property in Properties
-            where property is AnimatableProperty
-            select property as AnimatableProperty;
 
 
     // TODO: all event callbacks should be public, since there are callbacks in interfaces and them can't be protected or private. Be consistent.

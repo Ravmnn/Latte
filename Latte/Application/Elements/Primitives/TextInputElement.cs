@@ -1,5 +1,3 @@
-using System;
-
 using SFML.Window;
 
 using Latte.Core.Type;
@@ -23,9 +21,9 @@ public class TextInputElement : ButtonElement
     {
         FocusOnMouseDown = true;
 
-        Text.SizePolicy.Set(Behavior.SizePolicy.None);
-        Text.Size.Set(20);
-        Text.Alignment.Set(Behavior.Alignment.VerticalCenter | Behavior.Alignment.Left);
+        Text.SizePolicy = Behavior.SizePolicy.None;
+        Text.Size = 20;
+        Text.Alignment = Behavior.Alignment.VerticalCenter | Behavior.Alignment.Left;
 
         Caret = new TextInputCaretElement(this);
     }
@@ -36,9 +34,7 @@ public class TextInputElement : ButtonElement
         if (char.IsControl(character))
             return;
 
-        var text = Text.Text;
-
-        text.Set(text.Value.Insert(Caret.Index, character.ToString()));
+        Text.Text = Text.Text.Insert(Caret.Index, character.ToString());
         Caret.Index++;
     }
 
@@ -48,22 +44,8 @@ public class TextInputElement : ButtonElement
         if (Caret.Index <= 0)
             return;
 
-        var text = Text.Text;
-
-        text.Set(text.Value.Remove(Caret.Index - 1, 1));
+        Text.Text = Text.Text.Remove(Caret.Index - 1, 1);
         Caret.Index--;
-    }
-
-
-    public override void OnMouseDown()
-    {
-        base.OnMouseDown();
-    }
-
-
-    public override void OnMouseUp()
-    {
-        base.OnMouseUp();
     }
 
 

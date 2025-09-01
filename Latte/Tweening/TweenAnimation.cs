@@ -7,10 +7,10 @@ using Latte.Application;
 using Math = System.Math;
 
 
-namespace Latte.Animation;
+namespace Latte.Tweening;
 
 
-public abstract class AnimationData(double time, Easing easing = Easing.Linear, bool start = true) : IUpdateable
+public abstract class TweenAnimation(double time, Easing easing = Easing.Linear, bool start = true) : IUpdateable
 {
     public double Time { get; set; } = time;
     public double ElapsedTime { get; protected set; }

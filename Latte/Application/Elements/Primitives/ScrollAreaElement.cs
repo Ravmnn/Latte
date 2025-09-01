@@ -82,10 +82,10 @@ public class ScrollAreaElement : ButtonElement
         var childrenBounds = GetClampedChildrenBounds();
 
         if (VerticalScrollHandle is not null)
-            VerticalScrollHandle.Visible = childrenBounds.Size.Y > Size.Value.Y;
+            VerticalScrollHandle.Visible = childrenBounds.Size.Y > Size.Y;
 
         if (HorizontalScrollHandle is not null)
-            HorizontalScrollHandle.Visible = childrenBounds.Size.X > Size.Value.X;
+            HorizontalScrollHandle.Visible = childrenBounds.Size.X > Size.X;
     }
 
     protected void AddAppMouseScrollDeltaToScrollOffset()
@@ -118,13 +118,13 @@ public class ScrollAreaElement : ButtonElement
     protected void SyncScrollHandlesPositionToScrollOffset()
     {
         var childrenBounds = GetClampedChildrenBounds();
-        Vec2f progress = ScrollOffset / ((Vec2f)childrenBounds.Size - Size.Value);
+        Vec2f progress = ScrollOffset / ((Vec2f)childrenBounds.Size - Size);
 
         if (VerticalScrollHandle is not null)
-            VerticalScrollHandle.RelativePosition.Value.Y = (Size.Value.Y - VerticalScrollHandle.Size.Value.Y) * progress.Y;
+            VerticalScrollHandle.RelativePosition.Y = (Size.Y - VerticalScrollHandle.Size.Y) * progress.Y;
 
         if (HorizontalScrollHandle is not null)
-            HorizontalScrollHandle.RelativePosition.Value.X = (Size.Value.X - HorizontalScrollHandle.Size.Value.X) * progress.X;
+            HorizontalScrollHandle.RelativePosition.X = (Size.X - HorizontalScrollHandle.Size.X) * progress.X;
     }
 
 
@@ -132,21 +132,21 @@ public class ScrollAreaElement : ButtonElement
     {
         var bounds = GetClampedChildrenBounds();
 
-        ScrollOffset.X = Math.Clamp(ScrollOffset.X, 0, bounds.Width - Size.Value.X);
-        ScrollOffset.Y = Math.Clamp(ScrollOffset.Y, 0, bounds.Height - Size.Value.Y);
+        ScrollOffset.X = Math.Clamp(ScrollOffset.X, 0, bounds.Width - Size.X);
+        ScrollOffset.Y = Math.Clamp(ScrollOffset.Y, 0, bounds.Height - Size.Y);
     }
 
 
     public FloatRect GetClampedChildrenBounds()
     {
         var bounds = (from child in Children where !child.HasAttribute<IgnoreScrollAttribute>()
-            select new FloatRect(child.RelativePosition.Value, child.GetBounds().Size)).ToArray().GetBoundsOfRects();
+            select new FloatRect(child.RelativePosition, child.GetBounds().Size)).ToArray().GetBoundsOfRects();
 
-        if (bounds.Width < Size.Value.X)
-            bounds.Width = Size.Value.X;
+        if (bounds.Width < Size.X)
+            bounds.Width = Size.X;
 
-        if (bounds.Height < Size.Value.Y)
-            bounds.Height = Size.Value.Y;
+        if (bounds.Height < Size.Y)
+            bounds.Height = Size.Y;
 
         return bounds;
     }
@@ -156,7 +156,7 @@ public class ScrollAreaElement : ButtonElement
     {
         foreach (var child in Children)
             if (!child.HasAttribute<IgnoreScrollAttribute>())
-                child.RelativePosition.Value += offset;
+                child.RelativePosition += offset;
 
         OnScroll(offset);
     }

@@ -5,8 +5,8 @@ using SFML.Graphics;
 using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application.Elements.Behavior;
-using Latte.Application.Elements.Properties;
-using SFML.System;
+
+
 using Math = System.Math;
 
 
@@ -50,17 +50,17 @@ public class TextElement : Element, IClickable
 
     public event EventHandler? MouseClickEvent;
 
-    public Property<string> Text { get; }
-    public Property<Text.Styles> Style { get; }
+    public string Text { get; set; }
+    public Text.Styles Style { get; set; }
 
-    public Property<uint> Size { get; }
-    public AnimatableProperty<Float> LetterSpacing { get; }
-    public AnimatableProperty<Float> LineSpacing { get; }
+    public uint Size { get; set; }
+    public float LetterSpacing { get; set; }
+    public float LineSpacing { get; set; }
 
-    public AnimatableProperty<Float> BorderSize { get; }
+    public float BorderSize { get; set; }
 
-    public AnimatableProperty<ColorRGBA> Color { get; }
-    public AnimatableProperty<ColorRGBA> BorderColor { get; }
+    public ColorRGBA Color { get; set; }
+    public ColorRGBA BorderColor { get; set; }
 
 
     public readonly struct Character(int index, char @char, FloatRect absoluteGeometry)
@@ -86,21 +86,21 @@ public class TextElement : Element, IClickable
         SetRelativePositionOrAlignment(position);
 
         if (size is null)
-            SizePolicy.Set(Behavior.SizePolicy.FitParent);
+            SizePolicy = SizePolicy.FitParent;
 
-        SizePolicyMargin.Set(new Vec2f(3f, 3f));
+        SizePolicyMargin = new Vec2f(3f, 3f);
 
-        Text = new Property<string>(this, nameof(Text), text);
-        Style = new Property<Text.Styles>(this, nameof(Style), SFML.Graphics.Text.Styles.Regular);
+        Text = text;
+        Style = SFML.Graphics.Text.Styles.Regular;
 
-        Size = new Property<uint>(this, nameof(Size), size ?? 7);
-        LetterSpacing = new AnimatableProperty<Float>(this, nameof(LetterSpacing), 1f);
-        LineSpacing = new AnimatableProperty<Float>(this, nameof(LineSpacing), 1f);
+        Size = size ?? 7;
+        LetterSpacing = 1f;
+        LineSpacing = 1f;
 
-        BorderSize = new AnimatableProperty<Float>(this, nameof(BorderSize), 0f);
+        BorderSize = 0f;
 
-        Color = new AnimatableProperty<ColorRGBA>(this, nameof(Color), SFML.Graphics.Color.White);
-        BorderColor = new AnimatableProperty<ColorRGBA>(this, nameof(BorderColor), SFML.Graphics.Color.Black);
+        Color = SFML.Graphics.Color.White;
+        BorderColor = SFML.Graphics.Color.Black;
     }
 
 
@@ -119,17 +119,17 @@ public class TextElement : Element, IClickable
 
         // round to avoid blurry text
         SfmlTransformable.Position = AbsolutePosition.Round();
-        SfmlTransformable.Origin = new Vec2f(Origin.Value.X, Origin.Value.Y).Round();
+        SfmlTransformable.Origin = new Vec2f(Origin.X, Origin.Y).Round();
 
         SfmlText.DisplayedString = Text;
-        SfmlText.Style = Style.Value;
+        SfmlText.Style = Style;
 
-        SfmlText.CharacterSize = Size.Value;
-        SfmlText.LetterSpacing = LetterSpacing.Value;
-        SfmlText.LineSpacing = LineSpacing.Value;
+        SfmlText.CharacterSize = Size;
+        SfmlText.LetterSpacing = LetterSpacing;
+        SfmlText.LineSpacing = LineSpacing;
 
-        SfmlText.FillColor = Color.Value;
-        SfmlText.OutlineColor = BorderColor.Value;
+        SfmlText.FillColor = Color;
+        SfmlText.OutlineColor = BorderColor;
     }
 
 
@@ -137,7 +137,7 @@ public class TextElement : Element, IClickable
     {
         SfmlText.OutlineThickness = 0f;
         SimpleDraw(target);
-        SfmlText.OutlineThickness = BorderSize.Value;
+        SfmlText.OutlineThickness = BorderSize;
     }
 
 
@@ -151,22 +151,22 @@ public class TextElement : Element, IClickable
         => SfmlText.GetLocalBounds();
 
     public override FloatRect GetBorderLessBounds()
-        => GetBounds().ShrinkRect(BorderSize.Value);
+        => GetBounds().ShrinkRect(BorderSize);
 
     public override FloatRect GetBorderLessRelativeBounds()
-        => GetRelativeBounds().ShrinkRect(BorderSize.Value);
+        => GetRelativeBounds().ShrinkRect(BorderSize);
 
 
     public override Vec2f GetAlignmentPosition(Alignment alignment)
     {
         var position = AlignmentCalculator.GetTextAlignedPositionOfChild(SfmlText, GetParentBorderLessBounds(), alignment);
-        return AlignmentCalculator.ApplyBorderOffset(position, BorderSize.Value, alignment);
+        return AlignmentCalculator.ApplyBorderOffset(position, BorderSize, alignment);
     }
 
     public override Vec2f GetAlignmentRelativePosition(Alignment alignment)
     {
         var position = AlignmentCalculator.GetTextAlignedRelativePositionOfChild(SfmlText, GetParentBorderLessBounds(), alignment);
-        return AlignmentCalculator.ApplyBorderOffset(position, BorderSize.Value, alignment);
+        return AlignmentCalculator.ApplyBorderOffset(position, BorderSize, alignment);
     }
 
 
@@ -175,7 +175,7 @@ public class TextElement : Element, IClickable
         var (floatFitSize, fitSize) = CalculateFitSize(GetSizePolicyRect(), GetBounds());
 
         if (MathF.Abs(_lastFitSize - floatFitSize) > 0.5f)
-            Size.Set(fitSize);
+            Size = fitSize;
 
         _lastFitSize = floatFitSize;
     }
@@ -200,7 +200,7 @@ public class TextElement : Element, IClickable
 
     // https://math.stackexchange.com/questions/857073/formula-for-adjusting-font-height
     private float CalculateSizePolicyTextSize(float targetSize, float currentSize)
-        => targetSize * (Size.Value / currentSize);
+        => targetSize * (Size / currentSize);
 
 
     private static FloatRect CalculateBoundsOfTextWithSize(Text text, uint size)
@@ -220,7 +220,7 @@ public class TextElement : Element, IClickable
         if (!IsPointOverBounds(point))
             return OutsideCharacterFromX(point.X);
 
-        for (var i = 0; i < Text.Value.Length; i++)
+        for (var i = 0; i < Text.Length; i++)
         {
             var character = CharacterAtIndex(i);
 
@@ -240,7 +240,7 @@ public class TextElement : Element, IClickable
             return new Character(-1, '\0', bounds with { Width = 0 });
 
         if (x > vertices.TopRight.X)
-            return new Character(Text.Value.Length, '\0', bounds with { Left = vertices.TopRight.X, Width = 0 });
+            return new Character(Text.Length, '\0', bounds with { Left = vertices.TopRight.X, Width = 0 });
 
         return null;
     }
@@ -251,7 +251,7 @@ public class TextElement : Element, IClickable
 
     public Character CharacterAtIndex(int index)
     {
-        var character = Text.Value[index];
+        var character = Text[index];
         var rect = GetAbsoluteGeometryOfCharacter(index);
 
         return new Character(index, character, rect);
@@ -278,11 +278,11 @@ public class TextElement : Element, IClickable
 
     private float GetWidthOfCharacter(int index)
     {
-        if (index >= Text.Value.Length)
+        if (index >= Text.Length)
             return 0f;
 
-        var character = Text.Value[index];
-        var glyph = SfmlText.Font.GetGlyph(character, Size, false, BorderSize.Value);
+        var character = Text[index];
+        var glyph = SfmlText.Font.GetGlyph(character, Size, false, BorderSize);
 
         return glyph.Advance;
     }

@@ -14,18 +14,18 @@ internal class CheckBoxSelectedIndicatorElement : RectangleElement
     {
         IgnoreMouseInput = true;
 
-        Alignment.Set(Behavior.Alignment.Center);
-        SizePolicy.Set(Behavior.SizePolicy.FitParent);
-        SizePolicyMargin.Set(new Vec2f(5f, 5f));
+        Alignment = Behavior.Alignment.Center;
+        SizePolicy = Behavior.SizePolicy.FitParent;
+        SizePolicyMargin = new Vec2f(5f, 5f);
 
-        Color.Set(new ColorRGBA(50, 50, 50));
+        Color = new ColorRGBA(50, 50, 50);
     }
 
 
     public override void Update()
     {
         Visible = Parent.Selected;
-        Radius.Set(Radius);
+        Radius = Parent.Radius;
 
         base.Update();
     }
@@ -45,8 +45,8 @@ public class CheckBoxElement : ButtonElement
 
         Selected = selected;
 
-        Radius.Set(5f);
-        BorderSize.Set(2f);
+        Radius = 5f;
+        BorderSize = 2f;
     }
 
 

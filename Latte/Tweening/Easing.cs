@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Latte.Animation;
+namespace Latte.Tweening;
 
 
 /// <summary>

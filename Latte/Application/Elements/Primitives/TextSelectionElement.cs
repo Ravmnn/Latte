@@ -53,7 +53,7 @@ public class TextSelectionElement : RectangleElement
         ClipLayerIndexOffset = -1;
         Visible = false;
 
-        Color.Set(new ColorRGBA(190, 190, 190, 150));
+        Color = new ColorRGBA(190, 190, 190, 150);
 
         AddEventListeners(Parent);
     }
@@ -106,7 +106,7 @@ public class TextSelectionElement : RectangleElement
 
 
         AbsolutePosition = startPosition;
-        Size.Set(new Vec2f(endPosition.X - startPosition.X, endGeometry.Height));
+        Size = new Vec2f(endPosition.X - startPosition.X, endGeometry.Height);
         Visible = true;
 
         ShouldUpdateSelection = false;
@@ -116,7 +116,7 @@ public class TextSelectionElement : RectangleElement
     protected void Deselect()
     {
         AbsolutePosition = new Vec2f();
-        Size.Set(new Vec2f());
+        Size = new Vec2f();
         Visible = false;
     }
 
@@ -136,7 +136,7 @@ public class TextSelectionElement : RectangleElement
         var startIndex = start.Index + (fromEnd ? 1 : 0);
         var endIndex = end.Index + 1 - (fromEnd ? 0 : 1);
 
-        return Parent.Text.Value[(int)startIndex .. (int)endIndex];
+        return Parent.Text[startIndex .. endIndex];
     }
 
 
