@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 using SFML.Graphics;
 
@@ -10,7 +9,6 @@ using Latte.Core.Type;
 using Latte.Application.Elements.Attributes;
 using Latte.Application.Elements.Behavior;
 using Latte.Application.Elements.Properties;
-using Latte.Exceptions.Element;
 
 
 namespace Latte.Application.Elements.Primitives;
@@ -33,21 +31,11 @@ public enum PrioritySnap
 }
 
 
-public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePoliciable, IMouseInputTarget
+public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseInputTarget
 {
     private Element? _parent;
-    private readonly List<Property> _properties;
-
-    private bool _visible;
     private bool _active;
 
-    private int _priority;
-
-
-    public abstract Transformable SfmlTransformable { get; }
-    public abstract Drawable SfmlDrawable { get; }
-
-    public bool Initialized { get; private set; }
 
     public Element? Parent
     {
@@ -64,22 +52,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public List<Element> Children { get; }
 
-    public IEnumerable<Property> Properties => _properties;
-
     public ElementAttributeManager Attributes { get; private set; }
-
-    public bool Visible
-    {
-        get => _visible && ParentVisible;
-        set
-        {
-            if (_visible == value)
-                return;
-
-            _visible = value;
-            OnVisibilityChange();
-        }
-    }
 
     public bool Active
     {
@@ -89,26 +62,9 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     protected bool ParentVisible => Parent?.Visible ?? true;
 
-    public bool CanDraw => Initialized && Visible && IsInsideClipArea();
-
-    public int Priority
-    {
-        get => _priority;
-        set
-        {
-            if (_priority == value)
-                return;
-
-            _priority = value;
-            OnPriorityChange();
-        }
-    }
-
     public bool Clip { get; set; }
     public int ClipLayerIndex { get; protected set; }
     public int ClipLayerIndexOffset { get; set; }
-
-    protected int LastPriority { get; private set; }
 
     public PrioritySnap PrioritySnap { get; set; }
     public int PrioritySnapOffset { get; set; }
@@ -116,18 +72,15 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public bool IgnoreMouseInput { get; set; }
     public bool CaughtMouseInput { get; set; }
 
+    // TODO: there may be a better way of animating these... try to remove the property system
     public AnimatableProperty<Vec2f> RelativePosition { get; }
+
+    // TODO: changing this should modify relative position and vice versa
     public Vec2f AbsolutePosition
     {
-        get => Parent is not null ? Parent.MapToAbsolute(RelativePosition) : RelativePosition;
-        set => RelativePosition.Set(Parent is not null ? Parent.MapToRelative(value) : value);
+        get => Position.Value;
+        set => Position.Set(value);
     }
-
-    public AnimatableProperty<Vec2f> Origin { get; }
-
-    public AnimatableProperty<Float> Rotation { get; }
-
-    public AnimatableProperty<Vec2f> Scale { get; }
 
     public Property<Alignment> Alignment { get; }
     public AnimatableProperty<Vec2f> AlignmentMargin { get; }
@@ -137,18 +90,10 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
     public event EventHandler<ElementEventArgs>? ParentChangedEvent;
     public event EventHandler<ElementEventArgs>? ChildAddedEvent;
-    public event EventHandler? VisibilityChangedEvent;
-    public event EventHandler? PriorityChangedEvent;
-
-    public event EventHandler? SetupEvent;
-    public event EventHandler? ConstantUpdateEvent;
-    public event EventHandler? UpdateEvent;
-    public event EventHandler? DrawEvent;
 
 
     protected Element(Element? parent)
     {
-        _properties = [];
         _active = true;
 
 
@@ -157,16 +102,12 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
         Attributes = new ElementAttributeManager(this);
 
-        Visible = true;
         Clip = true;
 
         PrioritySnap = PrioritySnap.None;
         PrioritySnapOffset = 1;
 
         RelativePosition = new AnimatableProperty<Vec2f>(this, nameof(RelativePosition), new Vec2f());
-        Origin = new AnimatableProperty<Vec2f>(this, nameof(Origin), new Vec2f());
-        Rotation = new AnimatableProperty<Float>(this, nameof(Rotation), 0f);
-        Scale = new AnimatableProperty<Vec2f>(this, nameof(Scale), new Vec2f(1f, 1f));
 
         Alignment = new Property<Alignment>(this, nameof(Alignment), Behavior.Alignment.None);
         AlignmentMargin = new AnimatableProperty<Vec2f>(this, nameof(AlignmentMargin), new Vec2f());
@@ -182,30 +123,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
 
 
-    // called once after object construction
-    public virtual void Setup()
+    public override void ConstantUpdate()
     {
-        Initialized = true;
-
-        SetupEvent?.Invoke(this, EventArgs.Empty);
-    }
-
-
-
-    // called once each frame, only if Visible is true
-    public virtual void Update()
-    {
-        UpdateEvent?.Invoke(this, EventArgs.Empty);
-    }
-
-
-    // called at least one time each frame, independently of visibility. May be called
-    // more than one time a frame
-    public virtual void ConstantUpdate()
-    {
-        if (!Initialized)
-            Setup();
-
         RemoveNonChildren();
 
         Attributes.ProcessAttributes();
@@ -213,11 +132,8 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         UpdatePriority();
         UpdateClipLayerIndex();
         UpdateGeometry();
-        UpdateSfmlProperties();
 
-        LastPriority = Priority;
-
-        ConstantUpdateEvent?.Invoke(this, EventArgs.Empty);
+        base.ConstantUpdate();
     }
 
     protected void RemoveNonChildren()
@@ -259,24 +175,14 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
             ApplyAlignment();
     }
 
-    protected virtual void UpdateSfmlProperties()
-    {
-        SfmlTransformable.Position = AbsolutePosition;
-        SfmlTransformable.Origin = Origin.Value;
-        SfmlTransformable.Rotation = Rotation.Value;
-        SfmlTransformable.Scale = Scale.Value;
-    }
 
-
-
-    // same as Update, but should be used to drawings
-    public virtual void Draw(RenderTarget target)
+    public override void Draw(RenderTarget target)
     {
         BeginDraw(target);
         target.Draw(SfmlDrawable);
         EndDraw();
 
-        DrawEvent?.Invoke(this, EventArgs.Empty);
+        base.Draw(target);
     }
 
 
@@ -328,7 +234,7 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         => point.IsPointOverRect(GetIntersectedClipArea().ToWorldCoordinates());
 
 
-    public abstract FloatRect GetBounds();
+    public abstract FloatRect GetBounds(); // TODO: move to BaseObject as IBounds
     public abstract FloatRect GetRelativeBounds();
     public virtual FloatRect GetBorderLessBounds() => GetBounds();
     public virtual FloatRect GetBorderLessRelativeBounds() => GetRelativeBounds();
@@ -368,13 +274,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         => GetSizePolicyRect(SizePolicy).ShrinkRect(SizePolicyMargin);
 
 
-    public Vec2f MapToAbsolute(Vec2f position)
-        => position + AbsolutePosition;
-
-    public Vec2f MapToRelative(Vec2f position)
-        => position - AbsolutePosition;
-
-
     public IEnumerable<Element> GetParents()
     {
         var parents = new List<Element>();
@@ -409,13 +308,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     public abstract void ApplySizePolicy();
 
 
-    public virtual void Show() => Visible = true;
-    public virtual void Hide() => Visible = false;
-
-    protected virtual void OnVisibilityChange()
-        => VisibilityChangedEvent?.Invoke(this, EventArgs.Empty);
-
-
     public bool IsChildOf(Element parent)
     {
         if (parent == Parent)
@@ -423,11 +315,6 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
 
         return Parent is not null && Parent.IsChildOf(parent);
     }
-
-
-
-    public void Raise(uint amount = 1) => Priority += (int)amount;
-    public void Lower(uint amount = 1) => Priority -= (int)amount;
 
 
     private bool ParentHierarchyHasPrioritySnap()
@@ -492,37 +379,13 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
     }
 
 
-    public void AddProperty(Property property) => _properties.Add(property);
-    public bool RemoveProperty(Property property) => _properties.Remove(property);
-    public bool HasProperty(Property property) => _properties.Contains(property);
-
-    public Property GetProperty(string name)
-        => _properties.Find(property => property.Name == name)
-           ?? throw new ElementPropertyNotFoundException(name);
-
-    public bool TryGetProperty(string name, [MaybeNullWhen(false)] out Property property)
-    {
-        try
-        {
-            property = GetProperty(name);
-            return true;
-        }
-        catch
-        {
-            property = null;
-            return false;
-        }
-    }
-
-
-    public Property this[string name] => GetProperty(name);
-
-
     public IEnumerable<AnimatableProperty> GetAnimatableProperties()
         => from property in Properties
             where property is AnimatableProperty
             select property as AnimatableProperty;
 
+
+    // TODO: all event callbacks should be public, since there are callbacks in interfaces and them can't be protected or private. Be consistent.
 
     protected virtual void OnParentChange()
     {
@@ -538,8 +401,4 @@ public abstract class Element : IUpdateable, IDrawable, IAlignable, ISizePolicia
         Children.Add(child);
         ChildAddedEvent?.Invoke(this, new ElementEventArgs(child));
     }
-
-
-    protected virtual void OnPriorityChange()
-        => PriorityChangedEvent?.Invoke(this, EventArgs.Empty);
 }

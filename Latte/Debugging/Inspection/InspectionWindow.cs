@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using SFML.Graphics;
 
+using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application;
 using Latte.Application.Elements;

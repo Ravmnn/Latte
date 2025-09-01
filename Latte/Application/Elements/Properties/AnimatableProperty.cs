@@ -1,11 +1,12 @@
+using Latte.Core;
 using Latte.Animation;
-using Latte.Application.Elements.Primitives;
 
 
 namespace Latte.Application.Elements.Properties;
 
 
-public abstract class AnimatableProperty(Element owner, string name, object value) : Property(owner, name, value)
+public abstract class AnimatableProperty(BaseObject owner, string name, object value)
+    : Property(owner, name, value)
 {
     public new IAnimatable Value
     {
@@ -30,7 +31,7 @@ public abstract class AnimatableProperty(Element owner, string name, object valu
 }
 
 
-public class AnimatableProperty<T>(Element owner, string name, T value) : AnimatableProperty(owner, name, value)
+public class AnimatableProperty<T>(BaseObject owner, string name, T value) : AnimatableProperty(owner, name, value)
     where T : IAnimatable<T>
 {
     public new T Value

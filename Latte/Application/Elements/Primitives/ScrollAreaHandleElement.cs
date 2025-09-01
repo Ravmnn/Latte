@@ -1,8 +1,12 @@
 using System;
 
+using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application.Elements.Attributes;
 using Latte.Application.Elements.Behavior;
+
+
+using Math = System.Math;
 
 
 namespace Latte.Application.Elements.Primitives;

@@ -1,6 +1,6 @@
 using System;
 
-using Latte.Application.Elements.Primitives;
+using Latte.Core;
 
 
 namespace Latte.Application.Elements.Properties;
@@ -11,7 +11,7 @@ public abstract class Property
     private object _value;
 
 
-    public Element Owner { get; }
+    public BaseObject Owner { get; }
 
     public string Name { get; }
 
@@ -28,7 +28,7 @@ public abstract class Property
     public EventHandler? ValueChangedEvent;
 
 
-    public Property(Element owner, string name, object value)
+    public Property(BaseObject owner, string name, object value)
     {
         Owner = owner;
         Name = name;
@@ -50,7 +50,7 @@ public abstract class Property
 }
 
 
-public class Property<T>(Element owner, string name, T value) : Property(owner, name, value) where T : notnull
+public class Property<T>(BaseObject owner, string name, T value) : Property(owner, name, value) where T : notnull
 {
     public new T Value
     {
