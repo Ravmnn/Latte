@@ -11,7 +11,7 @@ using Latte.Exceptions.Element;
 namespace Latte.Application.Elements.Primitives;
 
 
-// TODO: code cleanup in here
+// TODO: rebuild grid system from scratch
 
 public enum GridLayoutGrowDirection
 {
@@ -239,7 +239,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     protected void CreateCells()
     {
-        GridLayoutCellElement[,] oldCells = Cells;
+        var oldCells = Cells;
 
         Cells = new GridLayoutCellElement[Rows, Columns];
 

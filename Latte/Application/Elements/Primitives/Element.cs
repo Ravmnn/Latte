@@ -59,11 +59,15 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         set => _active = value;
     }
 
-    protected bool ParentVisible => Parent?.VisibleAndParentVisible ?? true;
+    public new bool Visible
+    {
+        get => base.Visible && ParentVisible;
+        set => base.Visible = value;
+    }
 
-    public bool VisibleAndParentVisible => Visible && ParentVisible;
+    protected bool ParentVisible => Parent?.Visible ?? true;
 
-    public override bool CanDraw => base.CanDraw && VisibleAndParentVisible;
+    public override bool CanDraw => base.CanDraw && Visible;
 
     public bool Clip { get; set; }
     public int ClipLayerIndex { get; protected set; }
@@ -169,13 +173,13 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     private void UpdateGeometry()
     {
-        AbsolutePosition = MapToParentAbsolute(RelativePosition);
-
         if (SizePolicy != SizePolicy.None)
             ApplySizePolicy();
 
         if (Alignment != Alignment.None)
             ApplyAlignment();
+
+        AbsolutePosition = MapToParentAbsolute(RelativePosition);
     }
 
 

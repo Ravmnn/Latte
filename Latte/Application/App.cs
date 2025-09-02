@@ -283,7 +283,9 @@ public static class App
         => Window.SetView(MainView);
 
 
+    public static void AddElements(params IEnumerable<Element> elements) => Section.AddElements(elements);
     public static void AddElement(Element element) => Section.AddElement(element);
+    public static void RemoveElements(params IEnumerable<Element> elements) => Section.RemoveElements(elements);
     public static bool RemoveElement(Element element) => Section.RemoveElement(element);
     public static bool HasElement(Element element) => Section.HasElement(element);
 

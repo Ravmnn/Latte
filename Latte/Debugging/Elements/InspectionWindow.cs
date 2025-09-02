@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -6,17 +5,17 @@ using SFML.Graphics;
 
 using Latte.Core.Type;
 using Latte.Application;
-using Latte.Application.Elements;
 using Latte.Application.Elements.Attributes;
 using Latte.Application.Elements.Primitives;
+using Latte.Debugging.Inspection;
 
 
-namespace Latte.Debugging.Inspection;
+namespace Latte.Debugging.Elements;
 
 
 [DebuggerIgnoreShowBounds, DebuggerIgnoreShowBoundsDimensionsAndPosition, DebuggerIgnoreShowClipArea, DebuggerIgnoreShowPriority]
 [DebuggerIgnoreInspection]
-public class InspectionWindow : WindowElement
+public class InspectionWindow : DebugWindow
 {
     private readonly List<InspectionFrameElement> _frames;
 
@@ -24,7 +23,7 @@ public class InspectionWindow : WindowElement
     private Element? _lockAtElement;
 
 
-    public ScrollAreaElement ScrollArea { get; }
+    public DebugScrollArea ScrollArea { get; }
     public GridLayoutElement DataGrid { get; }
 
     public Element? ElementToInspect { get; set; }
@@ -36,20 +35,14 @@ public class InspectionWindow : WindowElement
     }
 
 
-    public InspectionWindow() : base("Inspector", new Vec2f(10, 10), new Vec2f(400, 400), WindowElementStyles.Moveable)
+    public InspectionWindow() : base("Inspector", new Vec2f(10, 10), new Vec2f(400, 400))
     {
         _lastInspectedElement = null;
         _frames = [];
 
-        Title.Color = SFML.Graphics.Color.White;
-
-        ScrollArea = new ScrollAreaElement(this, new Vec2f(), new Vec2f(380, 340))
+        ScrollArea = new DebugScrollArea(this, null, new Vec2f(380, 340))
         {
-            Alignment = Application.Elements.Behavior.Alignment.Center,
-            AlignmentMargin = new Vec2f(0, 20),
-
-            Color = new ColorRGBA(150, 150, 150, 100),
-            Radius = 3f
+            AlignmentMargin = new Vec2f(0, 20)
         };
 
         DataGrid = new GridLayoutElement(ScrollArea, new Vec2f(), 0, 0, 380, 380)
@@ -57,16 +50,6 @@ public class InspectionWindow : WindowElement
             GrowDirection = GridLayoutGrowDirection.Vertical,
             MinColumns = 1
         };
-
-        Radius = 5f;
-
-        BorderSize = 1f;
-
-        Color = new ColorRGBA(100, 100, 100, 100);
-        BorderColor = new ColorRGBA(255, 255, 255, 200);
-
-        PrioritySnap = PrioritySnap.AlwaysOnTop;
-        PrioritySnapOffset = 2;
     }
 
 

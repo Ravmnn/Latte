@@ -9,7 +9,7 @@ using Latte.Application;
 using Latte.Application.Elements.Attributes;
 using Latte.Application.Elements.Behavior;
 using Latte.Application.Elements.Primitives;
-using Latte.Debugging.Inspection;
+using Latte.Debugging.Elements;
 
 
 namespace Latte.Debugging;
@@ -59,6 +59,7 @@ public class DebuggerIgnoreInspection(bool inherit = true) : ElementAttribute(in
 public sealed class Debugger : IUpdateable, IDrawable
 {
     public InspectionWindow InspectionWindow { get; }
+    public AppStateWindow AppStateWindow { get; }
 
     public DebugOption Options { get; set; }
     public bool EnableKeyShortcuts { get; set; }
@@ -69,14 +70,13 @@ public sealed class Debugger : IUpdateable, IDrawable
 
     public Debugger()
     {
-        InspectionWindow = new InspectionWindow
-        {
-            Visible = false
-        };
+        InspectionWindow = new InspectionWindow { Visible = false };
+        AppStateWindow = new AppStateWindow { Visible = false };
 
         Options = DebugOption.None;
 
         App.AddElement(InspectionWindow);
+        App.AddElement(AppStateWindow);
     }
 
 
@@ -140,7 +140,7 @@ public sealed class Debugger : IUpdateable, IDrawable
                 break;
 
             case Keyboard.Scancode.F10:
-                InspectionWindow.Visible = !InspectionWindow.Visible;
+                ToggleDebugWindowsVisibility();
                 break;
         }
     }
@@ -151,6 +151,13 @@ public sealed class Debugger : IUpdateable, IDrawable
             Options &= ~option;
         else
             Options |= option;
+    }
+
+
+    private void ToggleDebugWindowsVisibility()
+    {
+        InspectionWindow.Visible = !InspectionWindow.Visible;
+        AppStateWindow.Visible = !AppStateWindow.Visible;
     }
 
 

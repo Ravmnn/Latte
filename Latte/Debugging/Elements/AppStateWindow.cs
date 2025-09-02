@@ -1,0 +1,59 @@
+using System.Linq;
+using System.Text;
+using Latte.Core.Type;
+using Latte.Application;
+using Latte.Application.Elements.Behavior;
+using Latte.Application.Elements.Primitives;
+
+
+namespace Latte.Debugging.Elements;
+
+
+[DebuggerIgnoreShowBounds, DebuggerIgnoreShowBoundsDimensionsAndPosition, DebuggerIgnoreShowClipArea, DebuggerIgnoreShowPriority]
+[DebuggerIgnoreInspection]
+public class AppStateWindow : DebugWindow
+{
+    private int _lastElementCount;
+
+
+    public DebugScrollArea ScrollArea { get; }
+    public TextElement State { get; }
+
+
+    public AppStateWindow() : base("App State", new Vec2f(500, 10), new Vec2f(300, 300))
+    {
+        ScrollArea = new DebugScrollArea(this, null, new Vec2f())
+        {
+            SizePolicy = SizePolicy.FitParent,
+            SizePolicyMargin = new Vec2f(10, 30),
+
+            AlignmentMargin = new Vec2f(0, 20)
+        };
+
+        State = new TextElement(ScrollArea, new Vec2f(10, 10), 13, "");
+    }
+
+
+    public override void Update()
+    {
+        var elementCount = App.Elements.Count();
+
+        if (_lastElementCount != elementCount)
+            State.Text = $"{App.Elements.Count()}\n\n{GetElementsText()}";
+
+        _lastElementCount = elementCount;
+
+        base.Update();
+    }
+
+
+    private string GetElementsText()
+    {
+        var builder = new StringBuilder();
+
+        foreach (var element in App.Elements)
+            builder.AppendLine($"{element.GetType().Name} - {element.Priority}");
+
+        return builder.ToString();
+    }
+}

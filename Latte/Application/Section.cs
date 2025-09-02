@@ -55,6 +55,12 @@ public class Section : IUpdateable, IDrawable
         => _elements = _elements.OrderBy(element => element.Priority).ToList();
 
 
+    public void AddElements(params IEnumerable<Element> elements)
+    {
+        foreach (var element in elements)
+            AddElement(element);
+    }
+
     public void AddElement(Element element)
     {
         AddSingleElement(element);
@@ -76,6 +82,12 @@ public class Section : IUpdateable, IDrawable
         ElementAddedEvent?.Invoke(null, new ElementEventArgs(element));
     }
 
+
+    public void RemoveElements(params IEnumerable<Element> elements)
+    {
+        foreach (var element in elements)
+            RemoveElement(element);
+    }
 
     public bool RemoveElement(Element element)
     {

@@ -1,8 +1,9 @@
 using Latte.Core.Type;
 using Latte.Application.Elements.Primitives;
+using Latte.Debugging.Inspection;
 
 
-namespace Latte.Debugging.Inspection;
+namespace Latte.Debugging.Elements;
 
 
 public class InspectionFrameElement : ScrollAreaElement
