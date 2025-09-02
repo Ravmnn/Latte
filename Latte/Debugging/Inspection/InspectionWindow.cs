@@ -1,9 +1,9 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
 using SFML.Graphics;
 
-using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application;
 using Latte.Application.Elements;
@@ -40,6 +40,8 @@ public class InspectionWindow : WindowElement
     {
         _lastInspectedElement = null;
         _frames = [];
+
+        Title.Color = SFML.Graphics.Color.White;
 
         ScrollArea = new ScrollAreaElement(this, new Vec2f(), new Vec2f(380, 340))
         {

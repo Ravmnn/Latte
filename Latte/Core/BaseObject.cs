@@ -3,12 +3,13 @@ using System;
 using SFML.Graphics;
 
 using Latte.Core.Type;
+using Latte.Application.Elements.Behavior;
 
 
 namespace Latte.Core;
 
 
-public abstract class BaseObject : IUpdateable, IDrawable
+public abstract class BaseObject : IUpdateable, IDrawable, IBounds
 {
     private int _priority;
     private bool _visible;
@@ -124,6 +125,9 @@ public abstract class BaseObject : IUpdateable, IDrawable
 
     public Vec2f MapToRelative(Vec2f position)
         => position - Position;
+
+
+    public abstract FloatRect GetBounds();
 
 
     public virtual void Show() => Visible = true;

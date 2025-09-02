@@ -32,8 +32,6 @@ public enum Alignment
     Center = HorizontalCenter | VerticalCenter
 }
 
-// TODO: alignment not working properly
-
 
 public interface IAlignable
 {

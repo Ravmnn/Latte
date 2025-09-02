@@ -75,14 +75,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     public bool IgnoreMouseInput { get; set; }
     public bool CaughtMouseInput { get; set; }
 
-    // TODO: there may be a better way of animating these... try to remove the property system
-    public Vec2f RelativePosition
-    {
-        get => Parent is not null ? Parent.MapToRelative(Position) : AbsolutePosition;
-        set => Position = Parent is not null ? Parent.MapToAbsolute(value) : value;
-    }
+    public Vec2f RelativePosition { get; set; }
 
-    // TODO: changing this should modify relative position and vice versa
     public Vec2f AbsolutePosition
     {
         get => Position;
@@ -175,6 +169,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     private void UpdateGeometry()
     {
+        AbsolutePosition = MapToParentAbsolute(RelativePosition);
+
         if (SizePolicy != SizePolicy.None)
             ApplySizePolicy();
 
@@ -220,6 +216,13 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     }
 
 
+    public Vec2f MapToParentAbsolute(Vec2f point)
+        => Parent is not null ? Parent.MapToAbsolute(point) : point;
+
+    public Vec2f MapToParentRelative(Vec2f point)
+        => Parent is not null ? Parent.MapToRelative(point) : point;
+
+
     // The clip area is a rectangle. It represents the borderless bounds of
     // the parent of an element. It is not used to directly clip the element,
     // stencil buffer is used instead.
@@ -239,7 +242,6 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         => point.IsPointOverRect(GetIntersectedClipArea().ToWorldCoordinates());
 
 
-    public abstract FloatRect GetBounds(); // TODO: move to BaseObject as IBounds
     public abstract FloatRect GetRelativeBounds();
     public virtual FloatRect GetBorderLessBounds() => GetBounds();
     public virtual FloatRect GetBorderLessRelativeBounds() => GetRelativeBounds();
