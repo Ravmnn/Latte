@@ -6,6 +6,7 @@ using Latte.Debugging.Inspection;
 namespace Latte.Debugging.Elements;
 
 
+[DebuggerIgnoreInspection]
 public class InspectionFrameElement : ScrollAreaElement
 {
     private InspectionData _data;

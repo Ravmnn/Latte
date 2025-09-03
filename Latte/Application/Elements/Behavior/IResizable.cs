@@ -33,7 +33,7 @@ public interface IResizable
         if (Resizing)
             return;
 
-        var point = MouseInput.PositionInElementView;
+        var point = MouseInput.PositionInObjectView;
 
         var left = Rect with { Width = CornerResizeAreaSize };
         var right = Rect with { Left = Rect.Left + Rect.Width - CornerResizeAreaSize, Width = CornerResizeAreaSize };

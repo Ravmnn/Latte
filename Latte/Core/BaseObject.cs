@@ -9,6 +9,12 @@ using Latte.Application.Elements.Behavior;
 namespace Latte.Core;
 
 
+public class BaseObjectEventArgs(BaseObject? @object) : EventArgs
+{
+    public BaseObject? @Object { get; } = @object;
+}
+
+
 public abstract class BaseObject : IUpdateable, IDrawable, IBounds
 {
     private int _priority;
@@ -17,6 +23,8 @@ public abstract class BaseObject : IUpdateable, IDrawable, IBounds
 
     public abstract Transformable SfmlTransformable { get; }
     public abstract Drawable SfmlDrawable { get; }
+
+    public BaseObjectAttributeManager Attributes { get; }
 
     public bool Initialized { get; private set; }
 
@@ -33,6 +41,7 @@ public abstract class BaseObject : IUpdateable, IDrawable, IBounds
         }
     }
 
+    public virtual bool CanUpdate => Visible;
     public virtual bool CanDraw => Initialized && Visible;
 
     public int Priority
@@ -66,6 +75,8 @@ public abstract class BaseObject : IUpdateable, IDrawable, IBounds
 
     public BaseObject()
     {
+        Attributes = new BaseObjectAttributeManager(this);
+
         Visible = true;
 
         Position = new Vec2f();

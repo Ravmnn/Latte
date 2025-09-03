@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Text;
+
 using Latte.Core.Type;
 using Latte.Application;
 using Latte.Application.Elements.Behavior;
@@ -9,7 +10,6 @@ using Latte.Application.Elements.Primitives;
 namespace Latte.Debugging.Elements;
 
 
-[DebuggerIgnoreShowBounds, DebuggerIgnoreShowBoundsDimensionsAndPosition, DebuggerIgnoreShowClipArea, DebuggerIgnoreShowPriority]
 [DebuggerIgnoreInspection]
 public class AppStateWindow : DebugWindow
 {
@@ -36,10 +36,10 @@ public class AppStateWindow : DebugWindow
 
     public override void Update()
     {
-        var elementCount = App.Elements.Count();
+        var elementCount = App.Objects.Count();
 
         if (_lastElementCount != elementCount)
-            State.Text = $"{App.Elements.Count()}\n\n{GetElementsText()}";
+            State.Text = $"{App.Objects.Count()}\n\n{GetElementsText()}";
 
         _lastElementCount = elementCount;
 
@@ -51,7 +51,7 @@ public class AppStateWindow : DebugWindow
     {
         var builder = new StringBuilder();
 
-        foreach (var element in App.Elements)
+        foreach (var element in App.Objects)
             builder.AppendLine($"{element.GetType().Name} - {element.Priority}");
 
         return builder.ToString();

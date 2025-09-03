@@ -217,7 +217,7 @@ public class TextElement : Element, IClickable
 
     public Character? CharacterAtPoint(Vec2f point)
     {
-        if (!IsPointOverBounds(point))
+        if (!IsPointOver(point))
             return OutsideCharacterFromX(point.X);
 
         for (var i = 0; i < Text.Length; i++)
@@ -246,7 +246,7 @@ public class TextElement : Element, IClickable
     }
 
     public Character? CharacterAtMousePosition()
-        => CharacterAtPoint(MouseInput.PositionInElementView);
+        => CharacterAtPoint(MouseInput.PositionInObjectView);
 
 
     public Character CharacterAtIndex(int index)
@@ -288,6 +288,10 @@ public class TextElement : Element, IClickable
     }
 
 
+    public bool IsPointOver(Vec2f point)
+        => point.IsPointOverElement(this);
+
+
     public void OnFocus()
         => FocusEvent?.Invoke(this, EventArgs.Empty);
 
@@ -313,8 +317,4 @@ public class TextElement : Element, IClickable
 
     public void OnMouseClick()
         => MouseClickEvent?.Invoke(this, EventArgs.Empty);
-
-
-    public bool IsPointOver(Vec2f point)
-        => IsPointOverBounds(point);
 }

@@ -164,13 +164,13 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
 
     public void ProcessDragging()
     {
-        RelativePosition += MouseInput.PositionDeltaInElementView;
+        RelativePosition += MouseInput.PositionDeltaInObjectView;
     }
 
 
     public void ProcessResizing()
     {
-        var delta = MouseInput.PositionDeltaInElementView;
+        var delta = MouseInput.PositionDeltaInObjectView;
 
         if (CornerToResize.HasFlag(Corner.Top))
             ResizeCorners(top: delta.Y, bottom: -delta.Y);
@@ -301,8 +301,5 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
 
 
     public virtual bool IsPointOver(Vec2f point)
-        => IsPointOverClipArea(point) && IsPointOverThis(point);
-
-    protected bool IsPointOverThis(Vec2f point)
-        => point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius);
+        => point.IsPointOverElementClipArea(this) && point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius);
 }

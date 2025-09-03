@@ -1,6 +1,7 @@
 using System;
 
 using Latte.Application.Elements.Primitives;
+using Latte.Core;
 using Latte.Exceptions.Element;
 
 

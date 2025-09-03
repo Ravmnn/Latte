@@ -21,39 +21,34 @@ public enum DebugOption
     None,
 
     Clip = 1 << 0,
-    OnlyHoveredElement = 1 << 1,
-    OnlyTrueHoveredElement = 1 << 2,
+    OnlyHoveredObject = 1 << 1,
+    OnlyVisibleObjects = 1 << 2,
 
     ShowBounds = 1 << 3,
     ShowBoundsDimensionsAndPosition = 1 << 4,
-    ShowClipArea = 1 << 5,
-    ShowPriority = 1 << 6,
-    ShowFocus = 1 << 7
+    ShowPriority = 1 << 5,
+    ShowFocus = 1 << 6
 }
 
 
 [AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowBoundsAttribute(bool inherit = true) : ElementAttribute(inherit);
+public class DebuggerIgnoreShowBoundsAttribute : ElementAttribute;
 
 
 [AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowBoundsDimensionsAndPositionAttribute(bool inherit = true) : ElementAttribute(inherit);
+public class DebuggerIgnoreShowBoundsDimensionsAndPositionAttribute : ElementAttribute;
 
 
 [AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowClipAreaAttribute(bool inherit = true) : ElementAttribute(inherit);
+public class DebuggerIgnoreShowPriorityAttribute : ElementAttribute;
 
 
 [AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowPriorityAttribute(bool inherit = true) : ElementAttribute(inherit);
+public class DebuggerIgnoreShowFocusAttribute : ElementAttribute;
 
 
 [AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowFocusAttribute(bool inherit = true) : ElementAttribute(inherit);
-
-
-[AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreInspection(bool inherit = true) : ElementAttribute(inherit);
+public class DebuggerIgnoreInspection : ElementAttribute;
 
 
 public sealed class Debugger : IUpdateable, IDrawable
@@ -73,7 +68,7 @@ public sealed class Debugger : IUpdateable, IDrawable
         InspectionWindow = new InspectionWindow { Visible = false };
         AppStateWindow = new AppStateWindow { Visible = false };
 
-        Options = DebugOption.None;
+        Options = DebugOption.OnlyVisibleObjects;
 
         App.AddElement(InspectionWindow);
         App.AddElement(AppStateWindow);
@@ -105,11 +100,11 @@ public sealed class Debugger : IUpdateable, IDrawable
                 break;
 
             case Keyboard.Scancode.F2:
-                ToggleDebugOption(DebugOption.OnlyHoveredElement);
+                ToggleDebugOption(DebugOption.OnlyHoveredObject);
                 break;
 
             case Keyboard.Scancode.F3:
-                ToggleDebugOption(DebugOption.OnlyTrueHoveredElement);
+                ToggleDebugOption(DebugOption.OnlyVisibleObjects);
                 break;
 
 
@@ -122,20 +117,16 @@ public sealed class Debugger : IUpdateable, IDrawable
                 break;
 
             case Keyboard.Scancode.F6:
-                ToggleDebugOption(DebugOption.ShowClipArea);
-                break;
-
-            case Keyboard.Scancode.F7:
                 ToggleDebugOption(DebugOption.ShowPriority);
                 break;
 
-            case Keyboard.Scancode.F8:
+            case Keyboard.Scancode.F7:
                 ToggleDebugOption(DebugOption.ShowFocus);
                 break;
 
             case Keyboard.Scancode.F9:
-                InspectionWindow.LockAtElement = InspectionWindow.LockAtElement is null
-                    ? MouseInput.TrueElementWhichCaughtMouseInput : null;
+                InspectionWindow.LockAtObject = InspectionWindow.LockAtObject is null
+                    ? MouseInput.TrueObjectWhichCaughtMouseInput : null;
 
                 break;
 
@@ -166,56 +157,55 @@ public sealed class Debugger : IUpdateable, IDrawable
         if (Options == DebugOption.None)
             return;
 
-        foreach (var element in App.Elements)
-            DebugElement(target, element);
+        foreach (var @object in App.Objects)
+            DebugObject(target, @object);
 
         DrawEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    public void DebugElement(RenderTarget target, Element element)
+    public void DebugObject(RenderTarget target, BaseObject @object)
     {
-        if (Options.HasFlag(DebugOption.OnlyHoveredElement) && element != MouseInput.ElementWhichCaughtMouseInput)
+        var onlyHoveredObject = Options.HasFlag(DebugOption.OnlyHoveredObject);
+        var onlyVisibleObjects = Options.HasFlag(DebugOption.OnlyVisibleObjects);
+
+        if (onlyHoveredObject && @object != MouseInput.ObjectWhichCaughtMouseInput)
             return;
 
-        if (Options.HasFlag(DebugOption.OnlyTrueHoveredElement) && element != MouseInput.TrueElementWhichCaughtMouseInput)
+        if (onlyVisibleObjects && !@object.CanDraw)
             return;
 
         var clip = Options.HasFlag(DebugOption.Clip);
 
-        if (clip)
+        if (clip && @object is Element element)
         {
             Clipping.ClipEnable();
             Clipping.SetClipToParents(target, element);
         }
 
-        if (Options.HasFlag(DebugOption.ShowBounds) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsAttribute>())
-            DrawElementBounds(target, element, Color.Red);
+        if (Options.HasFlag(DebugOption.ShowBounds) && !@object.HasCachedObjectAttribute<DebuggerIgnoreShowBoundsAttribute>())
+            DrawObjectBounds(target, @object, Color.Red);
 
-        if (Options.HasFlag(DebugOption.ShowBoundsDimensionsAndPosition) && !element.HasCachedElementAttribute<DebuggerIgnoreShowBoundsDimensionsAndPositionAttribute>())
-            DrawElementBoundsDimensionsAndPosition(target, element);
+        if (Options.HasFlag(DebugOption.ShowBoundsDimensionsAndPosition) && !@object.HasCachedObjectAttribute<DebuggerIgnoreShowBoundsDimensionsAndPositionAttribute>())
+            DrawObjectBoundsDimensionsAndPosition(target, @object);
 
-        if (Options.HasFlag(DebugOption.ShowClipArea) && !element.HasCachedElementAttribute<DebuggerIgnoreShowClipAreaAttribute>())
-            DrawElementClipArea(target, element);
+        if (Options.HasFlag(DebugOption.ShowPriority) && !@object.HasCachedObjectAttribute<DebuggerIgnoreShowPriorityAttribute>())
+            DrawObjectPriority(target, @object);
 
-        if (Options.HasFlag(DebugOption.ShowPriority) && !element.HasCachedElementAttribute<DebuggerIgnoreShowPriorityAttribute>())
-            DrawElementPriority(target, element);
-
-        if (Options.HasFlag(DebugOption.ShowFocus) && !element.HasCachedElementAttribute<DebuggerIgnoreShowFocusAttribute>())
-            if (element is IFocusable { Focused: true })
-                DrawFocusIndicator(target, element);
+        if (Options.HasFlag(DebugOption.ShowFocus) && !@object.HasCachedObjectAttribute<DebuggerIgnoreShowFocusAttribute>())
+            if (@object is IFocusable { Focused: true })
+                DrawFocusIndicator(target, @object);
 
         if (clip)
             Clipping.ClipDisable();
     }
 
 
-    public static void DrawElementBounds(RenderTarget target, Element element, ColorRGBA color)
-        => Debugging.Draw.LineRect(target, element.GetBounds(), color);
+    public static void DrawObjectBounds(RenderTarget target, BaseObject @object, ColorRGBA color)
+        => Debugging.Draw.LineRect(target, @object.GetBounds(), color);
 
-    public static void DrawElementBoundsDimensionsAndPosition(RenderTarget target, Element element)
+    public static void DrawObjectBoundsDimensionsAndPosition(RenderTarget target, BaseObject @object)
     {
-        var bounds = element.GetBounds();
-        var borderLessBounds = element.GetBorderLessBounds();
+        var bounds = @object.GetBounds();
 
         var backgroundColor = new Color(255, 255, 255, 220);
 
@@ -224,23 +214,20 @@ public sealed class Debugger : IUpdateable, IDrawable
         var width = $"{bounds.Width:F1}";
         var height = $"{bounds.Height:F1}";
 
-        Debugging.Draw.Text(target, borderLessBounds with { Left = borderLessBounds.Left - 40, Width = 10 }, Alignment.TopLeft, x, backgroundColor: backgroundColor);
-        Debugging.Draw.Text(target, borderLessBounds with { Top = borderLessBounds.Top - 20, Height = 10 }, Alignment.TopLeft, y, backgroundColor: backgroundColor);
-        Debugging.Draw.Text(target, borderLessBounds with { Top = borderLessBounds.Top + borderLessBounds.Height + 10 }, Alignment.HorizontalCenter | Alignment.Top, width, backgroundColor: backgroundColor);
-        Debugging.Draw.Text(target, borderLessBounds with { Left = borderLessBounds.Left + borderLessBounds.Width + 10 }, Alignment.VerticalCenter | Alignment.Left, height, backgroundColor: backgroundColor);
+        Debugging.Draw.Text(target, bounds with { Left = bounds.Left - 40, Width = 10 }, Alignment.TopLeft, x, backgroundColor: backgroundColor);
+        Debugging.Draw.Text(target, bounds with { Top = bounds.Top - 20, Height = 10 }, Alignment.TopLeft, y, backgroundColor: backgroundColor);
+        Debugging.Draw.Text(target, bounds with { Top = bounds.Top + bounds.Height + 10 }, Alignment.HorizontalCenter | Alignment.Top, width, backgroundColor: backgroundColor);
+        Debugging.Draw.Text(target, bounds with { Left = bounds.Left + bounds.Width + 10 }, Alignment.VerticalCenter | Alignment.Left, height, backgroundColor: backgroundColor);
     }
 
-    public static void DrawElementClipArea(RenderTarget target, Element element)
-        => Debugging.Draw.LineRect(target, (FloatRect)element.GetClipArea(), Color.Blue);
-
-    public static void DrawElementPriority(RenderTarget target, Element element)
+    public static void DrawObjectPriority(RenderTarget target, BaseObject @object)
     {
-        var absolutePriority = (uint)System.Math.Abs(element.Priority);
+        var absolutePriority = (uint)Math.Abs(@object.Priority);
 
-        Debugging.Draw.Rect(target, element.GetBounds(), ColorGenerator.FromIndex(absolutePriority, 50));
-        Debugging.Draw.Text(target, element.GetBorderLessBounds(), Alignment.Center, element.Priority.ToString(), backgroundColor: Color.White);
+        Debugging.Draw.Rect(target, @object.GetBounds(), ColorGenerator.FromIndex(absolutePriority, 50));
+        Debugging.Draw.Text(target, @object.GetBounds(), Alignment.Center, @object.Priority.ToString(), backgroundColor: Color.White);
     }
 
-    public static void DrawFocusIndicator(RenderTarget target, Element element)
-        => Debugging.Draw.LineRect(target, element.GetBounds(), Color.Magenta, 3f);
+    public static void DrawFocusIndicator(RenderTarget target, BaseObject @object)
+        => Debugging.Draw.LineRect(target, @object.GetBounds(), Color.Magenta, 3f);
 }

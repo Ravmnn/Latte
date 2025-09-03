@@ -11,9 +11,13 @@ using SFML.Window;
 
 using Latte.Core.Type;
 using Latte.Application.Elements.Primitives;
+using Latte.Core;
 using Latte.Exceptions.Application;
 using Latte.Tweening;
+
+
 using static SFML.Window.Cursor;
+
 
 using Debugger = Latte.Debugging.Debugger;
 
@@ -42,13 +46,13 @@ public static class App
 
     private static Window? s_window;
     private static View? s_mainView;
-    private static View? s_elementView;
+    private static View? s_objectView;
 
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
-    private static bool s_elementWasAddedAndNotUpdated;
+    private static bool s_objectWasAddedAndNotUpdated;
 
-    private static readonly List<TweenAnimation> s_tweenAnimations;
+    private static readonly List<TweenAnimation> s_tweenAnimations; // TODO: move to somewhere like AnimationManager
 
 
     public static Debugger? Debugger { get; private set; }
@@ -73,23 +77,23 @@ public static class App
         private set => s_mainView = value;
     }
 
-    public static View ElementView
+    public static View ObjectView
     {
         get
         {
             if (RenderMode == RenderMode.Unpinned)
                 return MainView;
 
-            return s_elementView ?? throw new AppNotInitializedException();
+            return s_objectView ?? throw new AppNotInitializedException();
         }
 
-        private set => s_elementView = value;
+        private set => s_objectView = value;
     }
 
     public static RenderMode RenderMode { get; set; }
 
     public static Section Section { get; set; }
-    public static IEnumerable<Element> Elements => Section.Elements;
+    public static IEnumerable<BaseObject> Objects => Section.Objects;
 
     public static TimeSpan DeltaTime { get; private set; }
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
@@ -105,14 +109,14 @@ public static class App
     {
         HasInitialized = false;
         s_deltaTimeStopwatch = new Stopwatch();
-        s_elementWasAddedAndNotUpdated = false;
+        s_objectWasAddedAndNotUpdated = false;
 
         s_tweenAnimations = [];
 
         RenderMode = RenderMode.Pinned;
 
         Section = new Section();
-        Section.ElementAddedEvent += (_, _) => OnSectionElementAdded();
+        Section.ObjectAddedEvent += (_, _) => OnSectionElementAdded();
 
         DeltaTime = TimeSpan.Zero;
 
@@ -162,7 +166,7 @@ public static class App
         // TODO: add deinit method
 
         MainView = new View(Window.GetView());
-        ElementView = new View(MainView);
+        ObjectView = new View(MainView);
     }
 
 
@@ -179,7 +183,7 @@ public static class App
         SetCursorToDefault();
 
 
-        SetElementRenderView();
+        SetObjectRenderView();
 
         // mouse input needs correct mouse coordinate information, so
         // it needs to update while using the correct view.
@@ -191,9 +195,9 @@ public static class App
         Debugger?.Update(); // update before elements
 
         UpdateTweenAnimations();
-        UpdateElementsAndCheckForNewElements();
+        UpdateObjectsAndCheckForNewOnes();
 
-        UnsetElementRenderView();
+        UnsetObjectRenderView();
 
 
         KeyboardInput.ClearKeyBuffers();
@@ -216,33 +220,33 @@ public static class App
         Window.Cursor.Type = CursorType.Arrow;
     }
 
-    private static void UpdateElementsAndCheckForNewElements()
+    private static void UpdateObjectsAndCheckForNewOnes()
     {
-        UpdateElements();
+        UpdateObjects();
 
         // if an element is added inside an Element.Update method, it won't be updated.
         // to avoid bugs due to it, whenever an element is added inside an Element.Update method,
         // another Update call will be made to update new added elements.
 
-        while (s_elementWasAddedAndNotUpdated)
+        while (s_objectWasAddedAndNotUpdated)
         {
-            s_elementWasAddedAndNotUpdated = false;
-            UpdateElements(true);
+            s_objectWasAddedAndNotUpdated = false;
+            UpdateObjects(true);
         }
     }
 
-    private static void UpdateElements(bool constantUpdateOnly = false)
+    private static void UpdateObjects(bool constantUpdateOnly = false)
     {
         // use ToArray() to avoid: InvalidOperationException "Collection was modified".
         // don't need to use it with DrawElements(), since it SHOULD not modify the element list
         // and SHOULD be used only for drawing stuff
 
-        foreach (var element in Elements.ToArray())
+        foreach (var @object in Objects.ToArray())
         {
-            if (element.Active && !constantUpdateOnly)
-                element.Update();
+            if (@object.CanUpdate && !constantUpdateOnly)
+                @object.Update();
 
-            element.ConstantUpdate();
+            @object.ConstantUpdate();
         }
     }
 
@@ -253,41 +257,46 @@ public static class App
 
         Window.Draw();
 
-        SetElementRenderView();
+        SetObjectRenderView();
 
         if (!ManualClearDisplayProcess)
             Window.Clear(BackgroundColor);
 
         Section.Draw(Window);
-        DrawElements();
+        DrawObjects();
 
         Debugger?.Draw(Window); // draw after elements
 
         if (!ManualClearDisplayProcess)
             Window.Display();
 
-        UnsetElementRenderView();
+        UnsetObjectRenderView();
     }
 
-    private static void DrawElements()
+    private static void DrawObjects()
     {
-        foreach (var element in Elements)
+        foreach (var element in Objects)
             if (element.CanDraw)
                 element.Draw(Window);
     }
 
-    private static void SetElementRenderView()
-        => Window.SetView(ElementView);
+    private static void SetObjectRenderView()
+        => Window.SetView(ObjectView);
 
-    private static void UnsetElementRenderView()
+    private static void UnsetObjectRenderView()
         => Window.SetView(MainView);
 
 
+    public static void AddObjects(params IEnumerable<BaseObject> objects) => Section.AddObjects(objects);
+    public static void AddObject(BaseObject @object) => Section.AddObject(@object);
+    public static void RemoveObjects(params IEnumerable<BaseObject> objects) => Section.RemoveObjects(objects);
+    public static bool RemoveObject(BaseObject @object) => Section.RemoveObject(@object);
+    public static bool HasObject(BaseObject @object) => Section.HasObject(@object);
+    
     public static void AddElements(params IEnumerable<Element> elements) => Section.AddElements(elements);
     public static void AddElement(Element element) => Section.AddElement(element);
     public static void RemoveElements(params IEnumerable<Element> elements) => Section.RemoveElements(elements);
     public static bool RemoveElement(Element element) => Section.RemoveElement(element);
-    public static bool HasElement(Element element) => Section.HasElement(element);
 
 
     // TODO: maybe move this logic to something like AnimationManager
@@ -328,13 +337,13 @@ public static class App
     {
         MainView.Size = newSize;
 
-        ElementView.Size = newSize;
-        ElementView.Center = (Vector2f)newSize / 2f;
+        ObjectView.Size = newSize;
+        ObjectView.Center = (Vector2f)newSize / 2f;
     }
 
 
     private static void OnSectionElementAdded()
     {
-        s_elementWasAddedAndNotUpdated = true;
+        s_objectWasAddedAndNotUpdated = true;
     }
 }

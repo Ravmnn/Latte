@@ -43,14 +43,14 @@ public static class FocusManager
 
     private static void UnfocusAllOtherElements()
     {
-        foreach (var element in App.Elements)
+        foreach (var element in App.Objects)
             if (element != CurrentFocused && element is IFocusable focusable)
                 focusable.Unfocus();
     }
 
     private static void UnfocusElementsWhichCannotBeFocused()
     {
-        foreach (var element in App.Elements)
+        foreach (var element in App.Objects)
             if (element is IFocusable { DisableFocus: true } focusable)
                 focusable.Unfocus();
     }

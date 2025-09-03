@@ -64,7 +64,8 @@ public class ScrollAreaElement : ButtonElement
     {
         UpdateScrollHandlesVisibility();
 
-        var isMouseHover = MouseInput.TrueElementWhichCaughtMouseInput?.IsChildOf(this) ?? false;
+        var element = MouseInput.TrueObjectWhichCaughtMouseInput as Element;
+        var isMouseHover = element?.IsChildOf(this) ?? false;
 
         if (!IsAnyHandlePressed && isMouseHover)
             AddAppMouseScrollDeltaToScrollOffset();

@@ -15,14 +15,15 @@ namespace Latte.Application;
 public class Section : IUpdateable, IDrawable
 {
     // Elements are ordered based on their priority
-    private List<Element> _elements;
+    private List<BaseObject> _objects;
 
 
-    public IEnumerable<Element> Elements => _elements;
+    public IEnumerable<BaseObject> Objects => _objects;
 
-    public event EventHandler<ElementEventArgs>? ElementAddedEvent;
-    public event EventHandler<ElementEventArgs>? ElementRemovedEvent;
-    public event EventHandler<ElementEventArgs>? ElementListModifiedEvent;
+    // TODO: rename to ObjectEventArgs
+    public event EventHandler<BaseObjectEventArgs>? ObjectAddedEvent;
+    public event EventHandler<BaseObjectEventArgs>? ObjectRemovedEvent;
+    public event EventHandler<BaseObjectEventArgs>? ObjectListModifiedEvent;
 
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;
@@ -30,10 +31,10 @@ public class Section : IUpdateable, IDrawable
 
     public Section()
     {
-        _elements = [];
+        _objects = [];
 
-        ElementAddedEvent += (_, args) => ElementListModifiedEvent?.Invoke(this, args);
-        ElementRemovedEvent += (_, args) => ElementListModifiedEvent?.Invoke(this, args);
+        ObjectAddedEvent += (_, args) => ObjectListModifiedEvent?.Invoke(this, args);
+        ObjectRemovedEvent += (_, args) => ObjectListModifiedEvent?.Invoke(this, args);
     }
 
 
@@ -42,7 +43,7 @@ public class Section : IUpdateable, IDrawable
 
     public virtual void Update()
     {
-        SortElementListByPriority();
+        SortObjectListByPriority();
 
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
@@ -51,8 +52,45 @@ public class Section : IUpdateable, IDrawable
         => DrawEvent?.Invoke(this, EventArgs.Empty);
 
 
-    private void SortElementListByPriority()
-        => _elements = _elements.OrderBy(element => element.Priority).ToList();
+    private void SortObjectListByPriority()
+        => _objects = _objects.OrderBy(@object => @object.Priority).ToList();
+
+
+    public void AddObjects(params IEnumerable<BaseObject> objects)
+    {
+        foreach (var @object in objects)
+            AddObject(@object);
+    }
+
+    public void AddObject(BaseObject @object)
+    {
+        if (HasObject(@object))
+            return;
+
+        _objects.Add(@object);
+
+        AddEventListenersTo(@object);
+
+        ObjectAddedEvent?.Invoke(null, new BaseObjectEventArgs(@object));
+    }
+
+
+    public void RemoveObjects(params IEnumerable<BaseObject> objects)
+    {
+        foreach (var @object in objects)
+            RemoveObject(@object);
+    }
+
+    public bool RemoveObject(BaseObject @object)
+    {
+        var result = _objects.Remove(@object);
+
+        RemoveEventListenersOf(@object);
+
+        ObjectRemovedEvent?.Invoke(null, new BaseObjectEventArgs(@object));
+
+        return result;
+    }
 
 
     public void AddElements(params IEnumerable<Element> elements)
@@ -63,24 +101,12 @@ public class Section : IUpdateable, IDrawable
 
     public void AddElement(Element element)
     {
-        AddSingleElement(element);
+        AddObject(element);
         AddElementsHierarchy(element.Children);
     }
 
     private void AddElementsHierarchy(IEnumerable<Element> elements)
-        => elements.ForeachElementRecursively(AddSingleElement);
-
-    private void AddSingleElement(Element element)
-    {
-        if (HasElement(element))
-            return;
-
-        _elements.Add(element);
-
-        AddEventListenersTo(element);
-
-        ElementAddedEvent?.Invoke(null, new ElementEventArgs(element));
-    }
+        => elements.ForeachElementRecursively(AddObject);
 
 
     public void RemoveElements(params IEnumerable<Element> elements)
@@ -91,7 +117,7 @@ public class Section : IUpdateable, IDrawable
 
     public bool RemoveElement(Element element)
     {
-        if (!RemoveSingleElement(element))
+        if (!RemoveObject(element))
             return false;
 
         RemoveElementsChildrenOf(element);
@@ -100,41 +126,38 @@ public class Section : IUpdateable, IDrawable
 
     private void RemoveElementsChildrenOf(Element parent)
     {
-        foreach (var element in _elements.ToArray().Reverse())
-            if (element.IsChildOf(parent))
-                RemoveSingleElement(element);
-    }
-
-    private bool RemoveSingleElement(Element element)
-    {
-        var result = _elements.Remove(element);
-
-        RemoveEventListenersOf(element);
-
-        ElementRemovedEvent?.Invoke(null, new ElementEventArgs(element));
-
-        return result;
+        foreach (var @object in _objects.ToArray().Reverse())
+            if (@object is Element child && child.IsChildOf(parent))
+                RemoveObject(child);
     }
 
 
-    public bool HasElement(Element element)
-        => _elements.Contains(element);
+    public bool HasObject(BaseObject @object)
+        => _objects.Contains(@object);
 
 
+    public IEnumerable<T> GetObjectsOfType<T>() where T : class
+        => from @object in Objects
+            let objectOfType = @object as T
+            where objectOfType is not null
+            select  objectOfType;
 
-    public void AddEventListenersTo(Element element)
+
+    public void AddEventListenersTo(BaseObject @object)
     {
-        AddChildAddedListenerTo(element);
+        if (@object is Element element)
+            AddChildAddedListenerTo(element);
 
-        if (element is IFocusable focusable)
+        if (@object is IFocusable focusable)
             FocusManager.AddFocusListenerTo(focusable);
     }
 
-    public void RemoveEventListenersOf(Element element)
+    public void RemoveEventListenersOf(BaseObject @object)
     {
-        RemoveChildAddedListenerOf(element);
+        if (@object is Element element)
+            RemoveChildAddedListenerOf(element);
 
-        if (element is IFocusable focusable)
+        if (@object is IFocusable focusable)
             FocusManager.RemoveFocusListenerOf(focusable);
     }
 
@@ -150,6 +173,6 @@ public class Section : IUpdateable, IDrawable
     private void OnElementChildAdded(object? _, ElementEventArgs e)
     {
         if (e.Element is not null)
-            AddElement(e.Element);
+            AddObject(e.Element);
     }
 }

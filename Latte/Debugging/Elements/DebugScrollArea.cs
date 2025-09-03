@@ -1,10 +1,11 @@
-using Latte.Application.Elements.Primitives;
 using Latte.Core.Type;
+using Latte.Application.Elements.Primitives;
 
 
 namespace Latte.Debugging.Elements;
 
 
+[DebuggerIgnoreInspection]
 public class DebugScrollArea : ScrollAreaElement
 {
     public DebugScrollArea(Element? parent, Vec2f? position, Vec2f size, bool verticalScrollHandle = true, bool horizontalScrollHandle = false)

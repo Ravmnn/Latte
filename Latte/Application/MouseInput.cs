@@ -1,8 +1,8 @@
 using System.Linq;
 
+using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application.Elements.Behavior;
-using Latte.Application.Elements.Primitives;
 
 
 namespace Latte.Application;
@@ -11,33 +11,33 @@ namespace Latte.Application;
 public static class MouseInput
 {
     private static Vec2i s_lastMousePosition;
-    private static Vec2f s_lastElementViewMousePosition;
+    private static Vec2f s_lastObjectViewMousePosition;
     private static Vec2f s_lastMainViewMousePosition;
 
 
     public static Vec2i Position { get; private set; }
     public static Vec2i PositionDelta => Position - s_lastMousePosition;
-    public static Vec2f PositionInElementView { get; private set; }
+    public static Vec2f PositionInObjectView { get; private set; }
     public static Vec2f PositionInMainView { get; private set; }
-    public static Vec2f PositionDeltaInElementView => PositionInElementView - s_lastElementViewMousePosition;
+    public static Vec2f PositionDeltaInObjectView => PositionInObjectView - s_lastObjectViewMousePosition;
     public static Vec2f PositionDeltaInMainView => PositionInMainView - s_lastMainViewMousePosition;
 
     public static float ScrollDelta { get; private set; }
 
-    public static Element? ElementWhichCaughtMouseInput { get; private set; }
-    public static Element? TrueElementWhichCaughtMouseInput { get; private set; }
+    public static BaseObject? ObjectWhichCaughtMouseInput { get; private set; }
+    public static BaseObject? TrueObjectWhichCaughtMouseInput { get; private set; }
 
-    public static IClickable? ElementWhichIsHoldingMouseInput { get; private set; }
+    public static BaseObject? ObjectWhichIsHoldingMouseInput { get; private set; }
 
 
     static MouseInput()
     {
         s_lastMousePosition = new Vec2i();
-        s_lastElementViewMousePosition = new Vec2f();
+        s_lastObjectViewMousePosition = new Vec2f();
         s_lastMainViewMousePosition = new Vec2f();
 
         Position = new Vec2i();
-        PositionInElementView = new Vec2f();
+        PositionInObjectView = new Vec2f();
         PositionInMainView = new Vec2f();
     }
 
@@ -57,11 +57,11 @@ public static class MouseInput
     private static void UpdateMouseProperties()
     {
         s_lastMousePosition = Position;
-        s_lastElementViewMousePosition = PositionInElementView;
+        s_lastObjectViewMousePosition = PositionInObjectView;
         s_lastMainViewMousePosition = PositionInMainView;
 
         Position = App.Window.MousePosition;
-        PositionInElementView = App.Window.MapPixelToCoords(Position, App.ElementView);
+        PositionInObjectView = App.Window.MapPixelToCoords(Position, App.ObjectView);
         PositionInMainView = App.Window.MapPixelToCoords(Position, App.MainView);
     }
 
@@ -70,53 +70,56 @@ public static class MouseInput
         if (!CheckMouseInputHolding())
             return;
 
-        var elements = App.Elements.ToArray();
+        var objects = App.Objects.ToArray();
 
-        ElementWhichCaughtMouseInput = TrueElementWhichCaughtMouseInput = null;
+        ObjectWhichCaughtMouseInput = TrueObjectWhichCaughtMouseInput = null;
 
-        for (var i = elements.Length - 1; i >= 0; i--)
+        for (var i = objects.Length - 1; i >= 0; i--)
         {
-            var element = elements[i];
-            var mouseInputWasCaught = ElementWhichCaughtMouseInput is not null;
-            var isMouseOver = IsMouseOverElement(element);
+            var @object = objects[i];
+            var mouseInputWasCaught = ObjectWhichCaughtMouseInput is not null;
+            var isMouseOver = IsMouseOverObject(@object);
 
-            if (element is IClickable clickable)
+            if (@object is IClickable clickable)
                 clickable.CaughtMouseInput = !mouseInputWasCaught && isMouseOver;
 
-            if (!mouseInputWasCaught && element.Visible && isMouseOver)
-                SetElementWhichCaughtMouseInput(element);
+            if (!mouseInputWasCaught && @object.CanDraw && isMouseOver)
+                SetObjectWhichCaughtMouseInput(@object);
         }
     }
 
     private static bool CheckMouseInputHolding()
     {
-        if (ElementWhichIsHoldingMouseInput is null)
+        if (ObjectWhichIsHoldingMouseInput is not IClickable clickableWhichIsHoldingMouseInput)
             return true;
 
-        if (!ElementWhichIsHoldingMouseInput.MouseState.IsMouseDown)
-            ElementWhichIsHoldingMouseInput = null;
+        if (!clickableWhichIsHoldingMouseInput.MouseState.IsMouseDown)
+            ObjectWhichIsHoldingMouseInput = null;
         else
             return false;
 
         return true;
     }
 
-    private static void SetElementWhichCaughtMouseInput(Element element)
+    private static void SetObjectWhichCaughtMouseInput(BaseObject @object)
     {
-        if (!element.IgnoreMouseInput)
-        {
-            ElementWhichCaughtMouseInput = element;
+        if (@object is not IClickable clickable)
+            return;
 
-            if (element is IClickable { MouseState.IsTruePressed: true } clickable)
-                ElementWhichIsHoldingMouseInput = clickable;
+        if (!clickable.IgnoreMouseInput)
+        {
+            ObjectWhichCaughtMouseInput = @object;
+
+            if (clickable.MouseState.IsTruePressed)
+                ObjectWhichIsHoldingMouseInput = @object;
         }
 
-        TrueElementWhichCaughtMouseInput = element;
+        TrueObjectWhichCaughtMouseInput = @object;
     }
 
 
-    public static bool IsMouseOverElement(Element element)
-        => (element as IClickable)?.IsPointOver(PositionInElementView) ?? element.IsPointOverBounds(PositionInElementView);
+    public static bool IsMouseOverObject(BaseObject @object)
+        => PositionInObjectView.IsPointOverObject(@object);
 
-    public static bool IsMouseOverAnyElement() => ElementWhichCaughtMouseInput is not null;
+    public static bool IsMouseOverAnyObject() => ObjectWhichCaughtMouseInput is not null;
 }

@@ -6,6 +6,7 @@ using Latte.Application.Elements.Primitives;
 namespace Latte.Debugging.Elements;
 
 
+[DebuggerIgnoreInspection]
 public abstract class DebugWindow : WindowElement
 {
     protected DebugWindow(string title, Vec2f position, Vec2f size)

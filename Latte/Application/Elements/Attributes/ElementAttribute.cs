@@ -1,13 +1,17 @@
+using Latte.Core;
 using Latte.Application.Elements.Primitives;
 
 
 namespace Latte.Application.Elements.Attributes;
 
 
-public abstract class ElementAttribute(bool inherit = false) : System.Attribute
+public abstract class ElementAttribute : BaseObjectAttribute
 {
-    public bool Inherit { get; } = inherit;
-
+    public sealed override void Process(BaseObject @object)
+    {
+        if (@object is Element element)
+            Process(element);
+    }
 
     public virtual void Process(Element element) {}
 }

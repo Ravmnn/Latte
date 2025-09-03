@@ -6,7 +6,6 @@ using SFML.Graphics;
 
 using Latte.Core;
 using Latte.Core.Type;
-using Latte.Application.Elements.Attributes;
 using Latte.Application.Elements.Behavior;
 
 
@@ -51,8 +50,6 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     public List<Element> Children { get; }
 
-    public ElementAttributeManager Attributes { get; private set; }
-
     public bool Active
     {
         get => _active && Visible;
@@ -67,6 +64,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     protected bool ParentVisible => Parent?.Visible ?? true;
 
+    public override bool CanUpdate => Active;
     public override bool CanDraw => base.CanDraw && Visible;
 
     public bool Clip { get; set; }
@@ -84,7 +82,11 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     public Vec2f AbsolutePosition
     {
         get => Position;
-        set => Position = value;
+        set
+        {
+            RelativePosition = MapToParentRelative(value);
+            Position = value;
+        }
     }
 
     public Alignment Alignment { get; set; }
@@ -104,8 +106,6 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
         Children = [];
         Parent = parent;
-
-        Attributes = new ElementAttributeManager(this);
 
         Clip = true;
 
@@ -239,13 +239,6 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         => GetBounds().Intersects((FloatRect)GetIntersectedClipArea());
 
 
-    public bool IsPointOverBounds(Vec2f point)
-        => IsPointOverClipArea(point) && point.IsPointOverRect(GetBounds());
-
-    public bool IsPointOverClipArea(Vec2f point)
-        => point.IsPointOverRect(GetIntersectedClipArea().ToWorldCoordinates());
-
-
     public abstract FloatRect GetRelativeBounds();
     public virtual FloatRect GetBorderLessBounds() => GetBounds();
     public virtual FloatRect GetBorderLessRelativeBounds() => GetRelativeBounds();
@@ -342,7 +335,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     public void RaiseToTop()
     {
-        var element = App.Elements.LastOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
+        var elements = App.Section.GetObjectsOfType<Element>();
+        var element = elements.LastOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
 
         if (element is not null)
             Priority = element.Priority + PrioritySnapOffset;
@@ -350,7 +344,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     public void LowerToBottom()
     {
-        var element = App.Elements.FirstOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
+        var elements = App.Section.GetObjectsOfType<Element>();
+        var element = elements.FirstOrDefault(element => element != this && !element.ParentHierarchyHasPrioritySnap());
 
         if (element is not null)
             Priority = element.Priority - PrioritySnapOffset;
