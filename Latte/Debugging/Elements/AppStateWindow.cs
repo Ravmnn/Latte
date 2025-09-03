@@ -3,8 +3,8 @@ using System.Text;
 
 using Latte.Core.Type;
 using Latte.Application;
-using Latte.Application.Elements.Behavior;
-using Latte.Application.Elements.Primitives;
+using Latte.UI;
+using Latte.UI.Elements;
 
 
 namespace Latte.Debugging.Elements;

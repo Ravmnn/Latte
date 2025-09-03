@@ -1,5 +1,5 @@
 using Latte.Core.Type;
-using Latte.Application.Elements.Primitives;
+using Latte.UI.Elements;
 
 
 namespace Latte.Debugging.Elements;

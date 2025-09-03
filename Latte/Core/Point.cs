@@ -4,8 +4,8 @@ using SFML.System;
 using SFML.Graphics;
 
 using Latte.Core.Type;
-using Latte.Application.Elements.Behavior;
-using Latte.Application.Elements.Primitives;
+using Latte.UI;
+using Latte.UI.Elements;
 
 
 namespace Latte.Core;
@@ -13,14 +13,14 @@ namespace Latte.Core;
 
 public static class Point
 {
-    public static bool IsPointOverObject(this Vec2f point, BaseObject @object)
-        => (@object as IClickable)?.IsPointOver(point) ?? point.IsPointOverObjectBounds(@object);
+    public static bool IsPointOverBounds(this Vec2f point, IBounds bounds)
+        => point.IsPointOverRect(bounds.GetBounds());
 
-    public static bool IsPointOverObjectBounds(this Vec2f point, BaseObject @object)
-        => point.IsPointOverRect(@object.GetBounds());
+    public static bool IsPointOverObject(this Vec2f point, BaseObject @object)
+        => (@object as IClickable)?.IsPointOver(point) ?? point.IsPointOverBounds(@object);
 
     public static bool IsPointOverElement(this Vec2f point, Element element)
-        => point.IsPointOverObjectBounds(element) && point.IsPointOverElementClipArea(element);
+        => point.IsPointOverBounds(element) && point.IsPointOverElementClipArea(element);
 
     public static bool IsPointOverElementClipArea(this Vec2f point, Element element)
         => point.IsPointOverRect(element.GetIntersectedClipArea().ToWorldCoordinates());

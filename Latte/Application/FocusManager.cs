@@ -1,6 +1,6 @@
 using System;
 
-using Latte.Application.Elements.Behavior;
+using Latte.UI;
 
 
 namespace Latte.Application;

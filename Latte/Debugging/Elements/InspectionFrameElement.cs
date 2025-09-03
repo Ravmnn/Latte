@@ -1,5 +1,6 @@
 using Latte.Core.Type;
-using Latte.Application.Elements.Primitives;
+using Latte.UI;
+using Latte.UI.Elements;
 using Latte.Debugging.Inspection;
 
 
@@ -35,13 +36,13 @@ public class InspectionFrameElement : ScrollAreaElement
 
         NameText = new TextElement(this, new Vec2f(), 10, data.Name)
         {
-            Alignment = Application.Elements.Behavior.Alignment.HorizontalCenter | Application.Elements.Behavior.Alignment.Top,
+            Alignment = Alignment.HorizontalCenter | Alignment.Top,
             AlignmentMargin = new Vec2f(0, 10)
         };
 
         DataText = new TextElement(this, new Vec2f(5, 20), 13, data.Data);
 
-        Alignment = Application.Elements.Behavior.Alignment.Center;
+        Alignment = Alignment.Center;
 
         Color = new ColorRGBA(100, 100, 100, 150);
         Radius = 5f;

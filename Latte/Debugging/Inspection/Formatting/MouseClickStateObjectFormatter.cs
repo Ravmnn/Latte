@@ -1,4 +1,4 @@
-using Latte.Application.Elements.Behavior;
+using Latte.UI;
 
 
 namespace Latte.Debugging.Inspection.Formatting;

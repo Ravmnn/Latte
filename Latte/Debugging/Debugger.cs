@@ -6,9 +6,9 @@ using SFML.Graphics;
 using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application;
-using Latte.Application.Elements.Attributes;
-using Latte.Application.Elements.Behavior;
-using Latte.Application.Elements.Primitives;
+using Latte.UI;
+using Latte.UI.Elements;
+using Latte.UI.Elements.Attributes;
 using Latte.Debugging.Elements;
 
 

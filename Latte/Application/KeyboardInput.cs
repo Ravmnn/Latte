@@ -2,7 +2,7 @@ using System;
 
 using SFML.Window;
 
-using Latte.Application.Elements.Behavior;
+using Latte.UI;
 
 
 namespace Latte.Application;
@@ -63,7 +63,7 @@ public static class KeyboardInput
 
         KeyReleasedEvent?.Invoke(sender, args);
     }
-    
+
 
     private static void OnTextEntered(object? sender, TextEventArgs args)
     {

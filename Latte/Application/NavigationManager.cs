@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 using SFML.Window;
 
-using Latte.Application.Elements.Behavior;
-using Latte.Application.Elements.Primitives;
+using Latte.UI;
+using Latte.UI.Elements;
 
 
 namespace Latte.Application;

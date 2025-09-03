@@ -5,13 +5,13 @@ using System.Diagnostics;
 
 using OpenTK.Windowing.Desktop;
 
-using SFML.Graphics;
 using SFML.System;
+using SFML.Graphics;
 using SFML.Window;
 
-using Latte.Core.Type;
-using Latte.Application.Elements.Primitives;
 using Latte.Core;
+using Latte.Core.Type;
+using Latte.UI.Elements;
 using Latte.Exceptions.Application;
 using Latte.Tweening;
 
@@ -292,7 +292,7 @@ public static class App
     public static void RemoveObjects(params IEnumerable<BaseObject> objects) => Section.RemoveObjects(objects);
     public static bool RemoveObject(BaseObject @object) => Section.RemoveObject(@object);
     public static bool HasObject(BaseObject @object) => Section.HasObject(@object);
-    
+
     public static void AddElements(params IEnumerable<Element> elements) => Section.AddElements(elements);
     public static void AddElement(Element element) => Section.AddElement(element);
     public static void RemoveElements(params IEnumerable<Element> elements) => Section.RemoveElements(elements);

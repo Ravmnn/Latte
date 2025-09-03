@@ -3,7 +3,7 @@ using System;
 using SFML.Graphics;
 
 using Latte.Core.Type;
-using Latte.Application.Elements.Behavior;
+using Latte.UI;
 
 
 namespace Latte.Core;
