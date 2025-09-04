@@ -20,6 +20,7 @@ using static SFML.Window.Cursor;
 
 
 using Debugger = Latte.Debugging.Debugger;
+using VideoMode = SFML.Window.VideoMode;
 
 
 namespace Latte.Application;
@@ -70,6 +71,8 @@ public static class App
     }
 
     public static bool ShouldQuit { get; private set; }
+
+    // TODO: this view system is probably no needed anymore, consider removing
 
     public static View MainView
     {
@@ -194,10 +197,10 @@ public static class App
         Section.Update();
         Debugger?.Update(); // update before elements
 
+        UnsetObjectRenderView();
         UpdateTweenAnimations();
         UpdateObjectsAndCheckForNewOnes();
 
-        UnsetObjectRenderView();
 
 
         KeyboardInput.ClearKeyBuffers();
@@ -251,33 +254,42 @@ public static class App
     }
 
 
+    public static void Draw(RenderTarget target)
+    {
+        AppNotInitializedException.ThrowIfAppWasNotInitialized();
+
+
+        SetObjectRenderView();
+
+        Section.Draw(target);
+        DrawObjects(target);
+
+        Debugger?.Draw(target); // draw after elements
+
+        UnsetObjectRenderView();
+    }
+
+
     public static void Draw()
     {
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
         Window.Draw();
 
-        SetObjectRenderView();
-
         if (!ManualClearDisplayProcess)
             Window.Clear(BackgroundColor);
 
-        Section.Draw(Window);
-        DrawObjects();
-
-        Debugger?.Draw(Window); // draw after elements
+        Draw(Window);
 
         if (!ManualClearDisplayProcess)
             Window.Display();
-
-        UnsetObjectRenderView();
     }
 
-    private static void DrawObjects()
+    private static void DrawObjects(RenderTarget target)
     {
         foreach (var element in Objects)
             if (element.CanDraw)
-                element.Draw(Window);
+                element.Draw(target);
     }
 
     private static void SetObjectRenderView()

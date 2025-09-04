@@ -20,4 +20,8 @@ public static class EmbeddedResourceLoader
 
     public static Font LoadFont(this Assembly assembly, string resourceName)
         => new Font(assembly.GetBytes(resourceName));
+
+
+    public static Texture LoadTexture(this Assembly assembly, string resourceName)
+        => new Texture(assembly.GetBytes(resourceName));
 }

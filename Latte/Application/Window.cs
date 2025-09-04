@@ -1,4 +1,5 @@
 using System;
+
 using SFML.System;
 using SFML.Window;
 using SFML.Graphics;
@@ -15,7 +16,7 @@ namespace Latte.Application;
 
 public class Window : RenderWindow, IUpdateable, IDrawable
 {
-    // Usually, an error message "X Error of failed request:  BadCursor (invalid Cursor parameter)"
+    // Usually, an error message "X Error of failed request: BadCursor (invalid Cursor parameter)"
     // from the X window compositor (Linux only) was being shown
     // whenever a program using Latte was closed. The error could randomly happen or not.
     // That error looks like to be the result of freeing the memory of a Cursor object after
@@ -70,6 +71,7 @@ public class Window : RenderWindow, IUpdateable, IDrawable
         => DrawEvent?.Invoke(this, EventArgs.Empty);
 
 
+    // TODO: move to Cursor class
     public static SfmlCursor.CursorType? GetCursorTypeFromCorners(Corner corner)
     {
         if (corner.HasFlag(Corner.TopLeft))
