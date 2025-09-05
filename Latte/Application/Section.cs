@@ -2,8 +2,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-using SFML.Graphics;
-
 using Latte.Core;
 using Latte.UI;
 using Latte.UI.Elements;
@@ -48,7 +46,7 @@ public class Section : IUpdateable, IDrawable
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    public virtual void Draw(RenderTarget target)
+    public virtual void Draw(IRenderer renderer)
         => DrawEvent?.Invoke(this, EventArgs.Empty);
 
 

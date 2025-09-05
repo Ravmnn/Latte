@@ -39,10 +39,10 @@ public abstract class ShapeElement : Element
     }
 
 
-    public override void BorderLessSimpleDraw(RenderTarget target)
+    public override void BorderLessSimpleDraw(IRenderer renderer)
     {
         SfmlShape.OutlineThickness = 0f;
-        SimpleDraw(target);
+        SimpleDraw(renderer);
         SfmlShape.OutlineThickness = BorderSize;
     }
 

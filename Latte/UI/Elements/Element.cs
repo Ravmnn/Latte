@@ -183,21 +183,21 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     }
 
 
-    public override void Draw(RenderTarget target)
+    public override void Draw(IRenderer renderer)
     {
-        BeginDraw(target);
-        SimpleDraw(target);
+        BeginDraw(renderer);
+        SimpleDraw(renderer);
         EndDraw();
     }
 
 
-    public void SimpleDraw(RenderTarget target)
-        => base.Draw(target);
+    public void SimpleDraw(IRenderer renderer)
+        => base.Draw(renderer);
 
-    public abstract void BorderLessSimpleDraw(RenderTarget target);
+    public abstract void BorderLessSimpleDraw(IRenderer renderer);
 
 
-    protected virtual void BeginDraw(RenderTarget target)
+    protected virtual void BeginDraw(IRenderer renderer)
     {
         if (!Clip)
             return;
@@ -207,7 +207,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         if (Parent is null)
             return;
 
-        Clipping.SetClipToParents(target, this);
+        Clipping.SetClipToParents(renderer, this);
         Clipping.Clip(ClipLayerIndex + ClipLayerIndexOffset);
     }
 

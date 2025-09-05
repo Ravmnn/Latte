@@ -1,5 +1,6 @@
 using SFML.Graphics;
 
+using Latte.Core;
 using Latte.Core.Type;
 
 
@@ -63,7 +64,7 @@ public class SpriteElement : Element
     // targetScale = (currentScale * targetSize) / currentSize
 
 
-    public override void BorderLessSimpleDraw(RenderTarget target) => SimpleDraw(target);
+    public override void BorderLessSimpleDraw(IRenderer renderer) => SimpleDraw(renderer);
 
 
     public override FloatRect GetBounds()

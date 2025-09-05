@@ -1,8 +1,6 @@
 using System.Linq;
 using System.Collections.Generic;
 
-using SFML.Graphics;
-
 using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application;
@@ -102,11 +100,11 @@ public class InspectionWindow : DebugWindow
     }
 
 
-    public override void Draw(RenderTarget renderTarget)
+    public override void Draw(IRenderer renderer)
     {
-        base.Draw(renderTarget);
+        base.Draw(renderer);
 
         if (LockAtObject is not null)
-            Debugger.DrawObjectBounds(renderTarget, LockAtObject, SFML.Graphics.Color.Green);
+            Debugger.DrawObjectBounds(renderer, LockAtObject, SFML.Graphics.Color.Green);
     }
 }

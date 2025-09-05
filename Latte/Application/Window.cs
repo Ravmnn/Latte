@@ -14,14 +14,9 @@ using SfmlCursor = SFML.Window.Cursor;
 namespace Latte.Application;
 
 
-public class Window : RenderWindow, IUpdateable, IDrawable
+public class Window : RenderWindow, IUpdateable
 {
-    // Usually, an error message "X Error of failed request: BadCursor (invalid Cursor parameter)"
-    // from the X window compositor (Linux only) was being shown
-    // whenever a program using Latte was closed. The error could randomly happen or not.
-    // That error looks like to be the result of freeing the memory of a Cursor object after
-    // setting it as the Window cursor.
-    // Basically... to solve it, the below field needs to exist.
+    public DefaultRenderer Renderer { get; set; }
 
     public Cursor Cursor { get; set; }
 
@@ -31,7 +26,6 @@ public class Window : RenderWindow, IUpdateable, IDrawable
     public IntRect WindowRect => new IntRect(new Vector2i(0, 0), (Vector2i)Size);
 
     public event EventHandler? UpdateEvent;
-    public event EventHandler? DrawEvent;
 
 
     public static ContextSettings DefaultSettings { get; }
@@ -52,6 +46,8 @@ public class Window : RenderWindow, IUpdateable, IDrawable
     public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings? settings = null)
         : base(mode, title, style, settings ?? DefaultSettings)
     {
+        Renderer = new DefaultRenderer(this);
+
         Cursor = new Cursor(this);
     }
 
@@ -63,12 +59,6 @@ public class Window : RenderWindow, IUpdateable, IDrawable
 
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
-
-    public void Draw() => Draw(this);
-
-
-    public virtual void Draw(RenderTarget target)
-        => DrawEvent?.Invoke(this, EventArgs.Empty);
 
 
     // TODO: move to Cursor class

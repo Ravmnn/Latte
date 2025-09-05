@@ -152,18 +152,18 @@ public sealed class Debugger : IUpdateable, IDrawable
     }
 
 
-    public void Draw(RenderTarget target)
+    public void Draw(IRenderer renderer)
     {
         if (Options == DebugOption.None)
             return;
 
         foreach (var @object in App.Objects)
-            DebugObject(target, @object);
+            DebugObject(renderer, @object);
 
         DrawEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    public void DebugObject(RenderTarget target, BaseObject @object)
+    public void DebugObject(IRenderer renderer, BaseObject @object)
     {
         var onlyHoveredObject = Options.HasFlag(DebugOption.OnlyHoveredObject);
         var onlyVisibleObjects = Options.HasFlag(DebugOption.OnlyVisibleObjects);
@@ -179,31 +179,31 @@ public sealed class Debugger : IUpdateable, IDrawable
         if (clip && @object is Element element)
         {
             Clipping.ClipEnable();
-            Clipping.SetClipToParents(target, element);
+            Clipping.SetClipToParents(renderer, element);
         }
 
         if (Options.HasFlag(DebugOption.ShowBounds) && !@object.HasCachedObjectAttribute<DebuggerIgnoreShowBoundsAttribute>())
-            DrawObjectBounds(target, @object, Color.Red);
+            DrawObjectBounds(renderer, @object, Color.Red);
 
         if (Options.HasFlag(DebugOption.ShowBoundsDimensionsAndPosition) && !@object.HasCachedObjectAttribute<DebuggerIgnoreShowBoundsDimensionsAndPositionAttribute>())
-            DrawObjectBoundsDimensionsAndPosition(target, @object);
+            DrawObjectBoundsDimensionsAndPosition(renderer, @object);
 
         if (Options.HasFlag(DebugOption.ShowPriority) && !@object.HasCachedObjectAttribute<DebuggerIgnoreShowPriorityAttribute>())
-            DrawObjectPriority(target, @object);
+            DrawObjectPriority(renderer, @object);
 
         if (Options.HasFlag(DebugOption.ShowFocus) && !@object.HasCachedObjectAttribute<DebuggerIgnoreShowFocusAttribute>())
             if (@object is IFocusable { Focused: true })
-                DrawFocusIndicator(target, @object);
+                DrawFocusIndicator(renderer, @object);
 
         if (clip)
             Clipping.ClipDisable();
     }
 
 
-    public static void DrawObjectBounds(RenderTarget target, BaseObject @object, ColorRGBA color)
-        => Debugging.Draw.LineRect(target, @object.GetBounds(), color);
+    public static void DrawObjectBounds(IRenderer renderer, BaseObject @object, ColorRGBA color)
+        => Debugging.Draw.LineRect(renderer, @object.GetBounds(), color);
 
-    public static void DrawObjectBoundsDimensionsAndPosition(RenderTarget target, BaseObject @object)
+    public static void DrawObjectBoundsDimensionsAndPosition(IRenderer renderer, BaseObject @object)
     {
         var bounds = @object.GetBounds();
 
@@ -214,20 +214,20 @@ public sealed class Debugger : IUpdateable, IDrawable
         var width = $"{bounds.Width:F1}";
         var height = $"{bounds.Height:F1}";
 
-        Debugging.Draw.Text(target, bounds with { Left = bounds.Left - 40, Width = 10 }, Alignment.TopLeft, x, backgroundColor: backgroundColor);
-        Debugging.Draw.Text(target, bounds with { Top = bounds.Top - 20, Height = 10 }, Alignment.TopLeft, y, backgroundColor: backgroundColor);
-        Debugging.Draw.Text(target, bounds with { Top = bounds.Top + bounds.Height + 10 }, Alignment.HorizontalCenter | Alignment.Top, width, backgroundColor: backgroundColor);
-        Debugging.Draw.Text(target, bounds with { Left = bounds.Left + bounds.Width + 10 }, Alignment.VerticalCenter | Alignment.Left, height, backgroundColor: backgroundColor);
+        Debugging.Draw.Text(renderer, bounds with { Left = bounds.Left - 40, Width = 10 }, Alignment.TopLeft, x, backgroundColor: backgroundColor);
+        Debugging.Draw.Text(renderer, bounds with { Top = bounds.Top - 20, Height = 10 }, Alignment.TopLeft, y, backgroundColor: backgroundColor);
+        Debugging.Draw.Text(renderer, bounds with { Top = bounds.Top + bounds.Height + 10 }, Alignment.HorizontalCenter | Alignment.Top, width, backgroundColor: backgroundColor);
+        Debugging.Draw.Text(renderer, bounds with { Left = bounds.Left + bounds.Width + 10 }, Alignment.VerticalCenter | Alignment.Left, height, backgroundColor: backgroundColor);
     }
 
-    public static void DrawObjectPriority(RenderTarget target, BaseObject @object)
+    public static void DrawObjectPriority(IRenderer renderer, BaseObject @object)
     {
         var absolutePriority = (uint)Math.Abs(@object.Priority);
 
-        Debugging.Draw.Rect(target, @object.GetBounds(), ColorGenerator.FromIndex(absolutePriority, 50));
-        Debugging.Draw.Text(target, @object.GetBounds(), Alignment.Center, @object.Priority.ToString(), backgroundColor: Color.White);
+        Debugging.Draw.Rect(renderer, @object.GetBounds(), ColorGenerator.FromIndex(absolutePriority, 50));
+        Debugging.Draw.Text(renderer, @object.GetBounds(), Alignment.Center, @object.Priority.ToString(), backgroundColor: Color.White);
     }
 
-    public static void DrawFocusIndicator(RenderTarget target, BaseObject @object)
-        => Debugging.Draw.LineRect(target, @object.GetBounds(), Color.Magenta, 3f);
+    public static void DrawFocusIndicator(IRenderer renderer, BaseObject @object)
+        => Debugging.Draw.LineRect(renderer, @object.GetBounds(), Color.Magenta, 3f);
 }

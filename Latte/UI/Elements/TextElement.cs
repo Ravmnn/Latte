@@ -133,10 +133,10 @@ public class TextElement : Element, IClickable
     }
 
 
-    public override void BorderLessSimpleDraw(RenderTarget target)
+    public override void BorderLessSimpleDraw(IRenderer renderer)
     {
         SfmlText.OutlineThickness = 0f;
-        SimpleDraw(target);
+        SimpleDraw(renderer);
         SfmlText.OutlineThickness = BorderSize;
     }
 

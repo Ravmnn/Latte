@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL;
 
 using SFML.Graphics;
 
+using Latte.Core;
 using Latte.UI.Elements;
 
 
@@ -55,7 +56,7 @@ public static class Clipping
     }
 
 
-    public static void SetClipToParents(RenderTarget target, Element element)
+    public static void SetClipToParents(IRenderer renderer, Element element)
     {
         DisableColorMask();
 
@@ -67,7 +68,7 @@ public static class Clipping
 
         // the first drawing sets the initial stencil bit to 1
         if (parents.Length > 0)
-            parents.First().BorderLessSimpleDraw(target);
+            parents.First().BorderLessSimpleDraw(renderer);
 
         // now, drawings are only allowed where the stencil bit is not 0.
         // if the pixel has a stencil bit > 0, increment it
@@ -75,7 +76,7 @@ public static class Clipping
         GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Incr);
 
         for (var i = 1; i < parents.Length; i++)
-            parents[i].BorderLessSimpleDraw(target);
+            parents[i].BorderLessSimpleDraw(renderer);
 
         EnableColorMask();
     }

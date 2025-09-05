@@ -2,6 +2,7 @@ using System;
 
 using SFML.Graphics;
 
+using Latte.Core;
 using Latte.Core.Type;
 
 
@@ -76,10 +77,8 @@ public class ProgressBarElement : Element
         => Progress = Math.Clamp(Progress, MinValue, MaxValue);
 
 
-    public override void BorderLessSimpleDraw(RenderTarget target)
-    {
-        Foreground.BorderLessSimpleDraw(target);
-    }
+    public override void BorderLessSimpleDraw(IRenderer renderer)
+        => Foreground.BorderLessSimpleDraw(renderer);
 
 
     public override FloatRect GetBounds()

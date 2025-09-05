@@ -123,9 +123,9 @@ public abstract class BaseObject : IUpdateable, IDrawable, IBounds
 
 
     // same as Update, but should be used for drawings
-    public virtual void Draw(RenderTarget target)
+    public virtual void Draw(IRenderer renderer)
     {
-        target.Draw(SfmlDrawable);
+        renderer.Render(SfmlDrawable);
 
         DrawEvent?.Invoke(this, EventArgs.Empty);
     }

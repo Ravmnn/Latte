@@ -110,11 +110,13 @@ public static class App
 
     static App()
     {
-        HasInitialized = false;
         s_deltaTimeStopwatch = new Stopwatch();
         s_objectWasAddedAndNotUpdated = false;
 
         s_tweenAnimations = [];
+
+
+        HasInitialized = false;
 
         RenderMode = RenderMode.Pinned;
 
@@ -125,6 +127,8 @@ public static class App
 
         BackgroundColor = Color.Black;
         ManualClearDisplayProcess = false;
+
+        // TODO: not every Latte application may use a window, so improve this
 
         // workaround for enabling OpenTK (OpenGL Context) integration with SFML.
         // this must be ALWAYS initialized before the rendering window
@@ -254,17 +258,17 @@ public static class App
     }
 
 
-    public static void Draw(RenderTarget target)
+    public static void Draw(IRenderer renderer)
     {
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
 
         SetObjectRenderView();
 
-        Section.Draw(target);
-        DrawObjects(target);
+        Section.Draw(renderer);
+        DrawObjects(renderer);
 
-        Debugger?.Draw(target); // draw after elements
+        Debugger?.Draw(renderer); // draw after elements
 
         UnsetObjectRenderView();
     }
@@ -274,22 +278,20 @@ public static class App
     {
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
-        Window.Draw();
-
         if (!ManualClearDisplayProcess)
             Window.Clear(BackgroundColor);
 
-        Draw(Window);
+        Draw(Window.Renderer);
 
         if (!ManualClearDisplayProcess)
             Window.Display();
     }
 
-    private static void DrawObjects(RenderTarget target)
+    private static void DrawObjects(IRenderer renderer)
     {
         foreach (var element in Objects)
             if (element.CanDraw)
-                element.Draw(target);
+                element.Draw(renderer);
     }
 
     private static void SetObjectRenderView()

@@ -11,6 +11,13 @@ namespace Latte.Application;
 
 public class Cursor : IUpdateable
 {
+    // Usually, an error message "X Error of failed request: BadCursor (invalid Cursor parameter)"
+    // from the X window compositor (Linux only) was being shown
+    // whenever a program using Latte was closed. The error could randomly happen or not.
+    // That error looks like to be the result of freeing the memory of a Cursor object after
+    // setting it as the Window cursor.
+    // Basically... to solve it, the below field needs to exist.
+
     private SfmlCursor _cursor;
 
 
