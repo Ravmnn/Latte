@@ -34,20 +34,11 @@ namespace Latte.Application;
 // TODO: add effects, which includes blur (a shader maybe), shadow and gradient (shader)
 
 
-public enum RenderMode
-{
-    Pinned,
-    Unpinned
-}
-
-
 public static class App
 {
     private static Font? s_defaultFont;
 
     private static Window? s_window;
-    private static View? s_mainView;
-    private static View? s_objectView;
 
     private static readonly Stopwatch s_deltaTimeStopwatch;
 
@@ -72,29 +63,6 @@ public static class App
 
     public static bool ShouldQuit { get; private set; }
 
-    // TODO: this view system is probably no needed anymore, consider removing
-
-    public static View MainView
-    {
-        get => s_mainView ?? throw new AppNotInitializedException();
-        private set => s_mainView = value;
-    }
-
-    public static View ObjectView
-    {
-        get
-        {
-            if (RenderMode == RenderMode.Unpinned)
-                return MainView;
-
-            return s_objectView ?? throw new AppNotInitializedException();
-        }
-
-        private set => s_objectView = value;
-    }
-
-    public static RenderMode RenderMode { get; set; }
-
     public static Section Section { get; set; }
     public static IEnumerable<BaseObject> Objects => Section.Objects;
 
@@ -117,8 +85,6 @@ public static class App
 
 
         HasInitialized = false;
-
-        RenderMode = RenderMode.Pinned;
 
         Section = new Section();
         Section.ObjectAddedEvent += (_, _) => OnSectionElementAdded();
@@ -171,9 +137,6 @@ public static class App
         KeyboardInput.AddKeyListeners(Window);
 
         // TODO: add deinit method
-
-        MainView = new View(Window.GetView());
-        ObjectView = new View(MainView);
     }
 
 
@@ -190,8 +153,6 @@ public static class App
         SetCursorToDefault();
 
 
-        SetObjectRenderView();
-
         // mouse input needs correct mouse coordinate information, so
         // it needs to update while using the correct view.
         MouseInput.Update();
@@ -201,7 +162,6 @@ public static class App
         Section.Update();
         Debugger?.Update(); // update before elements
 
-        UnsetObjectRenderView();
         UpdateTweenAnimations();
         UpdateObjectsAndCheckForNewOnes();
 
@@ -263,14 +223,10 @@ public static class App
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
 
-        SetObjectRenderView();
-
         Section.Draw(renderer);
         DrawObjects(renderer);
 
         Debugger?.Draw(renderer); // draw after elements
-
-        UnsetObjectRenderView();
     }
 
 
@@ -293,12 +249,6 @@ public static class App
             if (element.CanDraw)
                 element.Draw(renderer);
     }
-
-    private static void SetObjectRenderView()
-        => Window.SetView(ObjectView);
-
-    private static void UnsetObjectRenderView()
-        => Window.SetView(MainView);
 
 
     public static void AddObjects(params IEnumerable<BaseObject> objects) => Section.AddObjects(objects);
@@ -349,10 +299,13 @@ public static class App
 
     private static void OnWindowResize(Vec2u newSize)
     {
-        MainView.Size = newSize;
+        var oldView = Window.GetView();
+        var newView = new View(oldView);
 
-        ObjectView.Size = newSize;
-        ObjectView.Center = (Vector2f)newSize / 2f;
+        newView.Center = (Vector2f)newSize / 2f;
+        newView.Size = newSize;
+
+        Window.SetView(newView);
     }
 
 

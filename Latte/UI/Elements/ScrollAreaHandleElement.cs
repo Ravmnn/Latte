@@ -110,9 +110,9 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     public void ProcessDragging()
     {
         if (Orientation == ScrollDirection.Vertical)
-            RelativePosition.Y += MouseInput.PositionDeltaInObjectView.Y;
+            RelativePosition.Y += MouseInput.PositionDeltaInView.Y;
         else
-            RelativePosition.X += MouseInput.PositionDeltaInObjectView.X;
+            RelativePosition.X += MouseInput.PositionDeltaInView.X;
     }
 
 

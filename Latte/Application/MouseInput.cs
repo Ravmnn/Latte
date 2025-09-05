@@ -11,16 +11,13 @@ namespace Latte.Application;
 public static class MouseInput
 {
     private static Vec2i s_lastMousePosition;
-    private static Vec2f s_lastObjectViewMousePosition;
-    private static Vec2f s_lastMainViewMousePosition;
+    private static Vec2f s_lastViewMousePosition;
 
 
     public static Vec2i Position { get; private set; }
     public static Vec2i PositionDelta => Position - s_lastMousePosition;
-    public static Vec2f PositionInObjectView { get; private set; }
-    public static Vec2f PositionInMainView { get; private set; }
-    public static Vec2f PositionDeltaInObjectView => PositionInObjectView - s_lastObjectViewMousePosition;
-    public static Vec2f PositionDeltaInMainView => PositionInMainView - s_lastMainViewMousePosition;
+    public static Vec2f PositionInView { get; private set; }
+    public static Vec2f PositionDeltaInView => PositionInView - s_lastViewMousePosition;
 
     public static float ScrollDelta { get; private set; }
 
@@ -33,12 +30,10 @@ public static class MouseInput
     static MouseInput()
     {
         s_lastMousePosition = new Vec2i();
-        s_lastObjectViewMousePosition = new Vec2f();
-        s_lastMainViewMousePosition = new Vec2f();
+        s_lastViewMousePosition = new Vec2f();
 
         Position = new Vec2i();
-        PositionInObjectView = new Vec2f();
-        PositionInMainView = new Vec2f();
+        PositionInView = new Vec2f();
     }
 
 
@@ -57,12 +52,10 @@ public static class MouseInput
     private static void UpdateMouseProperties()
     {
         s_lastMousePosition = Position;
-        s_lastObjectViewMousePosition = PositionInObjectView;
-        s_lastMainViewMousePosition = PositionInMainView;
+        s_lastViewMousePosition = PositionInView;
 
         Position = App.Window.MousePosition;
-        PositionInObjectView = App.Window.MapPixelToCoords(Position, App.ObjectView);
-        PositionInMainView = App.Window.MapPixelToCoords(Position, App.MainView);
+        PositionInView = App.Window.MapPixelToCoords(Position, App.Window.GetView());
     }
 
     private static void UpdateMouseInputState()
@@ -119,7 +112,7 @@ public static class MouseInput
 
 
     public static bool IsMouseOverObject(BaseObject @object)
-        => PositionInObjectView.IsPointOverObject(@object);
+        => PositionInView.IsPointOverObject(@object);
 
     public static bool IsMouseOverAnyObject() => ObjectWhichCaughtMouseInput is not null;
 }

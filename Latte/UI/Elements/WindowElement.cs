@@ -162,13 +162,13 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
 
     public void ProcessDragging()
     {
-        RelativePosition += MouseInput.PositionDeltaInObjectView;
+        RelativePosition += MouseInput.PositionDeltaInView;
     }
 
 
     public void ProcessResizing()
     {
-        var delta = MouseInput.PositionDeltaInObjectView;
+        var delta = MouseInput.PositionDeltaInView;
 
         if (CornerToResize.HasFlag(Corner.Top))
             ResizeCorners(top: delta.Y, bottom: -delta.Y);

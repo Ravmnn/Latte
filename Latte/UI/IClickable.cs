@@ -41,7 +41,7 @@ public interface IClickable : IMouseInputTarget, IFocusable
         MouseState.WasPressed = MouseState.IsPressed;
         MouseState.WasTruePressed = MouseState.IsTruePressed;
 
-        MouseState.IsMouseOver = IsPointOver(MouseInput.PositionInObjectView);
+        MouseState.IsMouseOver = IsPointOver(MouseInput.PositionInView);
         MouseState.IsMouseHover = CaughtMouseInput;
         MouseState.IsMouseDown = Mouse.IsButtonPressed(Mouse.Button.Left);
         MouseState.IsPressed = MouseState.IsMouseHover && MouseState.IsMouseDown;

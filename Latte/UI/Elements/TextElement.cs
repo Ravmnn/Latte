@@ -246,7 +246,7 @@ public class TextElement : Element, IClickable
     }
 
     public Character? CharacterAtMousePosition()
-        => CharacterAtPoint(MouseInput.PositionInObjectView);
+        => CharacterAtPoint(MouseInput.PositionInView);
 
 
     public Character CharacterAtIndex(int index)
