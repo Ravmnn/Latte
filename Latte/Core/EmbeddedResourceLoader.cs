@@ -46,10 +46,11 @@ public static class EmbeddedResourceLoader
     public static string LoadText(string resourceName, Assembly? sourceAssembly = null)
         => Encoding.UTF8.GetString(Load(resourceName, sourceAssembly));
 
-
     public static Font LoadFont(string resourceName, Assembly? sourceAssembly = null)
         => new Font(Load(resourceName, sourceAssembly));
 
+    public static Image LoadImage(string resourceName, Assembly? sourceAssembly = null)
+        => new Image(Load(resourceName, sourceAssembly));
 
     public static Texture LoadTexture(string resourceName, Assembly? sourceAssembly = null)
         => new Texture(Load(resourceName, sourceAssembly));
