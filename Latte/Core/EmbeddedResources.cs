@@ -6,14 +6,13 @@ using SFML.Graphics;
 namespace Latte.Core;
 
 
-public static partial class EmbeddedResources
+public static class EmbeddedResources
 {
-    public static Assembly LatteAssembly => typeof(EmbeddedResourceLoader).Assembly;
+    public static Assembly LatteAssembly => typeof(EmbeddedResources).Assembly;
 
-    public static string FontPath => "Latte.Resources.Fonts";
     public static string DefaultFontName => "Roboto-Regular.ttf";
 
 
     public static Font DefaultFont()
-        => LatteAssembly.LoadFont($"{FontPath}.{DefaultFontName}");
+        => EmbeddedResourceLoader.LoadFont($"Fonts.{DefaultFontName}", LatteAssembly);
 }

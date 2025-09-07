@@ -120,9 +120,9 @@ public static class App
     }
 
 
-    public static void Init(VideoMode mode, string title, Font defaultFont, Styles style = Styles.Default, ContextSettings? settings = null)
+    public static void Init(VideoMode mode, string title, Font? defaultFont = null, Styles style = Styles.Default, ContextSettings? settings = null)
     {
-        Init(defaultFont);
+        Init(defaultFont ?? EmbeddedResources.DefaultFont());
         InitWindow(new Window(mode, title, style, settings));
     }
 
