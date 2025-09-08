@@ -12,6 +12,7 @@ public static class MouseInput
 {
     private static Vec2i s_lastMousePosition;
     private static Vec2f s_lastViewMousePosition;
+    private static bool s_canResetScrollDelta;
 
 
     public static Vec2i Position { get; private set; }
@@ -31,6 +32,8 @@ public static class MouseInput
     {
         s_lastMousePosition = new Vec2i();
         s_lastViewMousePosition = new Vec2f();
+        s_canResetScrollDelta = true;
+
 
         Position = new Vec2i();
         PositionInView = new Vec2f();
@@ -38,7 +41,11 @@ public static class MouseInput
 
 
     public static void AddScrollListener(Window window)
-        => window.MouseWheelScrolled += (_, args) => ScrollDelta = args.Delta;
+        => window.MouseWheelScrolled += (_, args) =>
+        {
+            ScrollDelta = args.Delta;
+            s_canResetScrollDelta = false;
+        };
 
 
     public static void Update()
@@ -46,7 +53,10 @@ public static class MouseInput
         UpdateMouseProperties();
         UpdateMouseInputState();
 
-        ScrollDelta = 0f;
+        if (s_canResetScrollDelta)
+            ScrollDelta = 0f;
+
+        s_canResetScrollDelta = true;
     }
 
     private static void UpdateMouseProperties()
