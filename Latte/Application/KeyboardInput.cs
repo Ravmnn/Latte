@@ -10,6 +10,9 @@ namespace Latte.Application;
 
 public static class KeyboardInput
 {
+    private static bool s_canClearKeyBuffers;
+
+
     public static event EventHandler<KeyEventArgs>? KeyPressedEvent;
     public static event EventHandler<KeyEventArgs>? KeyReleasedEvent;
     public static event EventHandler<TextEventArgs>? TextEnteredEvent;
@@ -36,8 +39,14 @@ public static class KeyboardInput
     }
 
 
-    public static void ClearKeyBuffers()
+    public static void Update()
     {
+        if (!s_canClearKeyBuffers)
+        {
+            s_canClearKeyBuffers = true;
+            return;
+        }
+
         PressedKey = null;
         ReleasedKey = null;
         EnteredText = null;
@@ -46,6 +55,7 @@ public static class KeyboardInput
 
     private static void OnKeyPressed(object? sender, KeyEventArgs args)
     {
+        s_canClearKeyBuffers = false;
         PressedKey = args;
 
         if (FocusManager.CurrentFocused is IKeyboardInputTarget inputTarget)
@@ -56,6 +66,7 @@ public static class KeyboardInput
 
     private static void OnKeyReleased(object? sender, KeyEventArgs args)
     {
+        s_canClearKeyBuffers = false;
         ReleasedKey = args;
 
         if (FocusManager.CurrentFocused is IKeyboardInputTarget inputTarget)
@@ -67,6 +78,7 @@ public static class KeyboardInput
 
     private static void OnTextEntered(object? sender, TextEventArgs args)
     {
+        s_canClearKeyBuffers = false;
         EnteredText = args;
 
         if (FocusManager.CurrentFocused is IKeyboardInputTarget inputTarget)

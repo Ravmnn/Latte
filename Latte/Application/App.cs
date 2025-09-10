@@ -156,6 +156,7 @@ public static class App
         // mouse input needs correct mouse coordinate information, so
         // it needs to update while using the correct view.
         MouseInput.Update();
+        KeyboardInput.Update();
         NavigationManager.Update();
         FocusManager.Update();
 
@@ -164,10 +165,6 @@ public static class App
 
         UpdateTweenAnimations();
         UpdateObjectsAndCheckForNewOnes();
-
-
-
-        KeyboardInput.ClearKeyBuffers();
     }
 
     private static void UpdateDeltaTime()
