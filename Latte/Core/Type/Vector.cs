@@ -1,7 +1,9 @@
 using System;
 using System.Numerics;
-using Latte.Tweening;
+
 using SFML.System;
+
+using Latte.Tweening;
 
 
 namespace Latte.Core.Type;
