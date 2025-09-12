@@ -72,6 +72,8 @@ public static class App
 
     public static ColorRGBA BackgroundColor { get; set; }
     public static bool ManualClearDisplayProcess { get; set; }
+    public static bool ManualObjectUpdate { get; set; }
+    public static bool ManualObjectDraw { get; set; }
 
     public static bool HasInitialized { get; private set; }
 
@@ -186,6 +188,9 @@ public static class App
 
     private static void UpdateObjectsAndCheckForNewOnes()
     {
+        if (ManualObjectUpdate)
+            return;
+
         UpdateObjects();
 
         // if an element is added inside an Element.Update method, it won't be updated.
@@ -206,19 +211,22 @@ public static class App
         // and SHOULD be used only for drawing stuff
 
         foreach (var @object in Objects.ToArray())
-        {
-            if (@object.CanUpdate && !constantUpdateOnly)
-                @object.Update();
+            UpdateObject(@object, constantUpdateOnly);
+    }
 
-            @object.ConstantUpdate();
-        }
+
+    public static void UpdateObject(BaseObject @object, bool constantUpdateOnly = false)
+    {
+        if (@object.CanUpdate && !constantUpdateOnly)
+            @object.Update();
+
+        @object.ConstantUpdate();
     }
 
 
     public static void Draw(IRenderer renderer)
     {
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
-
 
         Section.Draw(renderer);
         DrawObjects(renderer);
@@ -242,9 +250,18 @@ public static class App
 
     private static void DrawObjects(IRenderer renderer)
     {
-        foreach (var element in Objects)
-            if (element.CanDraw)
-                element.Draw(renderer);
+        if (ManualObjectDraw)
+            return;
+
+        foreach (var @object in Objects)
+            DrawObject(renderer, @object);
+    }
+
+
+    public static void DrawObject(IRenderer renderer, BaseObject @object)
+    {
+        if (@object.CanDraw)
+            @object.Draw(renderer);
     }
 
 
