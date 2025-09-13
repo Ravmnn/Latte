@@ -49,6 +49,8 @@ public class Window : RenderWindow, IUpdateable
         Renderer = new DefaultRenderer(this);
 
         Cursor = new Cursor(this);
+
+        SetFramerateLimit(60);
     }
 
 

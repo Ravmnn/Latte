@@ -9,6 +9,9 @@ using Latte.UI;
 namespace Latte.Core;
 
 
+// TODO: a lot of things can be split in its own interface
+
+
 public class BaseObjectEventArgs(BaseObject? @object) : EventArgs
 {
     public BaseObject? @Object { get; } = @object;
