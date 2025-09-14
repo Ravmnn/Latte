@@ -55,8 +55,8 @@ public class InspectionWindow : DebugWindow
         if (LockAtObject is not null)
             ObjectToInspect = LockAtObject;
 
-        else if (MouseInput.TrueObjectWhichCaughtMouseInput is { } element && App.Debugger is not null)
-            ObjectToInspect = element;
+        else if (MouseInput.ObjectWhichCaughtMouseInput is { } @object && App.Debugger is not null)
+            ObjectToInspect = @object;
 
         UpdateInspectionFrames();
 
@@ -96,7 +96,7 @@ public class InspectionWindow : DebugWindow
             _frames.Add(frame);
         }
 
-        _lastInspectedObject = MouseInput.TrueObjectWhichCaughtMouseInput;
+        _lastInspectedObject = MouseInput.ObjectWhichCaughtMouseInput;
     }
 
 

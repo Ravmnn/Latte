@@ -65,7 +65,7 @@ public class ScrollAreaElement : ButtonElement
     {
         UpdateScrollHandlesVisibility();
 
-        var element = MouseInput.TrueObjectWhichCaughtMouseInput as Element;
+        var element = MouseInput.TrueClickableWhichCaughtMouseInput as Element;
         var isMouseHover = element?.IsChildOf(this) ?? false;
 
         if (!IsAnyHandlePressed && isMouseHover)

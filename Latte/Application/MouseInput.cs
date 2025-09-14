@@ -8,6 +8,8 @@ using Latte.UI;
 namespace Latte.Application;
 
 
+// TODO: maybe add ButtonDownEvent, ButtonUpEvent, DragStartEvent and DragEndEvent
+
 public static class MouseInput
 {
     private static Vec2i s_lastMousePosition;
@@ -23,7 +25,8 @@ public static class MouseInput
     public static float ScrollDelta { get; private set; }
 
     public static BaseObject? ObjectWhichCaughtMouseInput { get; private set; }
-    public static BaseObject? TrueObjectWhichCaughtMouseInput { get; private set; }
+    public static BaseObject? ClickableWhichCaughtMouseInput { get; private set; }
+    public static BaseObject? TrueClickableWhichCaughtMouseInput { get; private set; }
 
     public static BaseObject? ObjectWhichIsHoldingMouseInput { get; private set; }
 
@@ -75,12 +78,12 @@ public static class MouseInput
 
         var objects = App.Objects.ToArray();
 
-        ObjectWhichCaughtMouseInput = TrueObjectWhichCaughtMouseInput = null;
+        ClickableWhichCaughtMouseInput = TrueClickableWhichCaughtMouseInput = null;
 
         for (var i = objects.Length - 1; i >= 0; i--)
         {
             var @object = objects[i];
-            var mouseInputWasCaught = ObjectWhichCaughtMouseInput is not null;
+            var mouseInputWasCaught = ClickableWhichCaughtMouseInput is not null;
             var isMouseOver = IsMouseOverObject(@object);
 
             if (@object is IClickable clickable)
@@ -106,23 +109,23 @@ public static class MouseInput
 
     private static void SetObjectWhichCaughtMouseInput(BaseObject @object)
     {
+        ObjectWhichCaughtMouseInput = @object;
+
         if (@object is not IClickable clickable)
             return;
 
         if (!clickable.IgnoreMouseInput)
         {
-            ObjectWhichCaughtMouseInput = @object;
+            ClickableWhichCaughtMouseInput = @object;
 
             if (clickable.MouseState.IsTruePressed)
                 ObjectWhichIsHoldingMouseInput = @object;
         }
 
-        TrueObjectWhichCaughtMouseInput = @object;
+        TrueClickableWhichCaughtMouseInput = @object;
     }
 
 
     public static bool IsMouseOverObject(BaseObject @object)
         => PositionInView.IsPointOverObject(@object);
-
-    public static bool IsMouseOverAnyObject() => ObjectWhichCaughtMouseInput is not null;
 }

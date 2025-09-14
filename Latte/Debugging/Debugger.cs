@@ -51,6 +51,12 @@ public class DebuggerIgnoreShowFocusAttribute : ElementAttribute;
 public class DebuggerIgnoreInspection : ElementAttribute;
 
 
+// TODO: replace the embedded debug system with a separated application that does it:
+
+// implement IPC, then use it to create an application that gets running information from another
+// Latte application and display useful data.
+
+
 public sealed class Debugger : IUpdateable, IDrawable
 {
     public InspectionWindow InspectionWindow { get; }
@@ -126,7 +132,7 @@ public sealed class Debugger : IUpdateable, IDrawable
 
             case Keyboard.Scancode.F9:
                 InspectionWindow.LockAtObject = InspectionWindow.LockAtObject is null
-                    ? MouseInput.TrueObjectWhichCaughtMouseInput : null;
+                    ? MouseInput.TrueClickableWhichCaughtMouseInput : null;
 
                 break;
 
@@ -168,7 +174,7 @@ public sealed class Debugger : IUpdateable, IDrawable
         var onlyHoveredObject = Options.HasFlag(DebugOption.OnlyHoveredObject);
         var onlyVisibleObjects = Options.HasFlag(DebugOption.OnlyVisibleObjects);
 
-        if (onlyHoveredObject && @object != MouseInput.ObjectWhichCaughtMouseInput)
+        if (onlyHoveredObject && @object != MouseInput.ClickableWhichCaughtMouseInput)
             return;
 
         if (onlyVisibleObjects && !@object.CanDraw)
