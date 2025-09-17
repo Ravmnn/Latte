@@ -10,7 +10,7 @@ namespace Latte.Core.Type;
 
 
 // TODO: this being a class is not a good idea. try to use struct instead
-public class Vec2<T>(T x, T y) : ICloneable where T :
+public class Vec2<T>(T x, T y) : ICloneable, IFloatArrayModifiable where T :
     IAdditionOperators<T, T, T>,
     ISubtractionOperators<T, T, T>,
     IMultiplyOperators<T, T, T>,
@@ -18,7 +18,8 @@ public class Vec2<T>(T x, T y) : ICloneable where T :
     IUnaryNegationOperators<T, T>,
     IEqualityOperators<T, T, bool>,
     IComparisonOperators<T, T, bool>,
-    IConvertible
+    IConvertible,
+    INumber<T>
 {
     public T X { get; set; } = x;
     public T Y { get; set; } = y;
@@ -61,34 +62,26 @@ public class Vec2<T>(T x, T y) : ICloneable where T :
 
     public Vec2<T> Copy() => (Clone() as Vec2<T>)!;
     public object Clone() => new Vec2<T>(X, Y);
+
+
+    public void ModifyFrom(float[] values)
+        => (X, Y) = (T.CreateChecked(values[0]), T.CreateChecked(values[1]));
 }
 
 
-public class Vec2f(float x = default, float y = default) : Vec2<float>(x, y), IFloatArrayModifiable
+public class Vec2f(float x = 0, float y = 0) : Vec2<float>(x, y)
 {
     public static implicit operator Vec2f(Vector2f vec2) => new Vec2f(vec2.X, vec2.Y);
-
-
-    public void ModifyFrom(float[] values)
-        => (X, Y) = (values[0], values[1]);
 }
 
 
-public class Vec2i(int x = default, int y = default) : Vec2<int>(x, y), IFloatArrayModifiable
+public class Vec2i(int x = 0, int y = 0) : Vec2<int>(x, y)
 {
     public static implicit operator Vec2i(Vector2i vec2) => new Vec2i(vec2.X, vec2.Y);
-
-
-    public void ModifyFrom(float[] values)
-        => (X, Y) = ((int)values[0], (int)values[1]);
 }
 
 
-public class Vec2u(uint x = default, uint y = default) : Vec2<uint>(x, y), IFloatArrayModifiable
+public class Vec2u(uint x = 0, uint y = 0) : Vec2<uint>(x, y)
 {
     public static implicit operator Vec2u(Vector2u vec2) => new Vec2u(vec2.X, vec2.Y);
-
-
-    public void ModifyFrom(float[] values)
-        => (X, Y) = ((uint)values[0], (uint)values[1]);
 }
