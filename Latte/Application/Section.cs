@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Latte.Core;
+using Latte.Core.Objects;
 using Latte.UI;
 using Latte.UI.Elements;
 

@@ -6,10 +6,7 @@ using Latte.Core.Type;
 using Latte.UI;
 
 
-namespace Latte.Core;
-
-
-// TODO: a lot of things can be split in its own interface
+namespace Latte.Core.Objects;
 
 
 public class BaseObjectEventArgs(BaseObject? @object) : EventArgs
@@ -18,7 +15,7 @@ public class BaseObjectEventArgs(BaseObject? @object) : EventArgs
 }
 
 
-public abstract class BaseObject : IUpdateable, IDrawable, IBounds
+public abstract class BaseObject : IUpdateable, IDrawable, IBounds, ISfmlObject
 {
     private int _priority;
     private bool _visible;
@@ -111,7 +108,7 @@ public abstract class BaseObject : IUpdateable, IDrawable, IBounds
     }
 
 
-    protected virtual void UpdateSfmlProperties()
+    public virtual void UpdateSfmlProperties()
     {
         SfmlTransformable.Position = Position;
         SfmlTransformable.Origin = Origin;

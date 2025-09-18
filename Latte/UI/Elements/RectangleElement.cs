@@ -30,7 +30,7 @@ public class RectangleElement : ShapeElement
     }
 
 
-    protected override void UpdateSfmlProperties()
+    public override void UpdateSfmlProperties()
     {
         base.UpdateSfmlProperties();
 

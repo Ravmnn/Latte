@@ -5,6 +5,7 @@ using System.Linq;
 using SFML.Graphics;
 
 using Latte.Core;
+using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.Application;
 
@@ -384,8 +385,6 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
             Priority += Parent.Priority - Parent.LastPriority;
     }
 
-
-    // TODO: all event callbacks should be public, since there are callbacks in interfaces and them can't be protected or private. Be consistent.
 
     protected virtual void OnParentChange()
     {

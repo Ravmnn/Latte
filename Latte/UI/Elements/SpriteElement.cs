@@ -43,7 +43,7 @@ public class SpriteElement : Element
     }
 
 
-    protected override void UpdateSfmlProperties()
+    public override void UpdateSfmlProperties()
     {
         base.UpdateSfmlProperties();
 

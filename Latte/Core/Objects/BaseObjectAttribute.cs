@@ -1,4 +1,4 @@
-namespace Latte.Core;
+namespace Latte.Core.Objects;
 
 
 public abstract class BaseObjectAttribute : System.Attribute

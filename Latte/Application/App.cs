@@ -10,6 +10,7 @@ using SFML.Graphics;
 using SFML.Window;
 
 using Latte.Core;
+using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.UI.Elements;
 using Latte.Exceptions.Application;

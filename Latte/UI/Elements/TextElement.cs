@@ -113,7 +113,7 @@ public class TextElement : Element, IClickable
     }
 
 
-    protected override void UpdateSfmlProperties()
+    public override void UpdateSfmlProperties()
     {
         base.UpdateSfmlProperties();
 

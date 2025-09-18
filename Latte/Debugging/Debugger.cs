@@ -4,6 +4,7 @@ using SFML.Window;
 using SFML.Graphics;
 
 using Latte.Core;
+using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.Application;
 using Latte.UI;

@@ -1,6 +1,7 @@
 using System.Linq;
 
 using Latte.Core;
+using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.UI;
 

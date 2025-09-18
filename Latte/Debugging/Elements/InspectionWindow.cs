@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Latte.Core;
+using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.Application;
 using Latte.UI.Elements;

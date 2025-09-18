@@ -9,7 +9,7 @@ using SfmlCursor = SFML.Window.Cursor;
 namespace Latte.Application;
 
 
-public class Cursor : IUpdateable
+public class Cursor(Window window) : IUpdateable
 {
     // Usually, an error message "X Error of failed request: BadCursor (invalid Cursor parameter)"
     // from the X window compositor (Linux only) was being shown
@@ -18,10 +18,10 @@ public class Cursor : IUpdateable
     // setting it as the Window cursor.
     // Basically... to solve it, the below field needs to exist.
 
-    private SfmlCursor _cursor;
+    private SfmlCursor _cursor = new SfmlCursor(SfmlCursor.CursorType.Arrow);
 
 
-    public Window Window { get; }
+    public Window Window { get; } = window;
 
     public SfmlCursor SfmlCursor
     {
@@ -33,20 +33,9 @@ public class Cursor : IUpdateable
         }
     }
 
-    public SfmlCursor.CursorType Type { get; set; }
+    public SfmlCursor.CursorType Type { get; set; } = SfmlCursor.CursorType.Arrow;
 
     public event EventHandler? UpdateEvent;
-
-
-    public Cursor(Window window)
-    {
-        _cursor = new SfmlCursor(SfmlCursor.CursorType.Arrow);
-
-
-        Window = window;
-
-        Type = SfmlCursor.CursorType.Arrow;
-    }
 
 
     public void Update()

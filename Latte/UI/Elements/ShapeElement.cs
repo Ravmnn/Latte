@@ -1,35 +1,27 @@
 using SFML.Graphics;
 
 using Latte.Core;
+using Latte.Core.Objects;
 using Latte.Core.Type;
 
 
 namespace Latte.UI.Elements;
 
 
-public abstract class ShapeElement : Element
+public abstract class ShapeElement(Element? parent, Shape shape) : Element(parent), IShape
 {
     public override Transformable SfmlTransformable => SfmlShape;
     public override Drawable SfmlDrawable => SfmlShape;
 
-    public Shape SfmlShape { get; }
+    public Shape SfmlShape { get; } = shape;
 
     public float BorderSize { get; set; }
 
-    public ColorRGBA Color { get; set; }
-    public ColorRGBA BorderColor { get; set; }
+    public ColorRGBA Color { get; set; } = SFML.Graphics.Color.White;
+    public ColorRGBA BorderColor { get; set; } = SFML.Graphics.Color.White;
 
 
-    protected ShapeElement(Element? parent, Shape shape) : base(parent)
-    {
-        SfmlShape = shape;
-
-        Color = SFML.Graphics.Color.White;
-        BorderColor = SFML.Graphics.Color.White;
-    }
-
-
-    protected override void UpdateSfmlProperties()
+    public override void UpdateSfmlProperties()
     {
         base.UpdateSfmlProperties();
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 
-namespace Latte.Core;
+namespace Latte.Core.Objects;
 
 
 public static class BaseObjectAttributeExtensions

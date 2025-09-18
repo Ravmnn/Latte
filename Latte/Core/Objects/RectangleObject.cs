@@ -29,7 +29,7 @@ public class RectangleObject : ShapeObject
     }
 
 
-    protected override void UpdateSfmlProperties()
+    public override void UpdateSfmlProperties()
     {
         base.UpdateSfmlProperties();
 
