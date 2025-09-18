@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using OpenTK.Windowing.Desktop;
 
@@ -37,10 +36,7 @@ namespace Latte.Application;
 public static class App
 {
     private static Font? s_defaultFont;
-
     private static Window? s_window;
-
-    private static readonly Stopwatch s_deltaTimeStopwatch;
 
     private static bool s_objectWasAddedAndNotUpdated;
 
@@ -64,10 +60,6 @@ public static class App
     public static Section Section { get; set; }
     public static IEnumerable<BaseObject> Objects => Section.Objects;
 
-    // TODO: move to somewhere like DeltaTime (static class)
-    public static TimeSpan DeltaTime { get; private set; }
-    public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
-    public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
 
     public static ColorRGBA BackgroundColor { get; set; }
     public static bool ManualClearDisplayProcess { get; set; }
@@ -79,7 +71,6 @@ public static class App
 
     static App()
     {
-        s_deltaTimeStopwatch = new Stopwatch();
         s_objectWasAddedAndNotUpdated = false;
 
 
@@ -87,8 +78,6 @@ public static class App
 
         Section = new Section();
         Section.ObjectAddedEvent += (_, _) => OnSectionElementAdded();
-
-        DeltaTime = TimeSpan.Zero;
 
         BackgroundColor = Color.Black;
         ManualClearDisplayProcess = false;
@@ -114,7 +103,7 @@ public static class App
 
         Debugger = new Debugger();
 
-        s_deltaTimeStopwatch.Start();
+        DeltaTime.Start();
 
         HasInitialized = true;
     }
@@ -167,7 +156,7 @@ public static class App
     {
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
-        UpdateDeltaTime();
+        DeltaTime.Update();
 
         Window.Update();
         SetCursorToDefault();
@@ -185,12 +174,6 @@ public static class App
         Debugger?.Update(); // update before elements
 
         UpdateObjectsAndCheckForNewOnes();
-    }
-
-    private static void UpdateDeltaTime()
-    {
-        DeltaTime = s_deltaTimeStopwatch.Elapsed;
-        s_deltaTimeStopwatch.Restart();
     }
 
     private static void SetCursorToDefault()

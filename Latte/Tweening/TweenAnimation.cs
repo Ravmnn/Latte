@@ -36,7 +36,7 @@ public abstract class TweenAnimation(double time, Easing easing = Easing.Linear,
         if (ShouldIgnoreUpdate)
             return;
 
-        ElapsedTime += App.DeltaTimeInSeconds;
+        ElapsedTime += DeltaTime.Seconds;
         ElapsedTime = Math.Min(ElapsedTime, Time);
 
         UpdateProgress();
