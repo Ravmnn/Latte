@@ -85,5 +85,8 @@ class Program
             App.Update();
             App.Draw();
         }
+
+
+        App.DeinitWindow();
     }
 }

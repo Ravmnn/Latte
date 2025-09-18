@@ -14,7 +14,6 @@ using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.UI.Elements;
 using Latte.Exceptions.Application;
-using Latte.Tweening;
 
 
 using static SFML.Window.Cursor;
@@ -45,8 +44,6 @@ public static class App
 
     private static bool s_objectWasAddedAndNotUpdated;
 
-    private static readonly List<TweenAnimation> s_tweenAnimations; // TODO: move to somewhere like AnimationManager
-
 
     public static Debugger? Debugger { get; private set; }
 
@@ -67,6 +64,7 @@ public static class App
     public static Section Section { get; set; }
     public static IEnumerable<BaseObject> Objects => Section.Objects;
 
+    // TODO: move to somewhere like DeltaTime (static class)
     public static TimeSpan DeltaTime { get; private set; }
     public static double DeltaTimeInSeconds => DeltaTime.TotalSeconds;
     public static int DeltaTimeInMilliseconds => DeltaTime.Milliseconds;
@@ -83,8 +81,6 @@ public static class App
     {
         s_deltaTimeStopwatch = new Stopwatch();
         s_objectWasAddedAndNotUpdated = false;
-
-        s_tweenAnimations = [];
 
 
         HasInitialized = false;
@@ -107,6 +103,7 @@ public static class App
 
     public static void Init(Font defaultFont)
     {
+        // TODO: throw exception instead
         if (HasInitialized)
         {
             Console.WriteLine("App has already been initialized.");
@@ -133,17 +130,37 @@ public static class App
     public static void InitWindow(Window window)
     {
         Window = window;
-        Window.Closed += (_, _) => Quit();
-        Window.Resized += (_, args) => OnWindowResize(new Vec2u(args.Width, args.Height));
+        AddEventListeners(Window);
+    }
 
-        MouseInput.AddScrollListener(Window);
-        KeyboardInput.AddKeyListeners(Window);
-
-        // TODO: add deinit method
+    public static void DeinitWindow()
+    {
+        RemoveEventListeners(Window);
+        Window.Close();
     }
 
 
-    public static void Quit() => ShouldQuit = true;
+    public static void Quit()
+        => ShouldQuit = true;
+
+
+    public static void AddEventListeners(Window window)
+    {
+        window.Closed += OnWindowClose;
+        window.Resized += OnWindowResize;
+
+        MouseInput.AddScrollListener(window);
+        KeyboardInput.AddKeyListeners(window);
+    }
+
+    public static void RemoveEventListeners(Window window)
+    {
+        window.Closed -= OnWindowClose;
+        window.Resized -= OnWindowResize;
+
+        MouseInput.RemoveScrollListener(window);
+        KeyboardInput.RemoveKeyListeners(window);
+    }
 
 
     public static void Update()
@@ -162,11 +179,11 @@ public static class App
         KeyboardInput.Update();
         NavigationManager.Update();
         FocusManager.Update();
+        AnimationManager.Update();
 
         Section.Update();
         Debugger?.Update(); // update before elements
 
-        UpdateTweenAnimations();
         UpdateObjectsAndCheckForNewOnes();
     }
 
@@ -174,12 +191,6 @@ public static class App
     {
         DeltaTime = s_deltaTimeStopwatch.Elapsed;
         s_deltaTimeStopwatch.Restart();
-    }
-
-    private static void UpdateTweenAnimations()
-    {
-        foreach (var animation in s_tweenAnimations.ToArray())
-            animation.Update();
     }
 
     private static void SetCursorToDefault()
@@ -278,44 +289,15 @@ public static class App
     public static bool RemoveElement(Element element) => Section.RemoveElement(element);
 
 
-    // TODO: maybe move this logic to something like AnimationManager
-    public static TweenAnimation AddTweenAnimation(TweenAnimation animation)
-    {
-        if (s_tweenAnimations.Contains(animation))
-            return animation;
+    private static void OnWindowClose(object? _, EventArgs __)
+        => Quit();
 
-        animation.AbortEvent += OnAnimationEnd;
-        animation.FinishEvent += OnAnimationEnd;
-
-        s_tweenAnimations.Add(animation);
-
-        return animation;
-    }
-
-    public static TweenAnimation RemoveTweenAnimation(TweenAnimation animation)
-    {
-        s_tweenAnimations.Remove(animation);
-
-        animation.AbortEvent -= OnAnimationEnd;
-        animation.FinishEvent -= OnAnimationEnd;
-
-        return animation;
-    }
-
-
-    private static void OnAnimationEnd(object? sender, EventArgs _)
-    {
-        if (sender is not TweenAnimation animation)
-            return;
-
-        RemoveTweenAnimation(animation);
-    }
-
-
-    private static void OnWindowResize(Vec2u newSize)
+    private static void OnWindowResize(object? _, SizeEventArgs args)
     {
         var oldView = Window.GetView();
         var newView = new View(oldView);
+
+        var newSize = new Vec2u(args.Width, args.Height);
 
         newView.Center = (Vector2f)newSize / 2f;
         newView.Size = newSize;

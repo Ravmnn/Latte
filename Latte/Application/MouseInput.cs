@@ -51,11 +51,10 @@ public static class MouseInput
 
 
     public static void AddScrollListener(Window window)
-        => window.MouseWheelScrolled += (_, args) =>
-        {
-            ScrollDelta = args.Delta;
-            s_canResetScrollDelta = false;
-        };
+        => window.MouseWheelScrolled += OnScroll;
+
+    public static void RemoveScrollListener(Window window)
+        => window.MouseWheelScrolled -= OnScroll;
 
 
     public static void Update()
@@ -84,11 +83,11 @@ public static class MouseInput
     {
         var currentlyPressedButtons = GetPressedButtons();
 
-        foreach (var currentlyPressedButton in currentlyPressedButtons)
+        foreach (var currentlyPressedButton in currentlyPressedButtons.ToArray())
             if (!s_pressedButtons.Contains(currentlyPressedButton))
                 OnButtonDown(currentlyPressedButton);
 
-        foreach (var pressedButton in s_pressedButtons)
+        foreach (var pressedButton in s_pressedButtons.ToArray())
             if (!currentlyPressedButtons.Contains(pressedButton))
                 OnButtonUp(pressedButton);
     }
@@ -179,6 +178,13 @@ public static class MouseInput
 
     private static bool IsMouseOverObject(BaseObject @object)
         => PositionInView.IsPointOverObject(@object);
+
+
+    private static void OnScroll(object? _, MouseWheelScrollEventArgs args)
+    {
+        ScrollDelta = args.Delta;
+        s_canResetScrollDelta = false;
+    }
 
 
     private static void OnButtonDown(Mouse.Button button)
