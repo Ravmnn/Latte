@@ -267,7 +267,7 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
 
     public virtual void OnMouseHover()
     {
-        if (IsResizable && Window.GetCursorTypeFromCorners(CornerToResize) is { } cursorType)
+        if (IsResizable && Cursor.GetCursorTypeFromCorners(CornerToResize) is { } cursorType)
             App.Window.Cursor.Type = cursorType;
 
         MouseHoverEvent?.Invoke(this, EventArgs.Empty);

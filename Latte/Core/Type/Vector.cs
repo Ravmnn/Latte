@@ -9,7 +9,6 @@ using Latte.Tweening;
 namespace Latte.Core.Type;
 
 
-// TODO: this being a class is not a good idea. try to use struct instead
 public class Vec2<T>(T x, T y) : ICloneable, IFloatArrayModifiable where T :
     IAdditionOperators<T, T, T>,
     ISubtractionOperators<T, T, T>,

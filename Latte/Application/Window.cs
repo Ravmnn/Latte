@@ -8,9 +8,6 @@ using Latte.Core;
 using Latte.Core.Type;
 
 
-using SfmlCursor = SFML.Window.Cursor;
-
-
 namespace Latte.Application;
 
 
@@ -60,31 +57,5 @@ public class Window : RenderWindow, IUpdateable
         Cursor.Update();
 
         UpdateEvent?.Invoke(this, EventArgs.Empty);
-    }
-
-
-    // TODO: move to Cursor class
-    public static SfmlCursor.CursorType? GetCursorTypeFromCorners(Corner corner)
-    {
-        if (corner.HasFlag(Corner.TopLeft))
-            return SfmlCursor.CursorType.SizeTopLeft;
-
-        if (corner.HasFlag(Corner.TopRight))
-            return SfmlCursor.CursorType.SizeTopRight;
-
-        if (corner.HasFlag(Corner.BottomLeft))
-            return SfmlCursor.CursorType.SizeBottomLeft;
-
-        if (corner.HasFlag(Corner.BottomRight))
-            return SfmlCursor.CursorType.SizeBottomRight;
-
-
-        if (corner.HasFlag(Corner.Left) || corner.HasFlag(Corner.Right))
-            return SfmlCursor.CursorType.SizeHorizontal;
-
-        if (corner.HasFlag(Corner.Top) || corner.HasFlag(Corner.Bottom))
-            return SfmlCursor.CursorType.SizeVertical;
-
-        return null;
     }
 }

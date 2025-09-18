@@ -59,4 +59,29 @@ public class Cursor : IUpdateable
 
     private void SetThisToWindow()
         => Window.SetMouseCursor(SfmlCursor);
+
+
+    public static SfmlCursor.CursorType? GetCursorTypeFromCorners(Corner corner)
+    {
+        if (corner.HasFlag(Corner.TopLeft))
+            return SfmlCursor.CursorType.SizeTopLeft;
+
+        if (corner.HasFlag(Corner.TopRight))
+            return SfmlCursor.CursorType.SizeTopRight;
+
+        if (corner.HasFlag(Corner.BottomLeft))
+            return SfmlCursor.CursorType.SizeBottomLeft;
+
+        if (corner.HasFlag(Corner.BottomRight))
+            return SfmlCursor.CursorType.SizeBottomRight;
+
+
+        if (corner.HasFlag(Corner.Left) || corner.HasFlag(Corner.Right))
+            return SfmlCursor.CursorType.SizeHorizontal;
+
+        if (corner.HasFlag(Corner.Top) || corner.HasFlag(Corner.Bottom))
+            return SfmlCursor.CursorType.SizeVertical;
+
+        return null;
+    }
 }

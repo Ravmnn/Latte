@@ -9,9 +9,6 @@ using SfSprite = SFML.Graphics.Sprite;
 namespace Latte.Core;
 
 
-// TODO: move this to Latte
-
-
 public class TextureRenderer : DefaultRenderer
 {
     public RenderTexture RenderTexture => (RenderTarget as RenderTexture)!;

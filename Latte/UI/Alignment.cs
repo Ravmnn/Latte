@@ -19,15 +19,18 @@ public enum Alignment
     Left = 1 << 2,
     Right = 1 << 3,
 
+    HorizontalCenter = 1 << 4,
+    VerticalCenter = 1 << 5,
+
     TopLeft = Top | Left,
     TopRight = Top | Right,
     BottomLeft = Bottom | Left,
     BottomRight = Bottom | Right,
 
-    HorizontalCenter = 1 << 4,
-    VerticalCenter = 1 << 5,
-
-    // TODO: add more, like TopCenter and LeftCenter
+    TopCenter = HorizontalCenter | Top,
+    BottomCenter = HorizontalCenter | Bottom,
+    LeftCenter = VerticalCenter | Left,
+    RightCenter = VerticalCenter | Right,
 
     Center = HorizontalCenter | VerticalCenter
 }

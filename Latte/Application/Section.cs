@@ -18,7 +18,6 @@ public class Section : IUpdateable, IDrawable
 
     public IEnumerable<BaseObject> Objects => _objects;
 
-    // TODO: rename to ObjectEventArgs
     public event EventHandler<BaseObjectEventArgs>? ObjectAddedEvent;
     public event EventHandler<BaseObjectEventArgs>? ObjectRemovedEvent;
     public event EventHandler<BaseObjectEventArgs>? ObjectListModifiedEvent;
