@@ -13,7 +13,7 @@ using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.UI.Elements;
 using Latte.Application.Exceptions;
-using Latte.Communication.BridgeProtocol;
+using Latte.Communication.Bridge;
 
 
 using static SFML.Window.Cursor;
