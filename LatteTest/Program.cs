@@ -16,6 +16,7 @@ class Program
     private static void Main()
     {
         App.Init(VideoMode.DesktopMode, "Latte Test", EmbeddedResources.DefaultFont());
+        App.InitBridge("latte-test");
         App.Debugger.EnableKeyShortcuts = true;
 
 
@@ -35,8 +36,7 @@ class Program
 
             Radius = 4f,
 
-            Alignment = Alignment.Top | Alignment.Left,
-            //AlignmentMargin = new Vec2f(30) }
+            Alignment = Alignment.Top | Alignment.Left
         };
 
         new TextElement(rect, new Vec2f(), 30, "This is a text.")
@@ -65,18 +65,6 @@ class Program
         };
 
 
-        // var rect = new RectangleElement(null, new Vec2f(100, 200), new Vec2f(200, 200), 5f)
-        // {
-        //     Color = new ColorRGBA(255, 100, 100)
-        // };
-        //
-        // Tween.Animate(rect.AbsolutePosition, new Vec2f(1500, 200), 6f, Easing.EaseInOutQuint)
-        //     .ProgressEvent += (_, args) => rect.AbsolutePosition = args.Values.ToVec2f();
-        //
-        // Tween.Animate(rect.Color, new ColorRGBA(100, 255, 100), 6f, Easing.EaseInOutQuint)
-        //     .ProgressEvent += (_, args) => rect.Color = args.Values.ToColor();
-
-
         App.AddElement(window);
 
 
@@ -87,6 +75,6 @@ class Program
         }
 
 
-        App.DeinitWindow();
+        App.Deinit();
     }
 }

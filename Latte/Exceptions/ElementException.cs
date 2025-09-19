@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Latte.Exceptions.Element;
+namespace Latte.Exceptions;
 
 
 public class ElementException : LatteException

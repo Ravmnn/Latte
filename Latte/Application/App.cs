@@ -12,7 +12,8 @@ using Latte.Core;
 using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.UI.Elements;
-using Latte.Exceptions.Application;
+using Latte.Application.Exceptions;
+using Latte.Communication.BridgeProtocol;
 
 
 using static SFML.Window.Cursor;
@@ -40,6 +41,8 @@ public static class App
 
     private static bool s_objectWasAddedAndNotUpdated;
 
+
+    public static BridgeNode? Bridge { get; set; }
 
     public static Debugger? Debugger { get; private set; }
 
@@ -90,7 +93,7 @@ public static class App
     }
 
 
-    public static void Init(Font defaultFont)
+    private static void Init(Font defaultFont)
     {
         // TODO: throw exception instead
         if (HasInitialized)
@@ -109,10 +112,18 @@ public static class App
     }
 
 
+    // TODO: move font, style and settings to a struct like AppInitializationSettings
     public static void Init(VideoMode mode, string title, Font? defaultFont = null, Styles style = Styles.Default, ContextSettings? settings = null)
     {
         Init(defaultFont ?? EmbeddedResources.DefaultFont());
         InitWindow(new Window(mode, title, style, settings));
+    }
+
+
+    public static void Deinit()
+    {
+        DeinitBridge();
+        DeinitWindow();
     }
 
 
@@ -126,6 +137,16 @@ public static class App
     {
         RemoveEventListeners(Window);
         Window.Close();
+    }
+
+
+    public static void InitBridge(string processName)
+        => Bridge = new BridgeNode(processName);
+
+    public static void DeinitBridge()
+    {
+        Bridge?.Dispose();
+        Bridge = null;
     }
 
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Latte.Core.Type;
 using Latte.Application;
 using Latte.UI.Elements.Attributes;
-using Latte.Exceptions.Element;
+using Latte.UI.Elements.Exceptions;
 
 
 namespace Latte.UI.Elements;
