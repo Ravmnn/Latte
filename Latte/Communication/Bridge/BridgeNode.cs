@@ -4,19 +4,31 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-using Latte.Communication.BridgeProtocol.Exceptions;
+using Latte.Exceptions;
+using Latte.Communication.Bridge.Exceptions;
 
 
 namespace Latte.Communication.Bridge;
 
 
-public readonly record struct BridgeNodeData(string Name, uint Port);
+public readonly record struct BridgeNodeData(string Name, int Port);
+
+
+public class BridgeConnectionEventArgs(BridgeConnection connection) : EventArgs
+{
+    public BridgeConnection Connection { get; } = connection;
+}
+
+public class TcpClientEventArgs(TcpClient client) : EventArgs
+{
+    public TcpClient Client { get; } = client;
+}
 
 
 public class BridgeNode : IDisposable
 {
-    public const uint MinPortId = 32000;
-    public const uint MaxPortId = 33000;
+    public const int MinPortId = 32000;
+    public const int MaxPortId = 33000;
 
 
     private bool _disposed;
@@ -29,47 +41,47 @@ public class BridgeNode : IDisposable
 
     protected TcpListener Server { get; }
 
+    public event EventHandler<TcpClientEventArgs>? ConnectionRequestedEvent;
+    public event EventHandler<BridgeConnectionEventArgs>? ConnectionAcceptedEvent;
+    public event EventHandler<BridgeConnectionEventArgs>? ConnectionRejectedEvent;
+    public event EventHandler<TcpClientEventArgs>? ConnectionFailedEvent;
 
-    public BridgeNode(string name, uint? port = null)
+
+    public BridgeNode(string name, int? port = null)
     {
         port ??= GenerateAvailablePort() ?? throw new NoAvailablePortsException();
         Data = new BridgeNodeData(name, port.Value);
 
         BridgeNodesFile.AddBridgeNode(Data);
 
-        Server = new TcpListener(IPAddress.Loopback, (int)Data.Port);
+        Server = new TcpListener(IPAddress.Loopback, Data.Port);
         Server.Start();
 
 
         _listenForConnectionsThreadCancellation = new CancellationTokenSource();
 
-        _listenForConnectionsThread = new Thread(ListenForConnections) { IsBackground = true };
+        _listenForConnectionsThread = new Thread(ListenForConnectionRequests) { IsBackground = true };
         _listenForConnectionsThread.Start();
     }
 
 
-    public void ConnectTo(string bridgeNodeName)
+    public void ConnectTo(string targetNodeName)
     {
-        var bridgeNode = BridgeNodesFile.GetBridgeNode(bridgeNodeName);
-
-        var client = new TcpClient();
-        client.Connect(IPAddress.Loopback, (int)bridgeNode.Port);
+        var connection = BridgeConnection.To(Data, targetNodeName);
     }
 
 
-    private void ListenForConnections()
+    private void ListenForConnectionRequests()
     {
         while (true)
         {
             try
             {
-                var task = Server.AcceptTcpClientAsync(_listenForConnectionsThreadCancellation.Token).AsTask();
-                task.Wait();
-
-                Console.WriteLine("Client connected");
+                ListenForConnectionRequest();
             }
             catch (AggregateException)
             {
+                // TODO: message is probably not needed
                 Console.WriteLine("Client connection thread cancelled");
                 break;
             }
@@ -77,7 +89,71 @@ public class BridgeNode : IDisposable
     }
 
 
-    private static uint? GenerateAvailablePort()
+    private void ListenForConnectionRequest()
+    {
+        var task = Server.AcceptTcpClientAsync(_listenForConnectionsThreadCancellation.Token).AsTask();
+        task.Wait();
+
+        OnConnectionRequested(task.Result);
+    }
+
+
+    private void ValidateConnectionRequest(TcpClient client)
+    {
+        try
+        {
+            var connection = BridgeConnection.From(client);
+
+            // TODO: connection rejection logic is not developed yet
+            // OnConnectionRejected(connection);
+
+            // TODO:
+            // create logic of disconnection.
+            // if client cannot write to server, then the server is disconnected
+            // if server cannot read from client, then the client is disconnected
+
+            OnConnectionAccepted(connection);
+        }
+        catch (BridgeException)
+        {
+            OnConnectionFailed(client);
+        }
+    }
+
+
+    protected virtual void OnConnectionRequested(TcpClient client)
+    {
+        ValidateConnectionRequest(client);
+
+        ConnectionRequestedEvent?.Invoke(this, new TcpClientEventArgs(client));
+    }
+
+
+    protected virtual void OnConnectionAccepted(BridgeConnection connection)
+    {
+        connection.TryWriteObjectAsJson(new ConnectionResponseObject(ConnectionResponse.Accepted));
+
+        ConnectionAcceptedEvent?.Invoke(this, new BridgeConnectionEventArgs(connection));
+    }
+
+
+    protected virtual void OnConnectionRejected(BridgeConnection connection)
+    {
+        connection.TryWriteObjectAsJson(new ConnectionResponseObject(ConnectionResponse.Rejected));
+
+        ConnectionRejectedEvent?.Invoke(this, new BridgeConnectionEventArgs(connection));
+    }
+
+
+    protected virtual void OnConnectionFailed(TcpClient client)
+    {
+        ConnectionFailedEvent?.Invoke(this, new TcpClientEventArgs(client));
+    }
+
+
+
+
+    private static int? GenerateAvailablePort()
     {
         var connectionNodes = BridgeNodesFile.ReadAllBridgeNodes().ToArray();
 

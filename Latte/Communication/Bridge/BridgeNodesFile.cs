@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
-using Latte.Communication.BridgeProtocol.Exceptions;
+using Latte.Communication.Bridge.Exceptions;
 
 
 namespace Latte.Communication.Bridge;
@@ -98,7 +98,7 @@ public static class BridgeNodesFile
     private static BridgeNodeData ReadBridgeNodeFromBinary(BinaryReader reader)
     {
         var processName = reader.ReadString();
-        var port = reader.ReadUInt32();
+        var port = reader.ReadInt32();
 
         return new BridgeNodeData(processName, port);
     }

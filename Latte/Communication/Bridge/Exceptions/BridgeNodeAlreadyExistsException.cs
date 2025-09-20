@@ -3,7 +3,7 @@ using System;
 using Latte.Exceptions;
 
 
-namespace Latte.Communication.BridgeProtocol.Exceptions;
+namespace Latte.Communication.Bridge.Exceptions;
 
 
 public class BridgeNodeAlreadyExistsException : BridgeException

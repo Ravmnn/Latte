@@ -26,6 +26,9 @@ using VideoMode = SFML.Window.VideoMode;
 namespace Latte.Application;
 
 
+// TODO: max of 2 lines of vertical spacing between anything is not clearly enough, use max of 4
+
+
 // TODO: add time-based performance analyzer, with FPS calculator
 
 // TODO: add text inputs
