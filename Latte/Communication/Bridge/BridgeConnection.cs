@@ -144,7 +144,7 @@ public class BridgeConnection : TcpClient
     public async Task WriteObjectAsJsonAsync(object @object)
     {
         var json = JsonSerializer.Serialize(@object);
-        var task = Writer.WriteAsync(json);
+        var task = Writer.WriteLineAsync(json);
 
         await WaitForTaskWithDefaultTimeoutOrThrow(task);
     }

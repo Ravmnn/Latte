@@ -81,8 +81,6 @@ public class BridgeNode : IDisposable
             }
             catch (AggregateException)
             {
-                // TODO: message is probably not needed
-                Console.WriteLine("Client connection thread cancelled");
                 break;
             }
         }
@@ -123,9 +121,9 @@ public class BridgeNode : IDisposable
 
     protected virtual void OnConnectionRequested(TcpClient client)
     {
-        ValidateConnectionRequest(client);
-
         ConnectionRequestedEvent?.Invoke(this, new TcpClientEventArgs(client));
+
+        ValidateConnectionRequest(client);
     }
 
 
