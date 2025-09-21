@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 using Latte.Communication.Bridge.Exceptions;
@@ -21,44 +20,60 @@ public enum ConnectionResponse
 public readonly record struct ConnectionResponseObject(ConnectionResponse Response);
 
 
+public class DataEventArgs(string data) : EventArgs
+{
+    public string Data { get; } = data;
+}
+
+
+// TODO: encapsulate TcpClient instead of using inheritance
 public class BridgeConnection : TcpClient
 {
-    public static TimeSpan MaxWaitingTimeout { get; } = TimeSpan.FromSeconds(10);
+    public static TimeSpan MaxWaitingTimeout { get; } = TimeSpan.FromSeconds(6);
 
 
     public StreamWriter Writer { get; private set; } = null!;
     public StreamReader Reader { get; private set; } = null!;
 
-    public bool Origin { get; }
+    public bool IsOrigin { get; }
 
-    public BridgeNodeData Data { get; private set; }
+    public BridgeNodeData Origin { get; private set; }
+    public BridgeNodeData Target { get; private set; }
+
+    public BridgeNodeData Sender => IsOrigin ? Origin : Target;
+    public BridgeNodeData Receiver => IsOrigin ? Target : Origin;
+
+    public EventHandler<DataEventArgs>? SentEvent;
+    public EventHandler<DataEventArgs>? ReceivedEvent;
 
 
-    // creating a bridge connection with an already existing connection
-    private BridgeConnection(TcpClient client)
+    // creating to receive an external connection
+    private BridgeConnection(BridgeNodeData target, TcpClient origin)
     {
-        ConstructStreamsFrom(client.GetStream());
-        Data = GetThisOwnNodeData();
+        ConstructStreamsFrom(origin.GetStream());
+
+        Target = target;
+        Origin = GetValidationData();
     }
 
 
-    // creating a connection to connect with a bridge node
-    private BridgeConnection(BridgeNodeData nodeData, string targetNodeName)
+    // creating to connect with a bridge node
+    private BridgeConnection(BridgeNodeData origin, string targetName)
     {
-        Origin = true;
-        Data = nodeData;
+        IsOrigin = true;
 
-        var targetNodeData = BridgeNodesFile.GetBridgeNode(targetNodeName);
+        Origin = origin;
+        Target = BridgeNodesFile.GetBridgeNode(targetName);
 
-        ConnectTo(targetNodeData);
+        ConnectTo(Target);
     }
 
 
-    public static BridgeConnection To(BridgeNodeData nodeData, string targetNodeName)
-        => new BridgeConnection(nodeData, targetNodeName);
+    public static BridgeConnection ToTarget(BridgeNodeData origin, string targetName)
+        => new BridgeConnection(origin, targetName);
 
-    public static BridgeConnection From(TcpClient client)
-        => new BridgeConnection(client);
+    public static BridgeConnection FromOrigin(BridgeNodeData target, TcpClient origin)
+        => new BridgeConnection(target, origin);
 
 
     private void ConnectAndConstructStreams(int port)
@@ -75,61 +90,110 @@ public class BridgeConnection : TcpClient
     }
 
 
-    private BridgeNodeData GetThisOwnNodeData()
+    private BridgeNodeData GetValidationData()
     {
-        var nodeData = ReadJsonStringAsObject<BridgeNodeData>();
+        var dataString = ReceiveString();
+        var origin = dataString.JsonStringAs<BridgeNodeData?>();
 
-        if (!BridgeNodesFile.BridgeNodeExists(nodeData.Name))
-            throw new BridgeNodeDoesNotExistException(nodeData.Name);
+        if (origin is null)
+            throw new InvalidValidationDataFormatException();
 
-        return nodeData;
+        // TODO: check if both name and port are valid... like BridgeNodesFile.IsBridgeNodeValid(name)
+        if (!BridgeNodesFile.BridgeNodeExists(origin.Value.Name))
+            throw new BridgeNodeDoesNotExistException(origin.Value.Name);
+
+        return origin.Value;
     }
 
 
-    private void ConnectTo(BridgeNodeData node)
+    private void ConnectTo(BridgeNodeData target)
     {
-        ConnectAndConstructStreams(node.Port);
+        ConnectAndConstructStreams(target.Port);
 
-        WriteObjectAsJson(Data);
-        var responseObject = ReadJsonStringAsObject<ConnectionResponseObject>();
+        SendValidationData();
+        var response = ReceiveValidationResponse();
 
-        if (responseObject.Response == ConnectionResponse.Rejected)
+        if (response is null || response.Value.Response == ConnectionResponse.Rejected)
             throw new BridgeConnectionRejectedException();
     }
 
+    private void SendValidationData()
+    {
+        var data = Origin.ToJsonObject()!;
+        SendString(data.ToJsonString());
+    }
 
-    public T? TryReadJsonStringAsObject<T>()
+    private ConnectionResponseObject? ReceiveValidationResponse()
+    {
+        var responseData = ReceiveString();
+        return responseData.JsonStringAs<ConnectionResponseObject?>();
+    }
+
+
+
+
+    public DataTransferObject? TryReceiveData()
     {
         try
         {
-            return ReadJsonStringAsObject<T>();
+            return ReceiveData();
         }
         catch
         {
-            return default;
+            return null;
         }
     }
 
-    public T ReadJsonStringAsObject<T>()
-        => ReadJsonStringAsObjectAsync<T>().Result;
+    public DataTransferObject ReceiveData()
+        => ReceiveDataAsync().Result;
 
-    public async Task<T> ReadJsonStringAsObjectAsync<T>()
+
+    public async Task<DataTransferObject> ReceiveDataAsync()
     {
         var task = Reader.ReadLineAsync();
         var jsonString = await WaitForTaskWithDefaultTimeoutOrThrow(task);
 
         if (jsonString is null)
-            throw new InvalidDataFormatException(string.Empty);
+            throw new InvalidDataTransferFormatException(null);
 
-        return JsonStringAsDataFormatOrThrow<T>(jsonString);
+        return new DataTransferObject(jsonString);
     }
 
 
-    public bool TryWriteObjectAsJson(object @object)
+    public string? TryReceiveString()
     {
         try
         {
-            WriteObjectAsJson(@object);
+            return ReceiveString();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public string ReceiveString()
+        => ReceiveStringAsync().Result;
+
+    public async Task<string> ReceiveStringAsync()
+    {
+        var task = Reader.ReadLineAsync();
+        var data = await WaitForTaskWithDefaultTimeoutOrThrow(task);
+
+        OnReceived(data ?? string.Empty);
+
+        if (data is null)
+            throw new InvalidDataTransferFormatException();
+
+        return data;
+    }
+
+
+    public bool TrySendData(DataTransferObject data)
+    {
+        try
+        {
+            SendData(data);
             return true;
         }
         catch
@@ -138,15 +202,57 @@ public class BridgeConnection : TcpClient
         }
     }
 
-    public void WriteObjectAsJson(object @object)
-        => WriteObjectAsJsonAsync(@object).Wait();
+    public void SendData(DataTransferObject data)
+        => SendDataAsync(data).Wait();
 
-    public async Task WriteObjectAsJsonAsync(object @object)
+    public async Task SendDataAsync(DataTransferObject data)
     {
-        var json = JsonSerializer.Serialize(@object);
-        var task = Writer.WriteLineAsync(json);
+        var json = data.ToJsonString();
+        await SendStringAsync(json);
+    }
 
+
+    public bool TrySendString(string data)
+    {
+        try
+        {
+            SendString(data);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public void SendString(string data)
+        => SendStringAsync(data).Wait();
+
+    public async Task SendStringAsync(string data)
+    {
+        OnSent(data);
+
+        var task = Writer.WriteLineAsync(data);
         await WaitForTaskWithDefaultTimeoutOrThrow(task);
+    }
+
+
+    protected virtual void OnSent(string data)
+    {
+        SentEvent?.Invoke(this, new DataEventArgs(data));
+    }
+
+    protected virtual void OnReceived(string data)
+    {
+        ReceivedEvent?.Invoke(this, new DataEventArgs(data));
+    }
+
+
+
+
+    public void Ping()
+    {
+
     }
 
 
@@ -172,19 +278,6 @@ public class BridgeConnection : TcpClient
         catch (TimeoutException)
         {
             throw new WaitingTimeoutReachedException();
-        }
-    }
-
-
-    private static T JsonStringAsDataFormatOrThrow<T>(string jsonString)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize<T>(jsonString) ?? throw new InvalidDataFormatException(jsonString);
-        }
-        catch (JsonException)
-        {
-            throw new InvalidDataFormatException(jsonString);
         }
     }
 }

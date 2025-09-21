@@ -67,7 +67,7 @@ public class BridgeNode : IDisposable
 
     public void ConnectTo(string targetNodeName)
     {
-        var connection = BridgeConnection.To(Data, targetNodeName);
+        var connection = BridgeConnection.ToTarget(Data, targetNodeName);
     }
 
 
@@ -100,7 +100,7 @@ public class BridgeNode : IDisposable
     {
         try
         {
-            var connection = BridgeConnection.From(client);
+            var connection = BridgeConnection.FromOrigin(Data, client);
 
             // TODO: connection rejection logic is not developed yet
             // OnConnectionRejected(connection);
@@ -129,7 +129,8 @@ public class BridgeNode : IDisposable
 
     protected virtual void OnConnectionAccepted(BridgeConnection connection)
     {
-        connection.TryWriteObjectAsJson(new ConnectionResponseObject(ConnectionResponse.Accepted));
+        var response = new ConnectionResponseObject(ConnectionResponse.Accepted).ToJsonString();
+        connection.TrySendString(response);
 
         ConnectionAcceptedEvent?.Invoke(this, new BridgeConnectionEventArgs(connection));
     }
@@ -137,7 +138,8 @@ public class BridgeNode : IDisposable
 
     protected virtual void OnConnectionRejected(BridgeConnection connection)
     {
-        connection.TryWriteObjectAsJson(new ConnectionResponseObject(ConnectionResponse.Rejected));
+        var response = new ConnectionResponseObject(ConnectionResponse.Rejected).ToJsonString();
+        connection.TrySendString(response);
 
         ConnectionRejectedEvent?.Invoke(this, new BridgeConnectionEventArgs(connection));
     }
