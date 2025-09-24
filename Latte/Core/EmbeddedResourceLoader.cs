@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text;
 using System.Reflection;
 
@@ -43,6 +44,9 @@ public static class EmbeddedResourceLoader
         return bytes;
     }
 
+    public static MemoryStream LoadAsStream(string resourceName, Assembly? sourceAssembly = null)
+        => new MemoryStream(Load(resourceName, sourceAssembly));
+
 
     public static string LoadText(string resourceName, Assembly? sourceAssembly = null)
         => Encoding.UTF8.GetString(Load(resourceName, sourceAssembly));
@@ -55,4 +59,14 @@ public static class EmbeddedResourceLoader
 
     public static Texture LoadTexture(string resourceName, Assembly? sourceAssembly = null)
         => new Texture(Load(resourceName, sourceAssembly));
+
+
+    public static Effect LoadEffect(string fragmentResourceName, string vertexResourceName, Assembly? sourceAssembly = null)
+        => new Effect(LoadAsStream(fragmentResourceName, sourceAssembly), LoadAsStream(vertexResourceName, sourceAssembly));
+
+    public static Effect LoadFragmentEffect(string resourceName, Assembly? sourceAssembly = null)
+        => new Effect(LoadAsStream(resourceName, sourceAssembly));
+
+    public static Effect LoadVertexEffect(string resourceName, Assembly? sourceAssembly = null)
+        => new Effect(null, LoadAsStream(resourceName, sourceAssembly));
 }

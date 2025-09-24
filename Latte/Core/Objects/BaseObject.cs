@@ -3,7 +3,6 @@ using System;
 using SFML.Graphics;
 
 using Latte.Core.Type;
-using Latte.UI;
 
 
 namespace Latte.Core.Objects;
@@ -15,7 +14,7 @@ public class BaseObjectEventArgs(BaseObject? @object) : EventArgs
 }
 
 
-public abstract class BaseObject : IUpdateable, IDrawable, IBounds, ISfmlObject
+public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
 {
     private int _priority;
     private bool _visible;
@@ -24,6 +23,7 @@ public abstract class BaseObject : IUpdateable, IDrawable, IBounds, ISfmlObject
     public abstract Transformable SfmlTransformable { get; }
     public abstract Drawable SfmlDrawable { get; }
 
+    public Effect? Effect { get; set; }
     public BaseObjectAttributeManager Attributes { get; }
 
     public bool Initialized { get; private set; }
@@ -125,7 +125,7 @@ public abstract class BaseObject : IUpdateable, IDrawable, IBounds, ISfmlObject
     // same as Update, but should be used for drawings
     public virtual void Draw(IRenderer renderer)
     {
-        renderer.Render(SfmlDrawable);
+        renderer.Render(SfmlDrawable, Effect);
 
         DrawEvent?.Invoke(this, EventArgs.Empty);
     }

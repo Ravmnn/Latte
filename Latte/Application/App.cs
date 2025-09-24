@@ -247,6 +247,8 @@ public static class App
     {
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
+        // TODO: update shader uniforms here
+
         Section.Draw(renderer);
         DrawObjects(renderer);
 

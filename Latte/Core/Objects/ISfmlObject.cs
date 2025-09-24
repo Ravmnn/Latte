@@ -1,12 +1,13 @@
 using SFML.Graphics;
 
 using Latte.Core.Type;
+using Latte.UI;
 
 
 namespace Latte.Core.Objects;
 
 
-public interface ISfmlObject
+public interface ISfmlObject : IBounds
 {
     Transformable SfmlTransformable { get; }
     Drawable SfmlDrawable { get; }
