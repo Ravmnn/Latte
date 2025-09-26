@@ -16,8 +16,7 @@ class Program
     private static void Main()
     {
         App.Init(VideoMode.DesktopMode, "Latte Test", EmbeddedResources.DefaultFont());
-        App.InitBridge("latte-test");
-        App.Debugger.EnableKeyShortcuts = true;
+        App.Debugger!.EnableKeyShortcuts = true;
 
 
         var window = new WindowElement("Window", new Vec2f(), new Vec2f(600, 300))
@@ -28,41 +27,8 @@ class Program
             BorderColor = Color.Magenta
         };
 
-        var rect = new RectangleElement(window, new Vec2f(), new Vec2f(200, 200))
-        {
-            Color = new ColorRGBA(230, 230, 230),
-            BorderSize = 2f,
-            BorderColor = Color.Red,
 
-            Radius = 4f,
-
-            Alignment = Alignment.Top | Alignment.Left
-        };
-
-        new TextElement(rect, new Vec2f(), 30, "This is a text.")
-        {
-            Color = Color.Black,
-
-            Alignment = Alignment.Center,
-
-            Selection = { CanSelect = true }
-        };
-
-        new TextElement(window, new Vec2f(), 15, "This is a very, very long text.")
-        {
-            Color = Color.Black,
-
-            Alignment = Alignment.HorizontalCenter | Alignment.Bottom,
-            AlignmentMargin = new Vec2f(0, -10)
-        };
-
-        new TextInputElement(window, null, new Vec2f(150, 50))
-        {
-            BorderSize = 5f,
-
-            Alignment = Alignment.VerticalCenter | Alignment.Right,
-            AlignmentMargin = new Vec2f()
-        };
+        var slider = new SliderElement(window, null, 0, 300, Orientation.Vertical);
 
 
         App.AddElement(window);
@@ -70,6 +36,8 @@ class Program
 
         while (!App.ShouldQuit)
         {
+            Console.WriteLine(slider.Value);
+
             App.Update();
             App.Draw();
         }

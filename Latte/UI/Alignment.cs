@@ -9,6 +9,13 @@ using Latte.Core.Type;
 namespace Latte.UI;
 
 
+public enum Orientation
+{
+    Vertical,
+    Horizontal
+}
+
+
 [Flags]
 public enum Alignment
 {

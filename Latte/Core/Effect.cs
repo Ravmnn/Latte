@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
 using System.Reflection;
 
 using SFML.Graphics;
 using SFML.Graphics.Glsl;
 
-using Latte.Application;
 using Latte.Core.Type;
+using Latte.Application;
 
 
 namespace Latte.Core;

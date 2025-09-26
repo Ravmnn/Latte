@@ -18,7 +18,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
 
     public new ScrollAreaElement Parent => (base.Parent as ScrollAreaElement)!;
 
-    public ScrollDirection Orientation { get; }
+    public Orientation Orientation { get; }
 
     public bool Dragging { get; set; }
     public bool WasDragging { get; set; }
@@ -28,7 +28,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     public event EventHandler? DraggingEvent;
 
 
-    public ScrollAreaHandleElement(ScrollAreaElement parent, ScrollDirection orientation) : base(parent, new Vec2f(), new Vec2f(), null)
+    public ScrollAreaHandleElement(ScrollAreaElement parent, Orientation orientation) : base(parent, new Vec2f(), new Vec2f(), null)
     {
         Orientation = orientation;
 
@@ -43,16 +43,16 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     }
 
 
-    private void InitFromOrientation(ScrollDirection orientation)
+    private void InitFromOrientation(Orientation orientation)
     {
         switch (orientation)
         {
-            case ScrollDirection.Vertical:
+            case Orientation.Vertical:
                 Alignment = Alignment.Right;
                 Size.X = 10;
                 break;
 
-            case ScrollDirection.Horizontal:
+            case Orientation.Horizontal:
                 Alignment = Alignment.Bottom;
                 Size.Y = 10;
                 break;
@@ -82,7 +82,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
         var sizeRatio = new Vec2f(parentSize.X / bounds.Width, parentSize.Y / bounds.Height);
         Vec2f size = parentSize * sizeRatio;
 
-        if (Orientation == ScrollDirection.Vertical)
+        if (Orientation == Orientation.Vertical)
             Size.Y = size.Y;
         else
             Size.X = size.X;
@@ -92,7 +92,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     {
         Vec2f scrollOffset = ((Vec2f)Parent.GetClampedChildrenBounds().Size - Parent.Size) * GetProgress();
 
-        if (Orientation == ScrollDirection.Vertical)
+        if (Orientation == Orientation.Vertical)
             Parent.ScrollOffset.Y = scrollOffset.Y;
         else
             Parent.ScrollOffset.X = scrollOffset.X;
@@ -100,7 +100,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
 
     protected void ClampPosition()
     {
-        if (Orientation == ScrollDirection.Vertical)
+        if (Orientation == Orientation.Vertical)
             RelativePosition.Y = Math.Clamp(RelativePosition.Y, 0, Parent.Size.Y - Size.Y);
         else
             RelativePosition.X = Math.Clamp(RelativePosition.X, 0, Parent.Size.X - Size.X);
@@ -109,7 +109,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
 
     public void ProcessDragging()
     {
-        if (Orientation == ScrollDirection.Vertical)
+        if (Orientation == Orientation.Vertical)
             RelativePosition.Y += MouseInput.PositionDeltaInView.Y;
         else
             RelativePosition.X += MouseInput.PositionDeltaInView.X;
@@ -130,7 +130,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     public override void OnMouseDown()
     {
         base.OnMouseDown();
-        Dragging = true;
+        Dragging = true; // TODO: after? check why
     }
 
     public override void OnMouseUp()

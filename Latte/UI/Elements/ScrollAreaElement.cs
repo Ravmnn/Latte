@@ -15,13 +15,6 @@ using Math = System.Math;
 namespace Latte.UI.Elements;
 
 
-public enum ScrollDirection
-{
-    Vertical,
-    Horizontal
-}
-
-
 // BUG: scrolling is not 100% accurate.
 
 
@@ -37,25 +30,26 @@ public class ScrollAreaElement : ButtonElement
     public Vec2f ScrollOffsetDelta => ScrollOffset - LastScrollOffset;
     public float ScrollOffsetStep { get; set; }
 
-    public ScrollDirection Direction { get; set; }
+    public Orientation Direction { get; set; }
 
     public event EventHandler<Vec2f>? ScrollEvent;
 
 
+    // TODO: instead of "verticalScrollHandle" or "horizontalScrollHandle", use Orientation
     public ScrollAreaElement(Element? parent, Vec2f? position, Vec2f size, bool verticalScrollHandle = true, bool horizontalScrollHandle = false)
             : base(parent, position, size, null)
     {
         if (verticalScrollHandle)
-            VerticalScrollHandle = new ScrollAreaHandleElement(this, ScrollDirection.Vertical);
+            VerticalScrollHandle = new ScrollAreaHandleElement(this, Orientation.Vertical);
 
         if (horizontalScrollHandle)
-            HorizontalScrollHandle = new ScrollAreaHandleElement(this, ScrollDirection.Horizontal);
+            HorizontalScrollHandle = new ScrollAreaHandleElement(this, Orientation.Horizontal);
 
         ScrollOffset = new Vec2f();
         LastScrollOffset = new Vec2f();
 
         ScrollOffsetStep = 10f;
-        Direction = ScrollDirection.Vertical;
+        Direction = Orientation.Vertical;
 
         DisableFocus = true;
     }
@@ -96,11 +90,11 @@ public class ScrollAreaElement : ButtonElement
 
         switch (Direction)
         {
-            case ScrollDirection.Vertical:
+            case Orientation.Vertical:
                 ScrollOffset.Y += step;
                 break;
 
-            case ScrollDirection.Horizontal:
+            case Orientation.Horizontal:
                 ScrollOffset.X += step;
                 break;
         }
