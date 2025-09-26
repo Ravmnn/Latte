@@ -111,10 +111,10 @@ public static class Rect
             if (rect.Top < bounds.Top)
                 bounds.Top = rect.Top;
 
-            if (rect.Left + rect.Width > bounds.Width)
+            if (rect.Left + rect.Width > bounds.Left + bounds.Width)
                 bounds.Width = rect.Left + rect.Width - bounds.Left;
 
-            if (rect.Top + rect.Height > bounds.Height)
+            if (rect.Top + rect.Height > bounds.Top + bounds.Height)
                 bounds.Height = rect.Top + rect.Height - bounds.Top;
         }
 

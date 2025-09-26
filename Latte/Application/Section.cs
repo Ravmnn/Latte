@@ -11,6 +11,7 @@ using Latte.UI.Elements;
 namespace Latte.Application;
 
 
+// TODO: improve this... make this really useful
 public class Section : IUpdateable, IDrawable
 {
     // Elements are ordered based on their priority

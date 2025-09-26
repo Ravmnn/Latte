@@ -7,9 +7,6 @@ using Latte.Application;
 namespace Latte.UI.Elements;
 
 
-// TODO: a slider's behavior is very similar to scroll handle... isn't it possible to reutilize one of them?
-// TODO: progress bar element also is very similar. Try to extern progress bar's behavior to a calculation static class
-
 public class SliderHandleElement : ButtonElement, IDraggable
 {
     public new SliderElement Parent => (base.Parent as SliderElement)!;
@@ -54,9 +51,9 @@ public class SliderHandleElement : ButtonElement, IDraggable
     public virtual void ProcessDragging()
     {
         if (Orientation == Orientation.Horizontal)
-            Parent.Value += MouseInput.PositionDeltaInView.X * Parent.Proportion;
+            Parent.Value += MouseInput.PositionDeltaInView.X * Parent.StepFactor;
         else
-            Parent.Value += MouseInput.PositionDeltaInView.Y * Parent.Proportion;
+            Parent.Value += MouseInput.PositionDeltaInView.Y * Parent.StepFactor;
     }
 
 
@@ -69,7 +66,7 @@ public class SliderHandleElement : ButtonElement, IDraggable
     }
 
 
-    private void UpdatePositionBasedOnNormalizedValue()
+    protected void UpdatePositionBasedOnNormalizedValue()
     {
         if (Orientation == Orientation.Horizontal)
             RelativePosition.X = (Parent.Size.X - Size.X) * Parent.NormalizedValue;

@@ -54,7 +54,7 @@ public class ProgressBarElement : Element
 
     public override void ConstantUpdate()
     {
-        KeepProgressBetweenLimits();
+        ClampProgress();
         UpdateSizeBasedOnProgress();
 
         if (!_wasCompleted && Completed)
@@ -70,10 +70,10 @@ public class ProgressBarElement : Element
 
 
     private float CalculateNormalizedProgress()
-        => (Progress - MinValue) / (MaxValue - MinValue);
+        => ProgressBarMath.CalculateNormalizedProgress(Progress, MinValue, MaxValue);
 
 
-    private void KeepProgressBetweenLimits()
+    private void ClampProgress()
         => Progress = Math.Clamp(Progress, MinValue, MaxValue);
 
 

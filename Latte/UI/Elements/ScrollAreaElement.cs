@@ -15,9 +15,6 @@ using Math = System.Math;
 namespace Latte.UI.Elements;
 
 
-// BUG: scrolling is not 100% accurate.
-
-
 public class ScrollAreaElement : ButtonElement
 {
     public ScrollAreaHandleElement? VerticalScrollHandle { get; set; }
@@ -30,26 +27,25 @@ public class ScrollAreaElement : ButtonElement
     public Vec2f ScrollOffsetDelta => ScrollOffset - LastScrollOffset;
     public float ScrollOffsetStep { get; set; }
 
-    public Orientation Direction { get; set; }
+    public Orientation Orientation { get; set; }
 
     public event EventHandler<Vec2f>? ScrollEvent;
 
 
-    // TODO: instead of "verticalScrollHandle" or "horizontalScrollHandle", use Orientation
-    public ScrollAreaElement(Element? parent, Vec2f? position, Vec2f size, bool verticalScrollHandle = true, bool horizontalScrollHandle = false)
+    public ScrollAreaElement(Element? parent, Vec2f? position, Vec2f size, Orientation orientation = Orientation.Vertical)
             : base(parent, position, size, null)
     {
-        if (verticalScrollHandle)
+        if (orientation.HasFlag(Orientation.Vertical))
             VerticalScrollHandle = new ScrollAreaHandleElement(this, Orientation.Vertical);
 
-        if (horizontalScrollHandle)
+        if (orientation.HasFlag(Orientation.Horizontal))
             HorizontalScrollHandle = new ScrollAreaHandleElement(this, Orientation.Horizontal);
 
         ScrollOffset = new Vec2f();
         LastScrollOffset = new Vec2f();
 
         ScrollOffsetStep = 10f;
-        Direction = Orientation.Vertical;
+        Orientation = Orientation.Vertical;
 
         DisableFocus = true;
     }
@@ -63,10 +59,10 @@ public class ScrollAreaElement : ButtonElement
         var isMouseHover = element?.IsChildOf(this) ?? false;
 
         if (!IsAnyHandlePressed && isMouseHover)
-            AddAppMouseScrollDeltaToScrollOffset();
+            MouseDragScroll();
 
         ClampScrollOffset();
-        ScrollBasedOnScrollDelta();
+        MouseWheelScroll();
 
         LastScrollOffset = ScrollOffset.Copy();
 
@@ -84,11 +80,11 @@ public class ScrollAreaElement : ButtonElement
             HorizontalScrollHandle.Visible = childrenBounds.Size.X > Size.X;
     }
 
-    protected void AddAppMouseScrollDeltaToScrollOffset()
+    protected void MouseDragScroll()
     {
         var step = ScrollOffsetStep * -MouseInput.ScrollDelta;
 
-        switch (Direction)
+        switch (Orientation)
         {
             case Orientation.Vertical:
                 ScrollOffset.Y += step;
@@ -102,7 +98,7 @@ public class ScrollAreaElement : ButtonElement
         SyncScrollHandlesPositionToScrollOffset();
     }
 
-    protected void ScrollBasedOnScrollDelta()
+    protected void MouseWheelScroll()
     {
         if (ScrollOffsetDelta.X != 0)
             ScrollHorizontally(-ScrollOffsetDelta.X);

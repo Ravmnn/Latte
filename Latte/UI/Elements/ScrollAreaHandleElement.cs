@@ -1,8 +1,8 @@
 using System;
 
 using Latte.Core.Type;
-using Latte.Application;
 using Latte.UI.Elements.Attributes;
+using Latte.Application;
 
 
 using Math = System.Math;
@@ -80,7 +80,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
         var parentSize = Parent.Size;
 
         var sizeRatio = new Vec2f(parentSize.X / bounds.Width, parentSize.Y / bounds.Height);
-        Vec2f size = parentSize * sizeRatio;
+        var size = parentSize * sizeRatio;
 
         if (Orientation == Orientation.Vertical)
             Size.Y = size.Y;
@@ -108,12 +108,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
 
 
     public void ProcessDragging()
-    {
-        if (Orientation == Orientation.Vertical)
-            RelativePosition.Y += MouseInput.PositionDeltaInView.Y;
-        else
-            RelativePosition.X += MouseInput.PositionDeltaInView.X;
-    }
+        => RelativePosition += MouseInput.PositionDeltaInView;
 
 
     public void OnDragBegin() => DragBeginEvent?.Invoke(this, EventArgs.Empty);
@@ -129,14 +124,14 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
 
     public override void OnMouseDown()
     {
+        Dragging = true;
         base.OnMouseDown();
-        Dragging = true; // TODO: after? check why
     }
 
     public override void OnMouseUp()
     {
-        base.OnMouseUp();
         Dragging = false;
+        base.OnMouseUp();
     }
 
 

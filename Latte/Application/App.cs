@@ -31,7 +31,7 @@ namespace Latte.Application;
 
 // TODO: add time-based performance analyzer, with FPS calculator
 
-// TODO: add text inputs
+// TODO: add horizontal and vertical layouts
 // TODO: add dropdown
 // TODO: add radial buttons
 // TODO: add effects, which includes blur (a shader maybe), shadow and gradient (shader)

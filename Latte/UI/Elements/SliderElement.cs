@@ -1,5 +1,8 @@
 using System;
 
+using SFML.Graphics;
+
+using Latte.Core;
 using Latte.Core.Type;
 
 
@@ -13,7 +16,6 @@ public class SliderElement : ButtonElement
 
     public Orientation Orientation => Handle.Orientation;
 
-    // TODO: these two cannot be equal, launch exception if it's the case
     public float Minimum { get; set; }
     public float Maximum { get; set; }
     public float Value
@@ -22,9 +24,9 @@ public class SliderElement : ButtonElement
         set => _value = Math.Clamp(value, Minimum, Maximum);
     }
 
-    public float NormalizedValue => CalculateNormalizedValue();
+    public float NormalizedValue => ProgressBarMath.CalculateNormalizedProgress(Value, Minimum, Maximum);
 
-    public float Proportion => CalculateProportion();
+    public float StepFactor => CalculateStepFactor();
 
 
     public SliderElement(Element? parent, Vec2f? position, float min, float max, Orientation orientation = Orientation.Horizontal)
@@ -39,9 +41,10 @@ public class SliderElement : ButtonElement
     }
 
 
-    private float CalculateProportion()
-        => (Maximum - Minimum) / (Orientation == Orientation.Horizontal ? Size.X : Size.Y);
+    public override FloatRect GetBounds()
+        => Rect.GetBoundsOfRects([base.GetBounds(), Handle.GetBounds()]);
 
-    private float CalculateNormalizedValue()
-        => (Value - Minimum) / (Maximum - Minimum);
+
+    private float CalculateStepFactor()
+        => (Maximum - Minimum) / Math.Max(1, Orientation == Orientation.Horizontal ? Size.X : Size.Y);
 }
