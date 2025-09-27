@@ -10,14 +10,20 @@ using Latte.UI.Elements;
 namespace Latte.Debugging.Elements;
 
 
+
+
 [DebuggerIgnoreInspection]
 public class AppStateWindow : DebugWindow
 {
     private int _lastElementCount;
 
 
+
+
     public DebugScrollArea ScrollArea { get; }
     public TextElement State { get; }
+
+
 
 
     public AppStateWindow() : base("App State", new Vec2f(500, 10), new Vec2f(300, 300))
@@ -34,6 +40,8 @@ public class AppStateWindow : DebugWindow
     }
 
 
+
+
     public override void Update()
     {
         var elementCount = App.Objects.Count();
@@ -45,6 +53,8 @@ public class AppStateWindow : DebugWindow
 
         base.Update();
     }
+
+
 
 
     private string GetElementsText()

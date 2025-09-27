@@ -6,6 +6,8 @@ using System.Reflection;
 namespace Latte.Debugging.Inspection;
 
 
+
+
 public class OrganizedPropertyContainer : Dictionary<System.Type, List<PropertyInfo>>
 {
     public OrganizedPropertyContainer(IEnumerable<System.Type> keyTypes)
@@ -27,11 +29,15 @@ public class OrganizedPropertyContainer : Dictionary<System.Type, List<PropertyI
     }
 
 
+
+
     private void Init(IEnumerable<System.Type> keyTypes)
     {
         foreach (var type in keyTypes)
             this[type] = [];
     }
+
+
 
 
     public void Organize(IEnumerable<PropertyInfo> properties)
@@ -47,6 +53,8 @@ public class OrganizedPropertyContainer : Dictionary<System.Type, List<PropertyI
                 propertyInfos.Add(property);
         }
     }
+
+
 
 
     public Dictionary<System.Type, List<PropertyInfo>> GetNonEmpty()

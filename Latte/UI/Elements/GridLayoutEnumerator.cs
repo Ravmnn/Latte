@@ -6,15 +6,24 @@ using System.Collections.Generic;
 namespace Latte.UI.Elements;
 
 
+
+
 public class GridLayoutEnumerator : IEnumerator<Element?>
 {
     private readonly GridLayoutElement _gridLayout;
     private uint _row, _col;
 
-    public Element? Current => _gridLayout[_row, _col];
+    private bool _disposed;
+
+
     object? IEnumerator.Current => Current;
 
-    private bool _disposed;
+
+
+
+    public Element? Current => _gridLayout[_row, _col];
+
+
 
 
     public GridLayoutEnumerator(GridLayoutElement gridLayout)
@@ -24,6 +33,8 @@ public class GridLayoutEnumerator : IEnumerator<Element?>
 
         _disposed = false;
     }
+
+
 
 
     public bool MoveNext()
@@ -39,6 +50,7 @@ public class GridLayoutEnumerator : IEnumerator<Element?>
         return _row < _gridLayout.Rows;
     }
 
+
     public void Reset()
     {
         _row = _col = 0;
@@ -46,6 +58,15 @@ public class GridLayoutEnumerator : IEnumerator<Element?>
 
 
     // an IEnumerator should implement the dispose pattern
+
+
+    ~GridLayoutEnumerator()
+    {
+        Dispose(false);
+    }
+
+
+
 
     public void Dispose()
     {
@@ -63,11 +84,5 @@ public class GridLayoutEnumerator : IEnumerator<Element?>
         if (disposing) {}
 
         _disposed = true;
-    }
-
-
-    ~GridLayoutEnumerator()
-    {
-        Dispose(false);
     }
 }

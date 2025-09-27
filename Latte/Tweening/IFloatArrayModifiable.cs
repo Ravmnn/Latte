@@ -2,6 +2,7 @@ namespace Latte.Tweening;
 
 
 
+
 /// <summary>
 /// Describes an object that can be animated.
 /// </summary>

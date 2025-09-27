@@ -7,14 +7,19 @@ using Latte.Debugging.Inspection;
 namespace Latte.Debugging.Elements;
 
 
+
+
 [DebuggerIgnoreInspection]
 public class InspectionFrameElement : ScrollAreaElement
 {
     private InspectionData _data;
 
 
+
+
     public TextElement NameText { get; }
     public TextElement DataText { get; }
+
 
     public InspectionData Data
     {
@@ -27,6 +32,8 @@ public class InspectionFrameElement : ScrollAreaElement
             DataText.Text = _data.Data;
         }
     }
+
+
 
 
     public InspectionFrameElement(InspectionData data)

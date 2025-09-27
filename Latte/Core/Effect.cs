@@ -13,13 +13,19 @@ using Latte.Application;
 namespace Latte.Core;
 
 
+
+
 [AttributeUsage(AttributeTargets.Property)]
 public class UniformAttribute : Attribute;
+
+
 
 
 public class Effect : Shader
 {
     private PropertyInfo[]? _uniformProperties;
+
+
 
 
     [Uniform] public float Time { get; protected set; }
@@ -28,13 +34,18 @@ public class Effect : Shader
     [Uniform] public Vec2i MousePosition { get; protected set; } = new Vec2i();
 
 
+
+
     public Effect(string? fragmentShaderFilename, string? vertexShaderFilename = null)
         : base(vertexShaderFilename, null, fragmentShaderFilename)
     {}
 
+
     public Effect(Stream? fragmentShaderStream, Stream? vertexShaderStream = null)
         : base(vertexShaderStream, null, fragmentShaderStream)
     {}
+
+
 
 
     public virtual void UpdateUniforms(IRenderer renderer)
@@ -46,6 +57,8 @@ public class Effect : Shader
 
         PropertiesToUniforms();
     }
+
+
 
 
     private void PropertiesToUniforms()
@@ -88,6 +101,8 @@ public class Effect : Shader
                 break;
         }
     }
+
+
 
 
     private void InitializeUniformProperties()

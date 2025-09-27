@@ -36,8 +36,6 @@ class Program
 
         while (!App.ShouldQuit)
         {
-            Console.WriteLine(slider.Value);
-
             App.Update();
             App.Draw();
         }

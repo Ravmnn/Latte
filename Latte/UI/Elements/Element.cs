@@ -13,10 +13,14 @@ using Latte.Application;
 namespace Latte.UI.Elements;
 
 
+
+
 public class ElementEventArgs(Element? element) : EventArgs
 {
     public Element? Element { get; } = element;
 }
+
+
 
 
 public enum PrioritySnap
@@ -30,12 +34,23 @@ public enum PrioritySnap
 }
 
 
+
+
 public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseInputTarget
 {
+    public bool IgnoreMouseInput { get; set; }
+    public bool CaughtMouseInput { get; set; }
+
+
+
+
+    public override bool CanUpdate => Active;
+    public override bool CanDraw => base.CanDraw && Visible;
+
+
+
+
     private Element? _parent;
-    private bool _active;
-
-
     public Element? Parent
     {
         get => _parent;
@@ -49,13 +64,25 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         }
     }
 
+    public event EventHandler<ElementEventArgs>? ParentChangedEvent;
+
+
+
+
     public List<Element> Children { get; }
 
+    public event EventHandler<ElementEventArgs>? ChildAddedEvent;
+
+
+
+
+    private bool _active;
     public bool Active
     {
         get => _active && Visible;
         set => _active = value;
     }
+
 
     public new bool Visible
     {
@@ -65,18 +92,17 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     protected bool ParentVisible => Parent?.Visible ?? true;
 
-    public override bool CanUpdate => Active;
-    public override bool CanDraw => base.CanDraw && Visible;
 
     public bool Clip { get; set; }
     public int ClipLayerIndex { get; protected set; }
     public int ClipLayerIndexOffset { get; set; }
 
+
     public PrioritySnap PrioritySnap { get; set; }
     public int PrioritySnapOffset { get; set; }
 
-    public bool IgnoreMouseInput { get; set; }
-    public bool CaughtMouseInput { get; set; }
+
+
 
     public Vec2f RelativePosition { get; set; }
 
@@ -96,8 +122,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     public SizePolicy SizePolicy { get; set; }
     public Vec2f SizePolicyMargin { get; set; }
 
-    public event EventHandler<ElementEventArgs>? ParentChangedEvent;
-    public event EventHandler<ElementEventArgs>? ChildAddedEvent;
+
 
 
     protected Element(Element? parent)
@@ -129,6 +154,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
 
 
+
+    // TODO: change name
     public override void ConstantUpdate()
     {
         RemoveNonChildren();
@@ -142,8 +169,10 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         base.ConstantUpdate();
     }
 
+
     protected void RemoveNonChildren()
         => Children.RemoveAll(element => element.Parent != this);
+
 
     private void UpdatePriority()
     {
@@ -167,10 +196,12 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         }
     }
 
+
     private void UpdateClipLayerIndex()
     {
         ClipLayerIndex = Clipping.GetClipLayerIndexOf(this);
     }
+
 
     private void UpdateGeometry()
     {
@@ -184,6 +215,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     }
 
 
+
+
     public override void Draw(IRenderer renderer)
     {
         BeginDraw(renderer);
@@ -194,6 +227,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     public void SimpleDraw(IRenderer renderer)
         => base.Draw(renderer);
+
 
     public abstract void BorderLessSimpleDraw(IRenderer renderer);
 
@@ -212,6 +246,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         Clipping.Clip(ClipLayerIndex + ClipLayerIndexOffset);
     }
 
+
     protected virtual void EndDraw()
     {
         if (!Clip)
@@ -219,6 +254,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
         Clipping.ClipDisable();
     }
+
+
 
 
     public Vec2f MapToParentAbsolute(Vec2f point)
@@ -232,6 +269,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     // the parent of an element. It is not used to directly clip the element,
     // stencil buffer is used instead.
 
+
     public IntRect GetIntersectedClipArea() => Clipping.OverlapElementClipAreaToParents(this) ?? new IntRect();
     public IntRect GetClipArea() => Parent?.GetThisClipArea() ?? App.Window.WindowRect;
     public virtual IntRect GetThisClipArea() => GetBorderLessBounds().ToWindowCoordinates();
@@ -240,14 +278,18 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         => GetBounds().Intersects((FloatRect)GetIntersectedClipArea());
 
 
+
+
     public abstract FloatRect GetRelativeBounds();
     public virtual FloatRect GetBorderLessBounds() => GetBounds();
     public virtual FloatRect GetBorderLessRelativeBounds() => GetRelativeBounds();
+
 
     public FloatRect GetParentBounds() => Parent?.GetBounds() ?? (FloatRect)App.Window.WindowRect;
     public FloatRect GetParentRelativeBounds() => Parent?.GetRelativeBounds() ?? (FloatRect)App.Window.WindowRect;
     public FloatRect GetParentBorderLessBounds() => Parent?.GetBorderLessBounds() ?? (FloatRect)App.Window.WindowRect;
     public FloatRect GetParentBorderLessRelativeBounds() => Parent?.GetBorderLessRelativeBounds() ?? (FloatRect)App.Window.WindowRect;
+
 
     public FloatRect GetChildrenBounds()
         => (from child in Children select child.GetBounds()).GetBoundsOfRects();
@@ -261,6 +303,13 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     public FloatRect GetChildrenBorderLessRelativeBounds()
         => (from child in Children select child.GetBorderLessRelativeBounds()).GetBoundsOfRects();
 
+
+
+
+    public virtual void ApplyAlignment()
+        => RelativePosition = GetAlignmentRelativePosition() + AlignmentMargin;
+
+
     public virtual Vec2f GetAlignmentPosition(Alignment alignment)
         => AlignmentCalculator.GetAlignedPositionOfChild(GetBounds(), GetParentBorderLessBounds(), alignment);
 
@@ -272,11 +321,31 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     public Vec2f GetAlignmentRelativePosition() => GetAlignmentRelativePosition(Alignment);
 
 
+
+
+
+    public abstract void ApplySizePolicy();
+
+
     public virtual FloatRect GetSizePolicyRect(SizePolicy policyType)
         => SizePolicyCalculator.CalculateChildRect(GetBorderLessBounds(), GetParentBorderLessBounds(), policyType);
 
+
     public FloatRect GetSizePolicyRect()
         => GetSizePolicyRect(SizePolicy).ShrinkRect(SizePolicyMargin);
+
+
+
+
+    protected void SetRelativePositionOrAlignment(Vec2f? position)
+    {
+        if (position is null)
+            Alignment = Alignment.Center;
+        else
+            RelativePosition = position;
+    }
+
+
 
 
     public IEnumerable<Element> GetParents()
@@ -298,19 +367,6 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     }
 
 
-    protected void SetRelativePositionOrAlignment(Vec2f? position)
-    {
-        if (position is null)
-            Alignment = Alignment.Center;
-        else
-            RelativePosition = position;
-    }
-
-
-    public virtual void ApplyAlignment()
-        => RelativePosition = GetAlignmentRelativePosition() + AlignmentMargin;
-
-    public abstract void ApplySizePolicy();
 
 
     public bool IsChildOf(Element parent)
@@ -320,6 +376,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
         return Parent is not null && Parent.IsChildOf(parent);
     }
+
+
 
 
     private bool ParentHierarchyHasPrioritySnap()
@@ -334,6 +392,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     }
 
 
+
+
     public void RaiseToTop()
     {
         var elements = App.Section.GetObjectsOfType<Element>();
@@ -343,6 +403,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
             Priority = element.Priority + PrioritySnapOffset;
     }
 
+
     public void LowerToBottom()
     {
         var elements = App.Section.GetObjectsOfType<Element>();
@@ -351,6 +412,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         if (element is not null)
             Priority = element.Priority - PrioritySnapOffset;
     }
+
 
     public void RaiseToParentTop()
     {
@@ -364,6 +426,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
         Priority = higherPriority == int.MinValue ? Priority : higherPriority + PrioritySnapOffset;
     }
+
 
     public void LowerToParentBottom()
     {
@@ -379,11 +442,15 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     }
 
 
+
+
     private void AddParentPriorityDeltaToThis()
     {
         if (Parent is not null)
             Priority += Parent.Priority - Parent.LastPriority;
     }
+
+
 
 
     protected virtual void OnParentChange()

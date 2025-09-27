@@ -4,14 +4,20 @@ using System;
 namespace Latte.UI;
 
 
+// TODO: try to decrease interface verbosity the max possible
+
+
 public interface IDraggable : IClickable
 {
     bool Dragging { get; }
     bool WasDragging { get; }
 
+
     event EventHandler? DragBeginEvent;
     event EventHandler? DragEndEvent;
     event EventHandler? DraggingEvent;
+
+
 
 
     void ProcessDraggingEvents()
@@ -27,10 +33,10 @@ public interface IDraggable : IClickable
     }
 
 
+
+    void ProcessDragging();
+
     void OnDragBegin();
     void OnDragEnd();
     void OnDragging();
-
-
-    void ProcessDragging();
 }

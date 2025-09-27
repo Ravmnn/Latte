@@ -5,6 +5,8 @@ using System.Text.Json.Nodes;
 namespace Latte.Communication.Bridge;
 
 
+
+
 public static class JsonExtensions
 {
     public static JsonObject? ToJsonObject(this object @object)

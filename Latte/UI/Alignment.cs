@@ -9,6 +9,8 @@ using Latte.Core.Type;
 namespace Latte.UI;
 
 
+
+
 [Flags]
 public enum Orientation
 {
@@ -17,6 +19,8 @@ public enum Orientation
 
     Both = Vertical | Horizontal
 }
+
+
 
 
 [Flags]
@@ -46,10 +50,14 @@ public enum Alignment
 }
 
 
+
+
 public interface IAlignable
 {
     Vec2f GetAlignmentPosition(Alignment alignment);
 }
+
+
 
 
 public static class AlignmentCalculator
@@ -105,6 +113,8 @@ public static class AlignmentCalculator
         return position;
     }
 
+
+
     // text local bounds work quite different
     // https://learnsfml.com/basics/graphics/how-to-center-text/#set-a-string
 
@@ -113,6 +123,8 @@ public static class AlignmentCalculator
 
     public static Vec2f GetTextAlignedRelativePositionOfChild(Text text, FloatRect parent, Alignment alignment)
         => GetAlignedRelativePositionOfChild(text.GetGlobalBounds(), parent, alignment) - text.GetLocalBounds().Position;
+
+
 
 
     public static Vec2f ApplyBorderOffset(Vec2f position, float borderSize, Alignment alignment)

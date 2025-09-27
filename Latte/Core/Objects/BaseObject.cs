@@ -8,26 +8,55 @@ using Latte.Core.Type;
 namespace Latte.Core.Objects;
 
 
+
+
 public class BaseObjectEventArgs(BaseObject? @object) : EventArgs
 {
     public BaseObject? @Object { get; } = @object;
 }
 
 
+
+
 public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
 {
-    private int _priority;
-    private bool _visible;
+
+
+    public event EventHandler? UpdateEvent;
+
+
+
+
+    public event EventHandler? DrawEvent;
+
+
 
 
     public abstract Transformable SfmlTransformable { get; }
     public abstract Drawable SfmlDrawable { get; }
 
+
+    public Vec2f Position { get; set; }
+    public Vec2f Origin { get; set; }
+    public float Rotation { get; set; }
+    public Vec2f Scale { get; set; }
+
+
+
+
     public Effect? Effect { get; set; }
+
     public BaseObjectAttributeManager Attributes { get; }
+
+
+
 
     public bool Initialized { get; private set; }
 
+
+
+
+    private bool _visible;
     public bool Visible
     {
         get => _visible;
@@ -41,9 +70,12 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
         }
     }
 
-    public virtual bool CanUpdate => Visible;
-    public virtual bool CanDraw => Initialized && Visible;
+    public event EventHandler? VisibilityChangedEvent;
 
+
+
+
+    private int _priority;
     public int Priority
     {
         get => _priority;
@@ -59,18 +91,20 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
 
     protected int LastPriority { get; private set; }
 
-    public Vec2f Position { get; set; }
-    public Vec2f Origin { get; set; }
-    public float Rotation { get; set; }
-    public Vec2f Scale { get; set; }
+    public event EventHandler? PriorityChangedEvent;
+
+
+
 
     public event EventHandler? SetupEvent;
     public event EventHandler? ConstantUpdateEvent;
-    public event EventHandler? UpdateEvent;
-    public event EventHandler? DrawEvent;
 
-    public event EventHandler? VisibilityChangedEvent;
-    public event EventHandler? PriorityChangedEvent;
+
+
+
+    public virtual bool CanUpdate => Visible;
+    public virtual bool CanDraw => Initialized && Visible;
+
 
 
     public BaseObject()
@@ -85,12 +119,16 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
     }
 
 
+
+
     public virtual void Setup()
     {
         Initialized = true;
 
         SetupEvent?.Invoke(this, EventArgs.Empty);
     }
+
+
 
 
     // called at least one time each frame, independently of visibility. May be called
@@ -108,18 +146,13 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
     }
 
 
-    public virtual void UpdateSfmlProperties()
-    {
-        SfmlTransformable.Position = Position;
-        SfmlTransformable.Origin = Origin;
-        SfmlTransformable.Rotation = Rotation;
-        SfmlTransformable.Scale = Scale;
-    }
 
 
     // called every frame
     public virtual void Update()
         => UpdateEvent?.Invoke(this, EventArgs.Empty);
+
+
 
 
     // same as Update, but should be used for drawings
@@ -131,6 +164,19 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
     }
 
 
+
+
+    public virtual void UpdateSfmlProperties()
+    {
+        SfmlTransformable.Position = Position;
+        SfmlTransformable.Origin = Origin;
+        SfmlTransformable.Rotation = Rotation;
+        SfmlTransformable.Scale = Scale;
+    }
+
+
+
+
     public Vec2f MapToAbsolute(Vec2f position)
         => position + Position;
 
@@ -138,15 +184,23 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
         => position - Position;
 
 
+
+
     public abstract FloatRect GetBounds();
+
+
 
 
     public virtual void Show() => Visible = true;
     public virtual void Hide() => Visible = false;
 
 
+
+
     public void Raise(uint amount = 1) => Priority += (int)amount;
     public void Lower(uint amount = 1) => Priority -= (int)amount;
+
+
 
 
     protected virtual void OnVisibilityChange()

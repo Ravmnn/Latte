@@ -11,14 +11,17 @@ using Math = System.Math;
 namespace Latte.UI.Elements;
 
 
+
+
 [IgnoreScroll]
 public class ScrollAreaHandleElement : ButtonElement, IDraggable
 {
-    protected IDraggable ThisDraggable => this;
-
     public new ScrollAreaElement Parent => (base.Parent as ScrollAreaElement)!;
 
-    public Orientation Orientation { get; }
+
+
+
+    protected IDraggable ThisDraggable => this;
 
     public bool Dragging { get; set; }
     public bool WasDragging { get; set; }
@@ -26,6 +29,13 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     public event EventHandler? DragBeginEvent;
     public event EventHandler? DragEndEvent;
     public event EventHandler? DraggingEvent;
+
+
+
+
+    public Orientation Orientation { get; }
+
+
 
 
     public ScrollAreaHandleElement(ScrollAreaElement parent, Orientation orientation) : base(parent, new Vec2f(), new Vec2f(), null)
@@ -60,6 +70,8 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     }
 
 
+
+
     public override void Update()
     {
         ThisDraggable.ProcessDraggingEvents();
@@ -73,6 +85,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
 
         base.Update();
     }
+
 
     protected void UpdateSize()
     {
@@ -88,6 +101,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
             Size.X = size.X;
     }
 
+
     protected void UpdateScrollAreaScrollOffset()
     {
         Vec2f scrollOffset = ((Vec2f)Parent.GetClampedChildrenBounds().Size - Parent.Size) * GetProgress();
@@ -98,6 +112,7 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
             Parent.ScrollOffset.X = scrollOffset.X;
     }
 
+
     protected void ClampPosition()
     {
         if (Orientation == Orientation.Vertical)
@@ -107,19 +122,18 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     }
 
 
+
+
     public void ProcessDragging()
         => RelativePosition += MouseInput.PositionDeltaInView;
 
 
-    public void OnDragBegin() => DragBeginEvent?.Invoke(this, EventArgs.Empty);
 
-    public void OnDragEnd() => DragEndEvent?.Invoke(this, EventArgs.Empty);
 
-    public void OnDragging()
-    {
-        ProcessDragging();
-        DraggingEvent?.Invoke(this, EventArgs.Empty);
-    }
+    public Vec2f GetProgress()
+        => RelativePosition / (Parent.Size - Size);
+
+
 
 
     public override void OnMouseDown()
@@ -135,6 +149,13 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
     }
 
 
-    public Vec2f GetProgress()
-        => RelativePosition / (Parent.Size - Size);
+    public void OnDragBegin() => DragBeginEvent?.Invoke(this, EventArgs.Empty);
+
+    public void OnDragEnd() => DragEndEvent?.Invoke(this, EventArgs.Empty);
+
+    public void OnDragging()
+    {
+        ProcessDragging();
+        DraggingEvent?.Invoke(this, EventArgs.Empty);
+    }
 }

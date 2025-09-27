@@ -17,14 +17,15 @@ public interface IClickable : IMouseInputTarget, IFocusable
     MouseClickState MouseState { get; }
     bool DisableTruePressOnlyWhenMouseIsUp { get; }
 
+
     event EventHandler? MouseEnterEvent;
     event EventHandler? MouseLeaveEvent;
     event EventHandler? MouseDownEvent;
     event EventHandler? MouseUpEvent;
-
     event EventHandler? MouseHoverEvent;
-
     event EventHandler? MouseClickEvent;
+
+
 
 
     void UpdateMouseState()
@@ -52,6 +53,9 @@ public interface IClickable : IMouseInputTarget, IFocusable
         if (MouseState.IsTruePressed && !(DisableTruePressOnlyWhenMouseIsUp ? MouseState.IsMouseDown : MouseState.IsPressed))
             MouseState.IsTruePressed = false;
     }
+
+
+
 
     void ProcessMouseEvents()
     {
@@ -91,15 +95,15 @@ public interface IClickable : IMouseInputTarget, IFocusable
     }
 
 
+
+
+    bool IsPointOver(Vec2f point);
+
+
     void OnMouseEnter();
     void OnMouseLeave();
     void OnMouseDown();
     void OnMouseUp();
-
     void OnMouseHover();
-
     void OnMouseClick();
-
-
-    bool IsPointOver(Vec2f point);
 }

@@ -11,7 +11,9 @@ using Latte.UI.Elements.Exceptions;
 namespace Latte.UI.Elements;
 
 
-// TODO: rebuild grid system from scratch
+
+
+// TODO: rebuild grid system from scratch... maybe use something like Horizontal and VerticalLayout
 
 public enum GridLayoutGrowDirection
 {
@@ -20,17 +22,17 @@ public enum GridLayoutGrowDirection
 }
 
 
+
+
 [ChildrenType(typeof(GridLayoutCellElement))]
 public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 {
-    private uint _rows;
-    private uint _columns;
-    private float _cellHeight;
-    private float _cellWidth;
-
-
     public GridLayoutCellElement[,] Cells { get; private set; }
 
+
+
+
+    private uint _rows;
     public uint Rows
     {
         get => _rows;
@@ -47,6 +49,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         }
     }
 
+
+    private uint _columns;
     public uint Columns
     {
         get => _columns;
@@ -69,6 +73,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     public uint? MinRows { get; set; }
     public uint? MinColumns { get; set; }
 
+
+    private float _cellWidth;
     public float CellWidth
     {
         get => _cellWidth;
@@ -79,6 +85,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         }
     }
 
+
+    private float _cellHeight;
     public float CellHeight
     {
         get => _cellHeight;
@@ -89,10 +97,13 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         }
     }
 
+
     public GridLayoutGrowDirection GrowDirection { get; set; }
     public bool Fixed { get; set; }
 
     public bool RecreationRequired { get; set; }
+
+
 
 
     public GridLayoutElement(Element? parent, Vec2f? position, uint rows, uint columns, float cellWidth, float cellHeight)
@@ -113,6 +124,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     }
 
 
+
+
     public override void ConstantUpdate()
     {
         if (RecreationRequired)
@@ -122,8 +135,12 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     }
 
 
+
+
     public void AddElementAtEnd(Element element)
         => FindAvailableCell().Element = element;
+
+
 
 
     public Element RemoveFirstElement()
@@ -157,6 +174,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     }
 
 
+
+
     public void DeleteFirstElement() => App.RemoveElement(RemoveFirstElement());
     public void DeleteLastElement() => App.RemoveElement(RemoveLastElement());
     public void DeleteElementAt(uint row, uint column) => App.RemoveElement(RemoveElementAt(row, column));
@@ -175,9 +194,13 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     }
 
 
+
+
     public Element? GetElementAt(uint row, uint col) => Cells[row, col].Element;
 
     public Element? this[uint row, uint col] => GetElementAt(row, col);
+
+
 
 
     public Element? FindFirstElement()
@@ -190,6 +213,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         return null;
     }
 
+
     public Element? FindLastElement()
     {
         for (var row = Cells.GetLength(0) - 1; row >= 0; row--)
@@ -201,8 +225,12 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     }
 
 
+
+
     public IEnumerator<Element?> GetEnumerator() => new GridLayoutEnumerator(this);
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+
 
 
     protected GridLayoutCellElement FindAvailableCell()
@@ -215,6 +243,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
         return FindAvailableCell();
     }
+
+
 
 
     protected void GrowLayout()
@@ -237,6 +267,8 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
     }
 
 
+
+
     protected void CreateCells()
     {
         var oldCells = Cells;
@@ -255,6 +287,7 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
         RecreationRequired = false;
     }
 
+
     private void InitializeCellBasedOnOldCellMatrix(GridLayoutCellElement[,] oldCells, uint row, uint col)
     {
         if (AreIndicesInsideMatrixBounds(oldCells, row, col))
@@ -263,11 +296,14 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
             Cells[row, col] = new GridLayoutCellElement(this, new Vec2f(), new Vec2f());
     }
 
+
     private void UpdateCellGeometry(uint row, uint col)
     {
         Cells[row, col].RelativePosition = new Vec2f(col * CellWidth, row * CellHeight);
         Cells[row, col].Size = new Vec2f(CellWidth, CellHeight);
     }
+
+
 
 
     private static bool AreIndicesInsideMatrixBounds<T>(T[,] matrix, uint row, uint col)

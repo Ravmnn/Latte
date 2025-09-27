@@ -7,9 +7,13 @@ using Latte.Tweening;
 namespace Latte.Application;
 
 
+
+
 public static class AnimationManager
 {
     public static List<TweenAnimation> TweenAnimations { get; } = [];
+
+
 
 
     public static void Update()
@@ -17,6 +21,8 @@ public static class AnimationManager
         foreach (var animation in TweenAnimations.ToArray())
             animation.Update();
     }
+
+
 
 
     public static TweenAnimation AddTweenAnimation(TweenAnimation animation)
@@ -32,6 +38,7 @@ public static class AnimationManager
         return animation;
     }
 
+
     public static TweenAnimation RemoveTweenAnimation(TweenAnimation animation)
     {
         TweenAnimations.Remove(animation);
@@ -41,6 +48,8 @@ public static class AnimationManager
 
         return animation;
     }
+
+
 
 
     private static void OnAnimationEnd(object? sender, EventArgs _)

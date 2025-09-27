@@ -5,6 +5,8 @@ using System.Collections.Generic;
 namespace Latte.Core.Objects;
 
 
+
+
 public class BaseObjectAttributeManager
 {
     // Attributes of the current element. Instead of loading it everytime before using it,
@@ -12,7 +14,11 @@ public class BaseObjectAttributeManager
     protected IEnumerable<BaseObjectAttribute> CachedAttributes { get; set; }
 
 
+
+
     public BaseObject Object { get; }
+
+
 
 
     public BaseObjectAttributeManager(BaseObject @object)
@@ -24,8 +30,11 @@ public class BaseObjectAttributeManager
         CacheAttributes();
     }
 
+
     public void CacheAttributes()
         => CachedAttributes = GetObjectAttributes();
+
+
 
 
     public virtual void ProcessAttributes()
@@ -33,6 +42,8 @@ public class BaseObjectAttributeManager
         foreach (var attribute in GetCachedObjectAttributes())
             attribute.Process(Object);
     }
+
+
 
 
     public T? GetCachedObjectAttribute<T>() where T : BaseObjectAttribute

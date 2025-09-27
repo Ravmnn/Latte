@@ -11,21 +11,31 @@ using Latte.Core.Type;
 namespace Latte.Application;
 
 
+
+
 public class Window : RenderWindow, IUpdateable
 {
+    public static ContextSettings DefaultSettings { get; }
+
+
+
+
     public DefaultRenderer Renderer { get; set; }
 
     public Cursor Cursor { get; set; }
+
 
     public Vec2i MousePosition => Mouse.GetPosition(this);
     public Vec2f ViewMousePosition => MapPixelToCoords(MousePosition);
 
     public IntRect WindowRect => new IntRect(new Vector2i(0, 0), (Vector2i)Size);
 
+
+
+
     public event EventHandler? UpdateEvent;
 
 
-    public static ContextSettings DefaultSettings { get; }
 
 
     static Window()
@@ -40,6 +50,8 @@ public class Window : RenderWindow, IUpdateable
     }
 
 
+
+
     public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings? settings = null)
         : base(mode, title, style, settings ?? DefaultSettings)
     {
@@ -49,6 +61,8 @@ public class Window : RenderWindow, IUpdateable
 
         SetFramerateLimit(60);
     }
+
+
 
 
     public virtual void Update()

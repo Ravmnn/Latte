@@ -10,12 +10,14 @@ using Latte.Application;
 namespace Latte.UI.Elements;
 
 
+
+
 public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 {
-    protected IClickable ThisClickable => this;
-    protected IFocusable ThisFocusable => this;
-
     public TextElement? Text { get; set; }
+
+
+
 
     public bool Focused { get; set; }
     public bool DisableFocus { get; set; }
@@ -23,22 +25,28 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
     public event EventHandler? FocusEvent;
     public event EventHandler? UnfocusEvent;
 
-    public bool FocusOnMouseDown { get; set; }
-    public bool UnfocusOnMouseDownOutside { get; set; }
+
+
+
+    protected IClickable ThisClickable => this;
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
+
+    public bool FocusOnMouseDown { get; set; }
+    public bool UnfocusOnMouseDownOutside { get; set; }
 
     public event EventHandler? MouseEnterEvent;
     public event EventHandler? MouseLeaveEvent;
     public event EventHandler? MouseDownEvent;
     public event EventHandler? MouseUpEvent;
-
     public event EventHandler? MouseHoverEvent;
-
     public event EventHandler? MouseClickEvent;
 
-    public int NavigationPriority { get; set; }
+
+
+
+    public bool IgnoreKeyboardInput { get; set; }
 
     public event EventHandler<KeyEventArgs>? KeyDownEvent;
     public event EventHandler<KeyEventArgs>? KeyUpEvent;
@@ -46,7 +54,12 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
     public event EventHandler<KeyEventArgs>? SubmitKeyDownEvent;
     public event EventHandler<KeyEventArgs>? SubmitKeyUpEvent;
 
-    public bool IgnoreKeyboardInput { get; set; }
+
+
+
+    public int NavigationPriority { get; set; }
+
+
 
 
     public ButtonElement(Element? parent, Vec2f? position, Vec2f size, string? text) : base(parent, position, size)
@@ -70,6 +83,8 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
     }
 
 
+
+
     public override void Update()
     {
         ThisClickable.UpdateMouseState();
@@ -77,6 +92,21 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 
         base.Update();
     }
+
+
+
+
+    public virtual void OnFocus()
+    {
+        FocusManager.FocusOn(this);
+        FocusEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    public virtual void OnUnfocus()
+        => UnfocusEvent?.Invoke(this, EventArgs.Empty);
+
+
 
 
     public virtual bool IsPointOver(Vec2f point)
@@ -98,19 +128,10 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
     public virtual void OnMouseHover()
         => MouseHoverEvent?.Invoke(this, EventArgs.Empty);
 
-
     public virtual void OnMouseClick()
         => MouseClickEvent?.Invoke(this, EventArgs.Empty);
 
 
-    public virtual void OnFocus()
-    {
-        FocusManager.FocusOn(this);
-        FocusEvent?.Invoke(this, EventArgs.Empty);
-    }
-
-    public virtual void OnUnfocus()
-        => UnfocusEvent?.Invoke(this, EventArgs.Empty);
 
 
     public virtual void OnKeyDown(KeyEventArgs key)
@@ -120,6 +141,7 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 
         KeyDownEvent?.Invoke(this, key);
     }
+
 
     public virtual void OnKeyUp(KeyEventArgs key)
     {
@@ -136,6 +158,7 @@ public class ButtonElement : RectangleElement, IClickable, INavigationTarget
 
     public virtual void OnSubmitKeyDown(KeyEventArgs key)
         => SubmitKeyDownEvent?.Invoke(this, key);
+
 
     public virtual void OnSubmitKeyUp(KeyEventArgs key)
     {

@@ -4,6 +4,8 @@ using System;
 namespace Latte.UI.Elements;
 
 
+
+
 public static class ProgressBarMath
 {
     public static float CalculateNormalizedProgress(float value, float min, float max)

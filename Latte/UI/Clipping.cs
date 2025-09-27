@@ -11,6 +11,8 @@ using Latte.UI.Elements;
 namespace Latte.UI;
 
 
+
+
 public static class Clipping
 {
     public static void ClipEnable()
@@ -86,6 +88,8 @@ public static class Clipping
         => element.GetParents().Count();
 
 
+
+
     private static void EnableColorMask()
     {
         GL.ColorMask(true, true, true, true);
@@ -98,6 +102,8 @@ public static class Clipping
         GL.ColorMask(false, false, false, false);
         GL.DepthMask(false);
     }
+
+
 
 
     public static IntRect? OverlapElementClipAreaToParents(Element start)

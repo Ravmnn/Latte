@@ -13,17 +13,23 @@ using Latte.UI;
 namespace Latte.Application;
 
 
+
+
 public class MouseButtonEventArgs(Mouse.Button button) : EventArgs
 {
     public Mouse.Button Button { get; } = button;
 }
 
 
+
+
 public static class MouseInput
 {
+    private static readonly List<Mouse.Button> s_pressedButtons = [];
+
     private static bool s_canResetScrollDelta = true;
 
-    private static readonly List<Mouse.Button> s_pressedButtons = [];
+
 
 
     public static Vec2i Position { get; private set; } = new Vec2i();
@@ -33,15 +39,21 @@ public static class MouseInput
     public static Vec2f LastPositionInView { get; private set; } = new Vec2f();
     public static Vec2f PositionDeltaInView => PositionInView - LastPositionInView;
 
+    public static float ScrollDelta { get; private set; }
+
     public static bool MouseMoved => Position != LastPosition;
 
-    public static float ScrollDelta { get; private set; }
+
+
 
     public static BaseObject? ObjectWhichCaughtMouseInput { get; private set; }
     public static BaseObject? ClickableWhichCaughtMouseInput { get; private set; }
     public static BaseObject? TrueClickableWhichCaughtMouseInput { get; private set; }
 
     public static BaseObject? ObjectWhichIsHoldingMouseInput { get; private set; }
+
+
+
 
     public static event EventHandler<MouseButtonEventArgs>? ButtonDownEvent;
     public static event EventHandler<MouseButtonEventArgs>? ButtonUpEvent;
@@ -50,11 +62,16 @@ public static class MouseInput
     public static event EventHandler<MouseButtonEventArgs>? DraggingEvent;
 
 
+
+
     public static void AddScrollListener(Window window)
         => window.MouseWheelScrolled += OnScroll;
 
+
     public static void RemoveScrollListener(Window window)
         => window.MouseWheelScrolled -= OnScroll;
+
+
 
 
     public static void Update()
@@ -70,6 +87,7 @@ public static class MouseInput
         s_canResetScrollDelta = true;
     }
 
+
     private static void UpdateMouseProperties()
     {
         LastPosition = Position;
@@ -78,6 +96,7 @@ public static class MouseInput
         Position = App.Window.MousePosition;
         PositionInView = App.Window.MapPixelToCoords(Position, App.Window.GetView());
     }
+
 
     private static void UpdatePressedButtons()
     {
@@ -92,6 +111,7 @@ public static class MouseInput
                 OnButtonUp(pressedButton);
     }
 
+
     private static void UpdateDragging()
     {
         if (!MouseMoved)
@@ -101,25 +121,6 @@ public static class MouseInput
             OnDragging(pressedButton);
     }
 
-
-    private static List<Mouse.Button> GetPressedButtons()
-    {
-        var buttons = new List<Mouse.Button>();
-
-        AddIfButtonPressed(ref buttons, Mouse.Button.Left);
-        AddIfButtonPressed(ref buttons, Mouse.Button.Right);
-        AddIfButtonPressed(ref buttons, Mouse.Button.Middle);
-        AddIfButtonPressed(ref buttons, Mouse.Button.XButton1);
-        AddIfButtonPressed(ref buttons, Mouse.Button.XButton2);
-
-        return buttons;
-    }
-
-    private static void AddIfButtonPressed(ref List<Mouse.Button> buttons, Mouse.Button button)
-    {
-        if (Mouse.IsButtonPressed(button))
-            buttons.Add(button);
-    }
 
     private static void UpdateMouseInputState()
     {
@@ -143,6 +144,7 @@ public static class MouseInput
                 SetObjectWhichCaughtMouseInput(@object);
         }
     }
+
 
     private static bool CheckMouseInputHolding()
     {
@@ -176,8 +178,37 @@ public static class MouseInput
     }
 
 
+
+
+    private static List<Mouse.Button> GetPressedButtons()
+    {
+        var buttons = new List<Mouse.Button>();
+
+        AddIfButtonPressed(ref buttons, Mouse.Button.Left);
+        AddIfButtonPressed(ref buttons, Mouse.Button.Right);
+        AddIfButtonPressed(ref buttons, Mouse.Button.Middle);
+        AddIfButtonPressed(ref buttons, Mouse.Button.XButton1);
+        AddIfButtonPressed(ref buttons, Mouse.Button.XButton2);
+
+        return buttons;
+    }
+
+
+
+
+    private static void AddIfButtonPressed(ref List<Mouse.Button> buttons, Mouse.Button button)
+    {
+        if (Mouse.IsButtonPressed(button))
+            buttons.Add(button);
+    }
+
+
+
+
     private static bool IsMouseOverObject(BaseObject @object)
         => PositionInView.IsPointOverObject(@object);
+
+
 
 
     private static void OnScroll(object? _, MouseWheelScrollEventArgs args)
@@ -185,6 +216,8 @@ public static class MouseInput
         ScrollDelta = args.Delta;
         s_canResetScrollDelta = false;
     }
+
+
 
 
     private static void OnButtonDown(Mouse.Button button)
@@ -196,6 +229,7 @@ public static class MouseInput
         OnDragStart(button);
     }
 
+
     private static void OnButtonUp(Mouse.Button button)
     {
         s_pressedButtons.Remove(button);
@@ -204,6 +238,8 @@ public static class MouseInput
 
         OnDragEnd(button);
     }
+
+
 
 
     private static void OnDragStart(Mouse.Button button)

@@ -10,17 +10,17 @@ using static SFML.Window.Cursor;
 namespace Latte.UI.Elements;
 
 
+
+
 public class TextSelectionElement : RectangleElement
 {
-    private TextElement.Character? _start;
-    private TextElement.Character? _end;
-
-
     // parent must not change
     public new TextElement Parent => (base.Parent as TextElement)!;
 
-    public bool CanSelect { get; set; }
 
+
+
+    private TextElement.Character? _start;
     public TextElement.Character? Start
     {
         get => _start;
@@ -31,6 +31,8 @@ public class TextSelectionElement : RectangleElement
         }
     }
 
+
+    private TextElement.Character? _end;
     public TextElement.Character? End
     {
         get => _end;
@@ -41,11 +43,16 @@ public class TextSelectionElement : RectangleElement
         }
     }
 
+
+    public bool CanSelect { get; set; }
     public bool IsSelecting { get; protected set; }
 
     protected bool ShouldUpdateSelection { get; set; }
 
+
     public event EventHandler? SelectionChanged;
+
+
 
 
     public TextSelectionElement(TextElement parent) : base(parent, new Vec2f(), new Vec2f())
@@ -60,6 +67,8 @@ public class TextSelectionElement : RectangleElement
     }
 
 
+
+
     private void AddEventListeners(TextElement element)
     {
         element.UnfocusEvent += OnParentUnfocus;
@@ -67,6 +76,7 @@ public class TextSelectionElement : RectangleElement
         element.MouseDownEvent += OnParentMouseDown;
         element.MouseUpEvent += OnParentMouseUp;
     }
+
 
 
 
@@ -82,6 +92,8 @@ public class TextSelectionElement : RectangleElement
 
         base.ConstantUpdate();
     }
+
+
 
 
     protected void Select(TextElement.Character start, TextElement.Character end)
@@ -122,6 +134,8 @@ public class TextSelectionElement : RectangleElement
     }
 
 
+
+
     public string GetSelectedText()
     {
         if (Start is null || End is null)
@@ -149,6 +163,7 @@ public class TextSelectionElement : RectangleElement
 
 
 
+
     public virtual void OnSelectionChanged()
     {
         ShouldUpdateSelection = true;
@@ -156,10 +171,14 @@ public class TextSelectionElement : RectangleElement
     }
 
 
+
+
     private void OnParentUnfocus(object? _, EventArgs __)
     {
         Start = End = null;
     }
+
+
 
 
     private void OnParentMouseHover(object? _, EventArgs __)

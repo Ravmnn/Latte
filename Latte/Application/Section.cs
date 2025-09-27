@@ -11,6 +11,8 @@ using Latte.UI.Elements;
 namespace Latte.Application;
 
 
+
+
 // TODO: improve this... make this really useful
 public class Section : IUpdateable, IDrawable
 {
@@ -18,14 +20,22 @@ public class Section : IUpdateable, IDrawable
     private List<BaseObject> _objects;
 
 
+
+
     public IEnumerable<BaseObject> Objects => _objects;
+
+
+
 
     public event EventHandler<BaseObjectEventArgs>? ObjectAddedEvent;
     public event EventHandler<BaseObjectEventArgs>? ObjectRemovedEvent;
     public event EventHandler<BaseObjectEventArgs>? ObjectListModifiedEvent;
 
+
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;
+
+
 
 
     public Section()
@@ -37,8 +47,13 @@ public class Section : IUpdateable, IDrawable
     }
 
 
+
+
     public virtual void Initialize() { }
     public virtual void Deinitialize() { }
+
+
+
 
     public virtual void Update()
     {
@@ -47,12 +62,17 @@ public class Section : IUpdateable, IDrawable
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
 
+
+    private void SortObjectListByPriority()
+        => _objects = _objects.OrderBy(@object => @object.Priority).ToList();
+
+
+
+
     public virtual void Draw(IRenderer renderer)
         => DrawEvent?.Invoke(this, EventArgs.Empty);
 
 
-    private void SortObjectListByPriority()
-        => _objects = _objects.OrderBy(@object => @object.Priority).ToList();
 
 
     public void AddObjects(params IEnumerable<BaseObject> objects)
@@ -60,6 +80,7 @@ public class Section : IUpdateable, IDrawable
         foreach (var @object in objects)
             AddObject(@object);
     }
+
 
     public void AddObject(BaseObject @object)
     {
@@ -74,11 +95,14 @@ public class Section : IUpdateable, IDrawable
     }
 
 
+
+
     public void RemoveObjects(params IEnumerable<BaseObject> objects)
     {
         foreach (var @object in objects)
             RemoveObject(@object);
     }
+
 
     public bool RemoveObject(BaseObject @object)
     {
@@ -92,11 +116,14 @@ public class Section : IUpdateable, IDrawable
     }
 
 
+
+
     public void AddElements(params IEnumerable<Element> elements)
     {
         foreach (var element in elements)
             AddElement(element);
     }
+
 
     public void AddElement(Element element)
     {
@@ -104,8 +131,11 @@ public class Section : IUpdateable, IDrawable
         AddElementsHierarchy(element.Children);
     }
 
+
     private void AddElementsHierarchy(IEnumerable<Element> elements)
         => elements.ForeachElementRecursively(AddObject);
+
+
 
 
     public void RemoveElements(params IEnumerable<Element> elements)
@@ -113,6 +143,7 @@ public class Section : IUpdateable, IDrawable
         foreach (var element in elements)
             RemoveElement(element);
     }
+
 
     public bool RemoveElement(Element element)
     {
@@ -123,6 +154,7 @@ public class Section : IUpdateable, IDrawable
         return true;
     }
 
+
     private void RemoveElementsChildrenOf(Element parent)
     {
         foreach (var @object in _objects.ToArray().Reverse())
@@ -131,8 +163,12 @@ public class Section : IUpdateable, IDrawable
     }
 
 
+
+
     public bool HasObject(BaseObject @object)
         => _objects.Contains(@object);
+
+
 
 
     public IEnumerable<T> GetObjectsOfType<T>() where T : class
@@ -140,6 +176,8 @@ public class Section : IUpdateable, IDrawable
             let objectOfType = @object as T
             where objectOfType is not null
             select  objectOfType;
+
+
 
 
     public void AddEventListenersTo(BaseObject @object)
@@ -151,6 +189,7 @@ public class Section : IUpdateable, IDrawable
             FocusManager.AddFocusListenerTo(focusable);
     }
 
+
     public void RemoveEventListenersOf(BaseObject @object)
     {
         if (@object is Element element)
@@ -161,11 +200,15 @@ public class Section : IUpdateable, IDrawable
     }
 
 
+
+
     private void AddChildAddedListenerTo(Element element)
         => element.ChildAddedEvent += OnElementChildAdded;
 
+
     private void RemoveChildAddedListenerOf(Element element)
         => element.ChildAddedEvent -= OnElementChildAdded;
+
 
 
 

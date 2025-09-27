@@ -9,6 +9,8 @@ using Color = SFML.Graphics.Color;
 namespace Latte.Core.Type;
 
 
+
+
 public struct NormalizedColorRGBA : IFloatArrayModifiable,
     IAdditionOperators<NormalizedColorRGBA, NormalizedColorRGBA, NormalizedColorRGBA>,
     ISubtractionOperators<NormalizedColorRGBA, NormalizedColorRGBA, NormalizedColorRGBA>,
@@ -16,34 +18,37 @@ public struct NormalizedColorRGBA : IFloatArrayModifiable,
     IDivisionOperators<NormalizedColorRGBA, NormalizedColorRGBA, NormalizedColorRGBA>
 {
     private float _r;
-    private float _g;
-    private float _b;
-    private float _a;
-
-
     public float R
     {
         readonly get => _r;
         set => _r = System.Math.Clamp(value, 0, 1);
     }
 
+
+    private float _g;
     public float G
     {
         readonly get => _g;
         set => _g = System.Math.Clamp(value, 0, 1);
     }
 
+
+    private float _b;
     public float B
     {
         readonly get => _b;
         set => _b = System.Math.Clamp(value, 0, 1);
     }
 
+
+    private float _a;
     public float A
     {
         readonly get => _a;
         set => _a = System.Math.Clamp(value, 0, 1);
     }
+
+
 
 
     public NormalizedColorRGBA(float red, float green, float blue, float alpha = 1)
@@ -60,8 +65,12 @@ public struct NormalizedColorRGBA : IFloatArrayModifiable,
     {}
 
 
+
+
     public void ModifyFrom(float[] values)
         => (R, G, B, A) = (values[0], values[1], values[2], values[3]);
+
+
 
 
     public static implicit operator Color(NormalizedColorRGBA color) => (ColorRGBA)color;
@@ -69,6 +78,8 @@ public struct NormalizedColorRGBA : IFloatArrayModifiable,
 
     public static implicit operator NormalizedColorRGBA(ColorRGBA color) => new NormalizedColorRGBA(color);
     public static implicit operator ColorRGBA(NormalizedColorRGBA color) => new ColorRGBA(color);
+
+
 
 
     public static NormalizedColorRGBA operator +(NormalizedColorRGBA left, NormalizedColorRGBA right)
@@ -91,6 +102,7 @@ public struct NormalizedColorRGBA : IFloatArrayModifiable,
         return left;
     }
 
+
     public static NormalizedColorRGBA operator *(NormalizedColorRGBA left, NormalizedColorRGBA right)
     {
         left.R *= right.R;
@@ -101,6 +113,7 @@ public struct NormalizedColorRGBA : IFloatArrayModifiable,
         return left;
     }
 
+
     public static NormalizedColorRGBA operator /(NormalizedColorRGBA left, NormalizedColorRGBA right)
     {
         left.R /= right.R;
@@ -110,6 +123,8 @@ public struct NormalizedColorRGBA : IFloatArrayModifiable,
 
         return left;
     }
+
+
 
 
     public readonly override string ToString() => $"normalized rgba({R}, {G}, {B}, {A})";

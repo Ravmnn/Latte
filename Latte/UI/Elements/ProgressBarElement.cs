@@ -9,16 +9,26 @@ using Latte.Core.Type;
 namespace Latte.UI.Elements;
 
 
+
+
 public class ProgressBarElement : Element
 {
     private bool _wasCompleted;
 
 
+
+
     public override Transformable SfmlTransformable => Foreground.SfmlTransformable;
     public override Drawable SfmlDrawable => Foreground.SfmlDrawable;
 
+
+
+
     protected RectangleElement Foreground { get; }
     protected RectangleElement Background { get; }
+
+
+
 
     public float Progress { get; set; }
 
@@ -30,7 +40,10 @@ public class ProgressBarElement : Element
 
     public bool Completed => IsAtMax;
 
+
     public event EventHandler? CompletedEvent;
+
+
 
 
     public ProgressBarElement(Element? parent, Vec2f? position, Vec2f size, float minValue = 0f, float maxValue = 1f) : base(parent)
@@ -52,6 +65,8 @@ public class ProgressBarElement : Element
     }
 
 
+
+
     public override void ConstantUpdate()
     {
         ClampProgress();
@@ -65,6 +80,7 @@ public class ProgressBarElement : Element
         base.ConstantUpdate();
     }
 
+
     private void UpdateSizeBasedOnProgress()
         => Foreground.Size = new Vec2f(Background.Size.X * CalculateNormalizedProgress(), Background.Size.Y);
 
@@ -77,8 +93,12 @@ public class ProgressBarElement : Element
         => Progress = Math.Clamp(Progress, MinValue, MaxValue);
 
 
+
+
     public override void BorderLessSimpleDraw(IRenderer renderer)
         => Foreground.BorderLessSimpleDraw(renderer);
+
+
 
 
     public override FloatRect GetBounds()
@@ -92,6 +112,8 @@ public class ProgressBarElement : Element
 
     public override FloatRect GetBorderLessRelativeBounds()
         => Background.GetBorderLessRelativeBounds();
+
+
 
 
     public override void ApplySizePolicy()

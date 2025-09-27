@@ -7,19 +7,27 @@ using Latte.Core.Type;
 namespace Latte.UI.Elements;
 
 
+
+
 public class SpriteElement : Element
 {
     public override Transformable SfmlTransformable => SfmlSprite;
     public override Drawable SfmlDrawable => SfmlSprite;
 
+
+
+
     public Sprite SfmlSprite { get; }
     public Texture SfmlTexture => SfmlSprite.Texture;
+
 
     public Texture Texture { get; set; }
     public bool Smooth { get; set; }
     public bool Repeat { get; set; }
 
     public Vec2f Size { get; set; }
+
+
 
 
     public SpriteElement(Element? parent, string imagePath, Vec2f? position, Vec2f size) : base(parent)
@@ -35,12 +43,16 @@ public class SpriteElement : Element
     }
 
 
+
+
     public override void ConstantUpdate()
     {
         Scale = CalculateScaleBasedOnSize(Size);
 
         base.ConstantUpdate();
     }
+
+
 
 
     public override void UpdateSfmlProperties()
@@ -51,6 +63,8 @@ public class SpriteElement : Element
         SfmlTexture.Smooth = Smooth;
         SfmlTexture.Repeated = Repeat;
     }
+
+
 
 
     private Vec2f CalculateScaleBasedOnSize(Vec2f targetSize)
@@ -64,7 +78,11 @@ public class SpriteElement : Element
     // targetScale = (currentScale * targetSize) / currentSize
 
 
+
+
     public override void BorderLessSimpleDraw(IRenderer renderer) => SimpleDraw(renderer);
+
+
 
 
     public override FloatRect GetBounds()
@@ -72,6 +90,8 @@ public class SpriteElement : Element
 
     public override FloatRect GetRelativeBounds()
         => new FloatRect(RelativePosition, Size);
+
+
 
 
     public override void ApplySizePolicy()

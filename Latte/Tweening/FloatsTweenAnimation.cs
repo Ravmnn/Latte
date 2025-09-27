@@ -4,6 +4,8 @@ using System;
 namespace Latte.Tweening;
 
 
+
+
 public class FloatsTweenAnimationEventArgs(float[] values) : EventArgs
 {
     public float[] Values { get; } = values;
@@ -35,7 +37,12 @@ public class FloatsTweenAnimation(float[] startValues, float[] endValues, double
     public float[] EndValues { get; } = endValues;
     public float[] CurrentValues { get; private set; } = new float[startValues.Length];
 
+
+
+
     public EventHandler<FloatsTweenAnimationEventArgs>? ProgressEvent;
+
+
 
 
     public override void Update()
@@ -56,6 +63,8 @@ public class FloatsTweenAnimation(float[] startValues, float[] endValues, double
         for (uint i = 0; i < StartValues.Length; i++)
             CurrentValues[i] = StartValues[i] + (EndValues[i] - StartValues[i]) * EasedProgress;
     }
+
+
 
 
     protected virtual void OnProgressEvent(float[] values)

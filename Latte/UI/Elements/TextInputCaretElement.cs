@@ -4,13 +4,16 @@ using Latte.Core.Type;
 namespace Latte.UI.Elements;
 
 
+
+
 public class TextInputCaretElement : RectangleElement
 {
-    private int _index;
-
-
     public new TextInputElement Parent => (base.Parent as TextInputElement)!;
 
+
+
+
+    private int _index;
     public int Index
     {
         get => _index;
@@ -26,7 +29,10 @@ public class TextInputCaretElement : RectangleElement
         }
     }
 
+
     public float HeightFactor { get; set; }
+
+
 
 
     public TextInputCaretElement(TextInputElement parent)
@@ -43,12 +49,15 @@ public class TextInputCaretElement : RectangleElement
     }
 
 
+
+
     public override void Update()
     {
         UpdateGeometry();
 
         base.Update();
     }
+
 
     private void UpdateGeometry()
     {
@@ -58,6 +67,8 @@ public class TextInputCaretElement : RectangleElement
         AbsolutePosition = absoluteGeometry.Position;
         Size = new Vec2f(Size.X, absoluteGeometry.Height);
     }
+
+
 
 
     public void Advance() => Index++;

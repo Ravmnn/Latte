@@ -4,13 +4,19 @@ using System;
 namespace Latte.UI;
 
 
+
+
 public interface IFocusable
 {
+    bool Focused { get; set; }
+    bool DisableFocus { get; }
+
+
     event EventHandler FocusEvent;
     event EventHandler UnfocusEvent;
 
-    bool Focused { get; set; }
-    bool DisableFocus { get; }
+
+
 
     void Focus()
     {
@@ -28,6 +34,7 @@ public interface IFocusable
         OnFocus();
     }
 
+
     void Unfocus()
     {
         if (!Focused)
@@ -36,6 +43,9 @@ public interface IFocusable
         Focused = false;
         OnUnfocus();
     }
+
+
+
 
     void OnFocus();
     void OnUnfocus();

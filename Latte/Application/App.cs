@@ -26,9 +26,6 @@ using VideoMode = SFML.Window.VideoMode;
 namespace Latte.Application;
 
 
-// TODO: max of 2 lines of vertical spacing between anything is not clearly enough, use max of 4
-
-
 // TODO: add time-based performance analyzer, with FPS calculator
 
 // TODO: add horizontal and vertical layouts
@@ -45,15 +42,10 @@ public static class App
     private static bool s_objectWasAddedAndNotUpdated;
 
 
+
+
     public static BridgeNode? Bridge { get; set; }
-
     public static Debugger? Debugger { get; private set; }
-
-    public static Font DefaultFont
-    {
-        get => s_defaultFont ?? throw new AppNotInitializedException();
-        set => s_defaultFont = value;
-    }
 
     public static Window Window
     {
@@ -61,7 +53,16 @@ public static class App
         private set => s_window = value;
     }
 
+    public static Font DefaultFont
+    {
+        get => s_defaultFont ?? throw new AppNotInitializedException();
+        set => s_defaultFont = value;
+    }
+
+
     public static bool ShouldQuit { get; private set; }
+    public static bool HasInitialized { get; private set; }
+
 
     public static Section Section { get; set; }
     public static IEnumerable<BaseObject> Objects => Section.Objects;
@@ -72,7 +73,7 @@ public static class App
     public static bool ManualObjectUpdate { get; set; }
     public static bool ManualObjectDraw { get; set; }
 
-    public static bool HasInitialized { get; private set; }
+
 
 
     static App()
@@ -96,17 +97,14 @@ public static class App
     }
 
 
+
+
     private static void Init(Font defaultFont)
     {
-        // TODO: throw exception instead
-        if (HasInitialized)
-        {
-            Console.WriteLine("App has already been initialized.");
-            return;
-        }
+        AppAlreadyInitializedException.ThrowIfAppIsInitialized();
+
 
         DefaultFont = defaultFont;
-
         Debugger = new Debugger();
 
         DeltaTime.Start();
@@ -123,17 +121,24 @@ public static class App
     }
 
 
-    public static void Deinit()
-    {
-        DeinitBridge();
-        DeinitWindow();
-    }
-
-
     public static void InitWindow(Window window)
     {
         Window = window;
         AddEventListeners(Window);
+    }
+
+
+    public static void InitBridge(string processName)
+        => Bridge = new BridgeNode(processName);
+
+
+
+
+
+    public static void Deinit()
+    {
+        DeinitBridge();
+        DeinitWindow();
     }
 
     public static void DeinitWindow()
@@ -142,10 +147,6 @@ public static class App
         Window.Close();
     }
 
-
-    public static void InitBridge(string processName)
-        => Bridge = new BridgeNode(processName);
-
     public static void DeinitBridge()
     {
         Bridge?.Dispose();
@@ -153,8 +154,12 @@ public static class App
     }
 
 
+
+
     public static void Quit()
         => ShouldQuit = true;
+
+
 
 
     public static void AddEventListeners(Window window)
@@ -166,6 +171,7 @@ public static class App
         KeyboardInput.AddKeyListeners(window);
     }
 
+
     public static void RemoveEventListeners(Window window)
     {
         window.Closed -= OnWindowClose;
@@ -174,6 +180,8 @@ public static class App
         MouseInput.RemoveScrollListener(window);
         KeyboardInput.RemoveKeyListeners(window);
     }
+
+
 
 
     public static void Update()
@@ -195,15 +203,15 @@ public static class App
         AnimationManager.Update();
 
         Section.Update();
-        Debugger?.Update(); // update before elements
+        Debugger?.Update();
 
         UpdateObjectsAndCheckForNewOnes();
     }
 
+
     private static void SetCursorToDefault()
-    {
-        Window.Cursor.Type = CursorType.Arrow;
-    }
+        => Window.Cursor.Type = CursorType.Arrow;
+
 
     private static void UpdateObjectsAndCheckForNewOnes()
     {
@@ -223,6 +231,7 @@ public static class App
         }
     }
 
+
     private static void UpdateObjects(bool constantUpdateOnly = false)
     {
         // use ToArray() to avoid: InvalidOperationException "Collection was modified".
@@ -241,6 +250,8 @@ public static class App
 
         @object.ConstantUpdate();
     }
+
+
 
 
     public static void Draw(IRenderer renderer)
@@ -269,6 +280,7 @@ public static class App
             Window.Display();
     }
 
+
     private static void DrawObjects(IRenderer renderer)
     {
         if (ManualObjectDraw)
@@ -286,6 +298,8 @@ public static class App
     }
 
 
+
+
     public static void AddObjects(params IEnumerable<BaseObject> objects) => Section.AddObjects(objects);
     public static void AddObject(BaseObject @object) => Section.AddObject(@object);
     public static void RemoveObjects(params IEnumerable<BaseObject> objects) => Section.RemoveObjects(objects);
@@ -298,8 +312,11 @@ public static class App
     public static bool RemoveElement(Element element) => Section.RemoveElement(element);
 
 
+
+
     private static void OnWindowClose(object? _, EventArgs __)
         => Quit();
+
 
     private static void OnWindowResize(object? _, SizeEventArgs args)
     {
@@ -313,6 +330,8 @@ public static class App
 
         Window.SetView(newView);
     }
+
+
 
 
     private static void OnSectionElementAdded()

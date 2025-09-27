@@ -16,6 +16,8 @@ using Latte.Debugging.Elements;
 namespace Latte.Debugging;
 
 
+
+
 [Flags]
 public enum DebugOption
 {
@@ -30,26 +32,6 @@ public enum DebugOption
     ShowPriority = 1 << 5,
     ShowFocus = 1 << 6
 }
-
-
-[AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowBoundsAttribute : ElementAttribute;
-
-
-[AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowBoundsDimensionsAndPositionAttribute : ElementAttribute;
-
-
-[AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowPriorityAttribute : ElementAttribute;
-
-
-[AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreShowFocusAttribute : ElementAttribute;
-
-
-[AttributeUsage(AttributeTargets.Class)]
-public class DebuggerIgnoreInspection : ElementAttribute;
 
 
 // TODO: replace the embedded debug system with a separated application that does it:

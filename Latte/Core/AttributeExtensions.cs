@@ -5,6 +5,8 @@ using System.Collections.Generic;
 namespace Latte.Core;
 
 
+
+
 public static class AttributeExtensions
 {
     public static T? GetAttribute<T>(this object obj) where T : System.Attribute

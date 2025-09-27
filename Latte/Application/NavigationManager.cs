@@ -11,9 +11,13 @@ using Latte.UI.Elements;
 namespace Latte.Application;
 
 
+
+
 public static class NavigationManager
 {
     private static INavigationTarget? s_currentTarget;
+
+
 
 
     public static INavigationTarget? CurrentTarget
@@ -27,13 +31,20 @@ public static class NavigationManager
         }
     }
 
+
+
+
     public static event EventHandler? CurrentNavigationTargetChangedEvent;
+
+
 
 
     static NavigationManager()
     {
         KeyboardInput.KeyPressedEvent += (_, args) => OnKeyPressed(args);
     }
+
+
 
 
     public static void Update()
@@ -43,13 +54,18 @@ public static class NavigationManager
     }
 
 
+
+
     public static void NextElement()
         => SelectElementFromCurrentTarget((index, targets) =>
             index + 1 >= targets.Length ? targets.First() : targets.ElementAt(index + 1));
 
+
     public static void PreviousElement()
         => SelectElementFromCurrentTarget((index, targets) =>
             index - 1 < 0 ? targets.Last() : targets.ElementAt(index - 1));
+
+
 
 
     private static void SelectElementFromCurrentTarget(Func<int, INavigationTarget[], INavigationTarget> func)
@@ -71,12 +87,16 @@ public static class NavigationManager
     }
 
 
+
+
     private static IEnumerable<INavigationTarget> GetElementsOrderedByNavigationPriority()
         => from @object in App.Objects
             let navigationTarget = @object as INavigationTarget
             where navigationTarget is { DisableFocus: false }
             orderby navigationTarget.NavigationPriority
             select navigationTarget;
+
+
 
 
     private static void OnKeyPressed(KeyEventArgs key)

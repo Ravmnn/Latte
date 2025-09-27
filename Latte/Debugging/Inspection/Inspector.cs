@@ -6,6 +6,8 @@ using Latte.Debugging.Inspection.Formatting;
 namespace Latte.Debugging.Inspection;
 
 
+
+
 public record InspectionData(string Name, string Data);
 
 

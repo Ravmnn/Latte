@@ -7,6 +7,8 @@ using Latte.Core.Type;
 namespace Latte.Tweening;
 
 
+
+
 /// <summary>
 /// Converts a float[] to a specific data structure.
 /// </summary>
@@ -24,6 +26,8 @@ public static class FloatArrayConversion
     public static ColorRGBA ToColor(this float[] values) =>
         new ColorRGBA((byte)System.Math.Clamp(values[0], 0, 255), (byte)System.Math.Clamp(values[1], 0, 255),
             (byte)System.Math.Clamp(values[2], 0, 255), (byte)System.Math.Clamp(values[3], 0, 255));
+
+
 
 
     public static Vector2f ToVector2f(this float[] values) => ToVec2f(values);

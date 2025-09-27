@@ -12,19 +12,26 @@ using Latte.UI.Elements;
 namespace Latte.Core;
 
 
+
+
 public static class Point
 {
     public static bool IsPointOverBounds(this Vec2f point, IBounds bounds)
         => point.IsPointOverRect(bounds.GetBounds());
 
+
     public static bool IsPointOverObject(this Vec2f point, BaseObject @object)
         => (@object as IClickable)?.IsPointOver(point) ?? point.IsPointOverBounds(@object);
+
 
     public static bool IsPointOverElement(this Vec2f point, Element element)
         => point.IsPointOverBounds(element) && point.IsPointOverElementClipArea(element);
 
+
     public static bool IsPointOverElementClipArea(this Vec2f point, Element element)
         => point.IsPointOverRect(element.GetIntersectedClipArea().ToWorldCoordinates());
+
+
 
 
     public static bool IsPointOverRect(this Vec2f point, Vec2f position, Vec2f size)
@@ -32,6 +39,8 @@ public static class Point
 
     public static bool IsPointOverRect(this Vec2f point, FloatRect rect)
         => IsPointOverRect(point, rect.Position, rect.Size);
+
+
 
 
     public static bool IsPointOverRoundedRect(this Vec2f point, Vec2f position, Vec2f size, float radius)
@@ -54,12 +63,17 @@ public static class Point
         return overCorners || overRects;
     }
 
+
     public static bool IsPointOverRoundedRect(this Vec2f point, FloatRect rect, float radius)
         => IsPointOverRoundedRect(point, rect.Position, rect.Size, radius);
 
 
+
+
     public static bool IsPointOverCircle(this Vec2f point, Vec2f circleCenter, float radius)
         => Distance(point, circleCenter) <= radius;
+
+
 
 
     public static float Distance(float x1, float y1, float x2, float y2)
@@ -67,6 +81,8 @@ public static class Point
 
     public static float Distance(this Vec2f p1, Vec2f p2)
         => Distance(p1.X, p1.Y, p2.X, p2.Y);
+
+
 
 
     public static Vec2f Round(this Vec2f vec) => new Vec2f(MathF.Round(vec.X), MathF.Round(vec.Y));

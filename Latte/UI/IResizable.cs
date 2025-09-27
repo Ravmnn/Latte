@@ -62,11 +62,9 @@ public interface IResizable
             OnResizing();
     }
 
+    void ProcessResizing();
 
     void OnResizeBegin();
     void OnResizeEnd();
     void OnResizing();
-
-
-    void ProcessResizing();
 }

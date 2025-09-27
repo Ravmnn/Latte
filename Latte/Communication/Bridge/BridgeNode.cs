@@ -11,7 +11,11 @@ using Latte.Communication.Bridge.Exceptions;
 namespace Latte.Communication.Bridge;
 
 
+
+
 public readonly record struct BridgeNodeData(string Name, int Port);
+
+
 
 
 public class BridgeConnectionEventArgs(BridgeConnection connection) : EventArgs
@@ -25,26 +29,39 @@ public class TcpClientEventArgs(TcpClient client) : EventArgs
 }
 
 
+
+
 public class BridgeNode : IDisposable
 {
     public const int MinPortId = 32000;
     public const int MaxPortId = 33000;
 
 
+
+
     private bool _disposed;
+
 
     private readonly Thread _listenForConnectionsThread;
     private readonly CancellationTokenSource _listenForConnectionsThreadCancellation;
 
 
+
+
     public BridgeNodeData Data { get; }
 
+
     protected TcpListener Server { get; }
+
+
+
 
     public event EventHandler<TcpClientEventArgs>? ConnectionRequestedEvent;
     public event EventHandler<BridgeConnectionEventArgs>? ConnectionAcceptedEvent;
     public event EventHandler<BridgeConnectionEventArgs>? ConnectionRejectedEvent;
     public event EventHandler<TcpClientEventArgs>? ConnectionFailedEvent;
+
+
 
 
     public BridgeNode(string name, int? port = null)
@@ -65,10 +82,14 @@ public class BridgeNode : IDisposable
     }
 
 
+
+
     public void ConnectTo(string targetNodeName)
     {
         var connection = BridgeConnection.ToTarget(Data, targetNodeName);
     }
+
+
 
 
     private void ListenForConnectionRequests()
@@ -96,6 +117,8 @@ public class BridgeNode : IDisposable
     }
 
 
+
+
     private void ValidateConnectionRequest(TcpClient client)
     {
         try
@@ -117,6 +140,8 @@ public class BridgeNode : IDisposable
             OnConnectionFailed(client);
         }
     }
+
+
 
 
     protected virtual void OnConnectionRequested(TcpClient client)
@@ -171,6 +196,8 @@ public class BridgeNode : IDisposable
     {
         Dispose(false);
     }
+
+
 
 
     public void Dispose()

@@ -6,10 +6,14 @@ using Latte.Core;
 namespace Latte.Application;
 
 
+
+
 public class DefaultRenderer(RenderTarget renderTarget) : IRenderer
 {
     public RenderTarget RenderTarget { get; set; } = renderTarget;
     public Effect? GlobalEffect { get; set; }
+
+
 
 
     public virtual void Render(Drawable drawable, Effect? drawableEffect = null)

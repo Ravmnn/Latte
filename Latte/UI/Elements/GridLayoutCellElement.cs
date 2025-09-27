@@ -5,6 +5,8 @@ using Latte.UI.Elements.Attributes;
 namespace Latte.UI.Elements;
 
 
+
+
 [ChildrenAmount(1)]
 public class GridLayoutCellElement : RectangleElement
 {
@@ -20,6 +22,8 @@ public class GridLayoutCellElement : RectangleElement
                 value.Parent = this;
         }
     }
+
+
 
 
     public GridLayoutCellElement(GridLayoutElement parent, Vec2f? position, Vec2f size) : base(parent, position, size)

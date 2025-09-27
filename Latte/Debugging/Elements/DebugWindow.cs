@@ -5,6 +5,8 @@ using Latte.UI.Elements;
 namespace Latte.Debugging.Elements;
 
 
+
+
 [DebuggerIgnoreInspection]
 public abstract class DebugWindow : WindowElement
 {

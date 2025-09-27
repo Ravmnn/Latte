@@ -10,6 +10,8 @@ using Latte.Communication.Bridge.Exceptions;
 namespace Latte.Communication.Bridge;
 
 
+
+
 public enum ConnectionResponse
 {
     Accepted,
@@ -20,10 +22,14 @@ public enum ConnectionResponse
 public readonly record struct ConnectionResponseObject(ConnectionResponse Response);
 
 
+
+
 public class DataEventArgs(string data) : EventArgs
 {
     public string Data { get; } = data;
 }
+
+
 
 
 // TODO: encapsulate TcpClient instead of using inheritance
@@ -32,8 +38,11 @@ public class BridgeConnection : TcpClient
     public static TimeSpan MaxWaitingTimeout { get; } = TimeSpan.FromSeconds(6);
 
 
+
+
     public StreamWriter Writer { get; private set; } = null!;
     public StreamReader Reader { get; private set; } = null!;
+
 
     public bool IsOrigin { get; }
 
@@ -43,8 +52,13 @@ public class BridgeConnection : TcpClient
     public BridgeNodeData Sender => IsOrigin ? Origin : Target;
     public BridgeNodeData Receiver => IsOrigin ? Target : Origin;
 
+
+
+
     public EventHandler<DataEventArgs>? SentEvent;
     public EventHandler<DataEventArgs>? ReceivedEvent;
+
+
 
 
     // creating to receive an external connection
@@ -69,11 +83,15 @@ public class BridgeConnection : TcpClient
     }
 
 
+
+
     public static BridgeConnection ToTarget(BridgeNodeData origin, string targetName)
         => new BridgeConnection(origin, targetName);
 
     public static BridgeConnection FromOrigin(BridgeNodeData target, TcpClient origin)
         => new BridgeConnection(target, origin);
+
+
 
 
     private void ConnectAndConstructStreams(int port)
@@ -88,6 +106,22 @@ public class BridgeConnection : TcpClient
         Writer = new StreamWriter(stream) { AutoFlush = true };
         Reader = new StreamReader(stream);
     }
+
+
+
+
+    private void ConnectTo(BridgeNodeData target)
+    {
+        ConnectAndConstructStreams(target.Port);
+
+        SendValidationData();
+        var response = ReceiveValidationResponse();
+
+        if (response is null || response.Value.Response == ConnectionResponse.Rejected)
+            throw new BridgeConnectionRejectedException();
+    }
+
+
 
 
     private BridgeNodeData GetValidationData()
@@ -106,22 +140,13 @@ public class BridgeConnection : TcpClient
     }
 
 
-    private void ConnectTo(BridgeNodeData target)
-    {
-        ConnectAndConstructStreams(target.Port);
-
-        SendValidationData();
-        var response = ReceiveValidationResponse();
-
-        if (response is null || response.Value.Response == ConnectionResponse.Rejected)
-            throw new BridgeConnectionRejectedException();
-    }
-
     private void SendValidationData()
     {
         var data = Origin.ToJsonObject()!;
         SendString(data.ToJsonString());
     }
+
+
 
     private ConnectionResponseObject? ReceiveValidationResponse()
     {
@@ -144,6 +169,7 @@ public class BridgeConnection : TcpClient
         }
     }
 
+
     public DataTransferObject ReceiveData()
         => ReceiveDataAsync().Result;
 
@@ -160,6 +186,8 @@ public class BridgeConnection : TcpClient
     }
 
 
+
+
     public string? TryReceiveString()
     {
         try
@@ -172,8 +200,10 @@ public class BridgeConnection : TcpClient
         }
     }
 
+
     public string ReceiveString()
         => ReceiveStringAsync().Result;
+
 
     public async Task<string> ReceiveStringAsync()
     {
@@ -189,6 +219,8 @@ public class BridgeConnection : TcpClient
     }
 
 
+
+
     public bool TrySendData(DataTransferObject data)
     {
         try
@@ -202,14 +234,18 @@ public class BridgeConnection : TcpClient
         }
     }
 
+
     public void SendData(DataTransferObject data)
         => SendDataAsync(data).Wait();
+
 
     public async Task SendDataAsync(DataTransferObject data)
     {
         var json = data.ToJsonString();
         await SendStringAsync(json);
     }
+
+
 
 
     public bool TrySendString(string data)
@@ -225,8 +261,10 @@ public class BridgeConnection : TcpClient
         }
     }
 
+
     public void SendString(string data)
         => SendStringAsync(data).Wait();
+
 
     public async Task SendStringAsync(string data)
     {
@@ -237,10 +275,13 @@ public class BridgeConnection : TcpClient
     }
 
 
+
+
     protected virtual void OnSent(string data)
     {
         SentEvent?.Invoke(this, new DataEventArgs(data));
     }
+
 
     protected virtual void OnReceived(string data)
     {
@@ -254,6 +295,8 @@ public class BridgeConnection : TcpClient
     {
 
     }
+
+
 
 
     private static async Task<T> WaitForTaskWithDefaultTimeoutOrThrow<T>(Task<T> task)

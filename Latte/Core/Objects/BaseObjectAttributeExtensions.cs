@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace Latte.Core.Objects;
 
 
+
+
 public static class BaseObjectAttributeExtensions
 {
     public static T? GetCachedObjectAttribute<T>(this BaseObject @object) where T : BaseObjectAttribute

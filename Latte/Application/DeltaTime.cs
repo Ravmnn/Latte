@@ -5,10 +5,13 @@ using System.Diagnostics;
 namespace Latte.Application;
 
 
+
+
 public static class DeltaTime
 {
     public static Stopwatch TimeCounter { get; } = new Stopwatch();
     public static Stopwatch DeltaTimeCounter { get; } = new Stopwatch();
+
 
     public static TimeSpan FromStart => TimeCounter.Elapsed;
     public static double FromStartSeconds => FromStart.TotalSeconds;
@@ -18,7 +21,10 @@ public static class DeltaTime
     public static double Seconds => Span.TotalSeconds;
     public static double Milliseconds => Span.TotalMilliseconds;
 
+
     public static double FramesPerSecond => 1f / Seconds;
+
+
 
 
     public static void Start()
@@ -27,11 +33,14 @@ public static class DeltaTime
         DeltaTimeCounter.Start();
     }
 
+
     public static void Stop()
     {
         TimeCounter.Start();
         DeltaTimeCounter.Stop();
     }
+
+
 
 
     public static void Update()

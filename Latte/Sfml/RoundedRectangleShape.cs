@@ -7,6 +7,8 @@ using SFML.Graphics;
 namespace Latte.Sfml;
 
 
+
+
 // this class original implementation was taken from
 // https://github.com/SFML/SFML/wiki/Source%3A-Draw-Rounded-Rectangle
 
@@ -16,10 +18,6 @@ namespace Latte.Sfml;
 public class RoundedRectangleShape : Shape
 {
     private Vector2f _size;
-    private float _radius;
-    private uint _cornerPointCount;
-    
-    
     public Vector2f Size
     {
         get => _size;
@@ -30,6 +28,8 @@ public class RoundedRectangleShape : Shape
         }
     }
 
+
+    private float _radius;
     public float Radius
     {
         get => _radius;
@@ -40,6 +40,8 @@ public class RoundedRectangleShape : Shape
         }
     }
 
+
+    private uint _cornerPointCount;
     public uint CornerPointCount
     {
         get => _cornerPointCount;
@@ -49,8 +51,10 @@ public class RoundedRectangleShape : Shape
             Update();
         }
     }
-    
-    
+
+
+
+
     public RoundedRectangleShape(Vector2f size, float radius, uint cornerPointCount)
     {
         Size = size;
@@ -59,9 +63,13 @@ public class RoundedRectangleShape : Shape
     }
 
 
+
+
     public override uint GetPointCount()
         => Radius != 0 ? CornerPointCount * 4 : 4;
-    
+
+
+
 
     private Vector2f RectangleGetPoint(uint index) => index switch
     {
@@ -71,19 +79,21 @@ public class RoundedRectangleShape : Shape
         _ => new Vector2f(0, 0)
     };
 
+
     public override Vector2f GetPoint(uint index)
     {
         const float Pi = 3.141592654f;
 
+
         // this GetPoint will not work properly if Radius is 0
         if (Radius == 0f)
             return RectangleGetPoint(index);
-        
+
         if (index >= CornerPointCount * 4)
             return new Vector2f();
 
         var deltaAngle = 90.0f / (CornerPointCount - 1);
-        
+
         var center = new Vector2f();
         var centerIndex = index / CornerPointCount;
 
@@ -93,17 +103,17 @@ public class RoundedRectangleShape : Shape
                 center.X = Size.X - Radius;
                 center.Y = Radius;
                 break;
-            
+
             case 1:
                 center.X = Radius;
                 center.Y = Radius;
                 break;
-            
+
             case 2:
                 center.X = Radius;
                 center.Y = Size.Y - Radius;
                 break;
-            
+
             case 3:
                 center.X = Size.X - Radius;
                 center.Y = Size.Y - Radius;

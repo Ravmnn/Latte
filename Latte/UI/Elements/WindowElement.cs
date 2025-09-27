@@ -10,6 +10,8 @@ using Latte.Application;
 namespace Latte.UI.Elements;
 
 
+
+
 [Flags]
 public enum WindowElementStyles
 {
@@ -23,58 +25,50 @@ public enum WindowElementStyles
 }
 
 
-public class WindowCloseButtonElement : ButtonElement
-{
-    public new WindowElement Parent => (base.Parent as WindowElement)!;
-
-
-    public WindowCloseButtonElement(WindowElement parent) : base(parent, new Vec2f(), new Vec2f(15, 15), null)
-    {
-        Color = new ColorRGBA(255, 100, 100);
-
-        Alignment = Alignment.TopRight;
-        AlignmentMargin = new Vec2f(-7, 8);
-    }
-
-
-    public override void OnMouseClick()
-    {
-        Parent.Close();
-        base.OnMouseClick();
-    }
-}
 
 
 public class WindowElement : RectangleElement, IDraggable, IResizable
 {
-    protected IFocusable ThisFocusable => this;
-    protected IClickable ThisClickable => this;
-    protected IDraggable ThisDraggable => this;
-    protected IResizable ThisResizable => this;
-
-    public TextElement Title { get; protected set; }
-
-    public WindowCloseButtonElement CloseButton { get; protected set; }
-
-    public WindowElementStyles Styles { get; set; }
-
-    public bool Dragging { get; protected set; }
-    public bool WasDragging { get; protected set; }
-
-    public bool Resizing { get; protected set; }
-    public bool WasResizing { get; protected set; }
-
     public bool Focused { get; set; }
     public bool DisableFocus { get; set; }
 
     public event EventHandler? FocusEvent;
     public event EventHandler? UnfocusEvent;
 
+
+
+
+    protected IDraggable ThisDraggable => this;
+
+    public bool Dragging { get; protected set; }
+    public bool WasDragging { get; protected set; }
+
+    public event EventHandler? DragBeginEvent;
+    public event EventHandler? DragEndEvent;
+    public event EventHandler? DraggingEvent;
+
+
+
+
+    protected IClickable ThisClickable => this;
+
     public bool FocusOnMouseDown { get; set; }
     public bool UnfocusOnMouseDownOutside { get; set; }
 
     public MouseClickState MouseState { get; }
     public bool DisableTruePressOnlyWhenMouseIsUp { get; protected set; }
+
+    public event EventHandler? MouseEnterEvent;
+    public event EventHandler? MouseLeaveEvent;
+    public event EventHandler? MouseDownEvent;
+    public event EventHandler? MouseUpEvent;
+    public event EventHandler? MouseHoverEvent;
+    public event EventHandler? MouseClickEvent;
+
+
+
+
+    protected IResizable ThisResizable => this;
 
     public Corner CornerToResize { get; set; }
     public FloatRect Rect => new FloatRect(RelativePosition, Size);
@@ -83,29 +77,31 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
     public Vec2f? MinSize { get; set; }
     public Vec2f? MaxSize { get; set; }
 
-    public bool IsCloseable => Styles.HasFlag(WindowElementStyles.Closeable);
-    public bool IsResizable => Styles.HasFlag(WindowElementStyles.Resizable);
-    public bool IsMoveable => Styles.HasFlag(WindowElementStyles.Moveable);
-
-    public event EventHandler? OpenedEvent;
-    public event EventHandler? ClosedEvent;
-
-    public event EventHandler? MouseEnterEvent;
-    public event EventHandler? MouseLeaveEvent;
-    public event EventHandler? MouseDownEvent;
-    public event EventHandler? MouseUpEvent;
-
-    public event EventHandler? MouseHoverEvent;
-
-    public event EventHandler? MouseClickEvent;
-
-    public event EventHandler? DragBeginEvent;
-    public event EventHandler? DragEndEvent;
-    public event EventHandler? DraggingEvent;
+    public bool Resizing { get; protected set; }
+    public bool WasResizing { get; protected set; }
 
     public event EventHandler? ResizeBeginEvent;
     public event EventHandler? ResizeEndEvent;
     public event EventHandler? ResizingEvent;
+
+
+
+
+    public TextElement Title { get; protected set; }
+    public WindowCloseButtonElement CloseButton { get; protected set; }
+
+    public WindowElementStyles Styles { get; set; }
+
+
+    public bool IsCloseable => Styles.HasFlag(WindowElementStyles.Closeable);
+    public bool IsResizable => Styles.HasFlag(WindowElementStyles.Resizable);
+    public bool IsMoveable => Styles.HasFlag(WindowElementStyles.Moveable);
+
+
+    public event EventHandler? OpenedEvent;
+    public event EventHandler? ClosedEvent;
+
+
 
 
     public WindowElement(string title, Vec2f position, Vec2f size, WindowElementStyles styles = WindowElementStyles.Default)
@@ -121,6 +117,7 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
             AlignmentMargin = new Vec2f(0, 10)
         };
 
+
         CloseButton = new WindowCloseButtonElement(this);
 
         Styles = styles;
@@ -135,6 +132,8 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
 
         MinSize = new Vec2f(50, 50);
     }
+
+
 
 
     public override void Update()
@@ -160,10 +159,14 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
     }
 
 
+
+
     public void ProcessDragging()
     {
         RelativePosition += MouseInput.PositionDeltaInView;
     }
+
+
 
 
     public void ProcessResizing()
@@ -183,6 +186,7 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
             ResizeCorners(right: delta.X);
     }
 
+
     private void ResizeCorners(float left = 0f, float top = 0f, float right = 0f, float bottom = 0f)
     {
         ResizeCornersBy(left, top, right, bottom);
@@ -194,6 +198,7 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
             ResizeCornersToSizeLimit(MaxSize! - Size, left != 0f, top != 0f, right != 0f, bottom != 0f);
     }
 
+
     private void ResizeCornersBy(float left = 0f, float top = 0f, float right = 0f, float bottom = 0f)
     {
         RelativePosition.X += left;
@@ -202,37 +207,25 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         Size.Y += bottom;
     }
 
+
     private void ResizeCornersToSizeLimit(Vec2f value, bool left = false, bool top = false, bool right = false, bool bottom = false)
         => ResizeCornersBy(left ? -value.X : 0f, top ? -value.Y : 0f, right ? value.X : 0f, bottom ? value.Y : 0f);
+
 
     private bool ShouldResizeCornersToMinSize()
         => MinSize is not null && (Size.X < MinSize.X || Size.Y < MinSize.Y);
 
+
     private bool ShouldResizeCornersToMaxSize()
         => MaxSize is not null && (Size.X > MaxSize.X || Size.Y > MaxSize.Y);
+
+
 
 
     public void Open() => OnOpen();
     public void Close() => OnClose();
 
 
-    protected virtual void OnOpen()
-    {
-        if (Visible)
-            return;
-
-        Show();
-        OpenedEvent?.Invoke(this, EventArgs.Empty);
-    }
-
-    protected virtual void OnClose()
-    {
-        if (!Visible)
-            return;
-
-        Hide();
-        ClosedEvent?.Invoke(this, EventArgs.Empty);
-    }
 
 
     public void OnFocus()
@@ -240,6 +233,12 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
 
     public void OnUnfocus()
         => UnfocusEvent?.Invoke(this, EventArgs.Empty);
+
+
+
+
+    public virtual bool IsPointOver(Vec2f point)
+        => point.IsPointOverElementClipArea(this) && point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius);
 
 
     public virtual void OnMouseEnter()
@@ -278,6 +277,8 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         => MouseClickEvent?.Invoke(this, EventArgs.Empty);
 
 
+
+
     public virtual void OnDragBegin() => DragBeginEvent?.Invoke(this, EventArgs.Empty);
     public virtual void OnDragEnd() => DragEndEvent?.Invoke(this, EventArgs.Empty);
 
@@ -286,6 +287,8 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         ProcessDragging();
         DraggingEvent?.Invoke(this, EventArgs.Empty);
     }
+
+
 
 
     public virtual void OnResizeBegin() => ResizeBeginEvent?.Invoke(this, EventArgs.Empty);
@@ -298,6 +301,24 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
     }
 
 
-    public virtual bool IsPointOver(Vec2f point)
-        => point.IsPointOverElementClipArea(this) && point.IsPointOverRoundedRect(AbsolutePosition, Size, Radius);
+
+
+    protected virtual void OnOpen()
+    {
+        if (Visible)
+            return;
+
+        Show();
+        OpenedEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    protected virtual void OnClose()
+    {
+        if (!Visible)
+            return;
+
+        Hide();
+        ClosedEvent?.Invoke(this, EventArgs.Empty);
+    }
 }

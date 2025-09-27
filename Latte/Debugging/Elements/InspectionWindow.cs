@@ -12,17 +12,23 @@ using Latte.Debugging.Inspection;
 namespace Latte.Debugging.Elements;
 
 
+
+
 [DebuggerIgnoreInspection]
 public class InspectionWindow : DebugWindow
 {
     private readonly List<InspectionFrameElement> _frames;
 
+
     private BaseObject? _lastInspectedObject;
     private BaseObject? _lockAtObject;
 
 
+
+
     public DebugScrollArea ScrollArea { get; }
     public GridLayoutElement DataGrid { get; }
+
 
     public BaseObject? ObjectToInspect { get; set; }
 
@@ -31,6 +37,8 @@ public class InspectionWindow : DebugWindow
         get => _lockAtObject;
         set => _lockAtObject = value?.HasCachedObjectAttribute<DebuggerIgnoreInspection>() ?? false ? null : value;
     }
+
+
 
 
     public InspectionWindow() : base("Inspector", new Vec2f(10, 10), new Vec2f(400, 400))
@@ -49,6 +57,8 @@ public class InspectionWindow : DebugWindow
             MinColumns = 1
         };
     }
+
+
 
 
     public override void ConstantUpdate()
@@ -85,6 +95,8 @@ public class InspectionWindow : DebugWindow
     }
 
 
+
+
     private void CreateInspectionFrames(IEnumerable<InspectionData> data)
     {
         DataGrid.Clear();
@@ -99,6 +111,8 @@ public class InspectionWindow : DebugWindow
 
         _lastInspectedObject = MouseInput.ObjectWhichCaughtMouseInput;
     }
+
+
 
 
     public override void Draw(IRenderer renderer)

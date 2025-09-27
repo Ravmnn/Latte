@@ -10,25 +10,36 @@ using Math = System.Math;
 namespace Latte.Tweening;
 
 
+
+
 public abstract class TweenAnimation(double time, Easing easing = Easing.Linear, bool start = true) : IUpdateable
 {
     public double Time { get; set; } = time;
     public double ElapsedTime { get; protected set; }
 
+
     public Easing Easing { get; set; } = easing;
+
 
     public float Progress { get; protected set; }
     public float EasedProgress { get; protected set; }
+
 
     public bool IsRunning { get; private set; } = start;
     public bool HasFinished => HasAborted || ElapsedTime >= Time;
     public bool HasAborted { get; protected set; }
 
+
     protected bool ShouldIgnoreUpdate => !IsRunning || HasFinished || HasAborted;
+
+
+
 
     public event EventHandler? UpdateEvent;
     public event EventHandler? FinishEvent;
     public event EventHandler? AbortEvent;
+
+
 
 
     public virtual void Update()
@@ -45,11 +56,15 @@ public abstract class TweenAnimation(double time, Easing easing = Easing.Linear,
             OnFinished();
     }
 
+
     private void UpdateProgress()
     {
         Progress = (float)(ElapsedTime / Time);
         EasedProgress = EasingFunctions.Ease(Progress, Easing);
     }
+
+
+
 
     public void Start() => IsRunning = true;
     public void Stop() => IsRunning = false;
@@ -69,8 +84,12 @@ public abstract class TweenAnimation(double time, Easing easing = Easing.Linear,
     }
 
 
+
+
     public override string ToString()
         => $"{(HasAborted ? "[aborted]" : "")}{ElapsedTime} | {Time} ({Progress * 100}%)";
+
+
 
 
     protected virtual void OnFinished()

@@ -13,27 +13,33 @@ using Math = System.Math;
 namespace Latte.UI.Elements;
 
 
+
+
 public class TextElement : Element, IClickable
 {
     private float _lastFitSize;
 
 
-    protected IClickable ThisClickable => this;
-    protected IFocusable ThisFocusable => this;
+
 
     public override Transformable SfmlTransformable => SfmlText;
     public override Drawable SfmlDrawable => SfmlText;
 
-    public Text SfmlText { get; }
 
-    public TextSelectionElement Selection { get; protected set; }
-    public string SelectedText => Selection.GetSelectedText();
+
+
+    protected IFocusable ThisFocusable => this;
 
     public bool Focused { get; set; }
     public bool DisableFocus { get; set; }
 
     public event EventHandler? FocusEvent;
     public event EventHandler? UnfocusEvent;
+
+
+
+
+    protected IClickable ThisClickable => this;
 
     public bool FocusOnMouseDown { get; set; }
     public bool UnfocusOnMouseDownOutside { get; set; }
@@ -45,22 +51,29 @@ public class TextElement : Element, IClickable
     public event EventHandler? MouseLeaveEvent;
     public event EventHandler? MouseDownEvent;
     public event EventHandler? MouseUpEvent;
-
     public event EventHandler? MouseHoverEvent;
-
     public event EventHandler? MouseClickEvent;
+
+
+
+
+    public Text SfmlText { get; }
+
+
+    public TextSelectionElement Selection { get; protected set; }
+    public string SelectedText => Selection.GetSelectedText();
+
 
     public string Text { get; set; }
     public Text.Styles Style { get; set; }
-
     public uint Size { get; set; }
     public float LetterSpacing { get; set; }
     public float LineSpacing { get; set; }
-
     public float BorderSize { get; set; }
-
     public ColorRGBA Color { get; set; }
     public ColorRGBA BorderColor { get; set; }
+
+
 
 
     public readonly struct Character(int index, char @char, FloatRect absoluteGeometry)
@@ -70,6 +83,8 @@ public class TextElement : Element, IClickable
 
         public FloatRect AbsoluteGeometry { get; } = absoluteGeometry;
     }
+
+
 
 
     public TextElement(Element? parent, Vec2f? position, uint? size, string text, Font? font = null) : base(parent)
@@ -104,6 +119,8 @@ public class TextElement : Element, IClickable
     }
 
 
+
+
     public override void Update()
     {
         ThisClickable.UpdateMouseState();
@@ -111,6 +128,8 @@ public class TextElement : Element, IClickable
 
         base.Update();
     }
+
+
 
 
     public override void UpdateSfmlProperties()
@@ -133,6 +152,8 @@ public class TextElement : Element, IClickable
     }
 
 
+
+
     public override void BorderLessSimpleDraw(IRenderer renderer)
     {
         SfmlText.OutlineThickness = 0f;
@@ -143,6 +164,7 @@ public class TextElement : Element, IClickable
 
     // use SFML's bound API instead of calculating it manually...
     // may not be the best option.
+
 
     public override FloatRect GetBounds()
         => SfmlText.GetGlobalBounds();
@@ -155,6 +177,8 @@ public class TextElement : Element, IClickable
 
     public override FloatRect GetBorderLessRelativeBounds()
         => GetRelativeBounds().ShrinkRect(BorderSize);
+
+
 
 
     public override Vec2f GetAlignmentPosition(Alignment alignment)
@@ -170,6 +194,8 @@ public class TextElement : Element, IClickable
     }
 
 
+
+
     public override void ApplySizePolicy()
     {
         var (floatFitSize, fitSize) = CalculateFitSize(GetSizePolicyRect(), GetBounds());
@@ -179,6 +205,7 @@ public class TextElement : Element, IClickable
 
         _lastFitSize = floatFitSize;
     }
+
 
     private (float, uint) CalculateFitSize(FloatRect targetRect, FloatRect bounds)
     {
@@ -198,6 +225,7 @@ public class TextElement : Element, IClickable
         return (floatFitSize, fitSize);
     }
 
+
     // https://math.stackexchange.com/questions/857073/formula-for-adjusting-font-height
     private float CalculateSizePolicyTextSize(float targetSize, float currentSize)
         => targetSize * (Size / currentSize);
@@ -213,6 +241,8 @@ public class TextElement : Element, IClickable
 
         return bounds;
     }
+
+
 
 
     public Character? CharacterAtPoint(Vec2f point)
@@ -231,6 +261,7 @@ public class TextElement : Element, IClickable
         return null;
     }
 
+
     private Character? OutsideCharacterFromX(float x)
     {
         var bounds = GetBounds();
@@ -245,6 +276,9 @@ public class TextElement : Element, IClickable
         return null;
     }
 
+
+
+
     public Character? CharacterAtMousePosition()
         => CharacterAtPoint(MouseInput.PositionInView);
 
@@ -258,6 +292,8 @@ public class TextElement : Element, IClickable
     }
 
 
+
+
     public FloatRect GetRelativeGeometryOfCharacter(int index)
         => new FloatRect
         {
@@ -267,6 +303,7 @@ public class TextElement : Element, IClickable
             Height = GetBounds().Height
         };
 
+
     public FloatRect GetAbsoluteGeometryOfCharacter(int index)
     {
         var relativeGeometry = GetRelativeGeometryOfCharacter(index);
@@ -274,6 +311,8 @@ public class TextElement : Element, IClickable
 
         return new FloatRect(absolutePosition, relativeGeometry.Size);
     }
+
+
 
 
     private float GetWidthOfCharacter(int index)
@@ -288,8 +327,12 @@ public class TextElement : Element, IClickable
     }
 
 
+
+
     public bool IsPointOver(Vec2f point)
         => point.IsPointOverElement(this);
+
+
 
 
     public void OnFocus()
@@ -297,6 +340,9 @@ public class TextElement : Element, IClickable
 
     public void OnUnfocus()
         => UnfocusEvent?.Invoke(this, EventArgs.Empty);
+
+
+
 
     public void OnMouseEnter()
         => MouseEnterEvent?.Invoke(this, EventArgs.Empty);
@@ -310,10 +356,8 @@ public class TextElement : Element, IClickable
     public void OnMouseUp()
         => MouseUpEvent?.Invoke(this, EventArgs.Empty);
 
-
     public void OnMouseHover()
         => MouseHoverEvent?.Invoke(this, EventArgs.Empty);
-
 
     public void OnMouseClick()
         => MouseClickEvent?.Invoke(this, EventArgs.Empty);

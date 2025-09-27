@@ -10,11 +10,18 @@ using static SFML.Window.Cursor;
 namespace Latte.UI.Elements;
 
 
+
+
 public class TextInputElement : ButtonElement
 {
+    public new TextElement Text => base.Text!;
+
+
+
+
     public TextInputCaretElement Caret { get; protected set; }
 
-    public new TextElement Text => base.Text!;
+
 
 
     public TextInputElement(Element? parent, Vec2f? position, Vec2f size)
@@ -28,6 +35,8 @@ public class TextInputElement : ButtonElement
 
         Caret = new TextInputCaretElement(this);
     }
+
+
 
 
     public void InsertAtCaret(char character)
@@ -50,12 +59,6 @@ public class TextInputElement : ButtonElement
     }
 
 
-    public override void OnMouseHover()
-    {
-        App.Window.Cursor.Type = CursorType.Text;
-
-        base.OnMouseHover();
-    }
 
 
     public override void OnFocus()
@@ -71,6 +74,18 @@ public class TextInputElement : ButtonElement
 
         base.OnUnfocus();
     }
+
+
+
+
+    public override void OnMouseHover()
+    {
+        App.Window.Cursor.Type = CursorType.Text;
+
+        base.OnMouseHover();
+    }
+
+
 
 
     public override void OnTextEntered(TextEventArgs enteredText)

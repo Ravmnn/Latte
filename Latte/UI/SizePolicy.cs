@@ -6,6 +6,8 @@ using SFML.Graphics;
 namespace Latte.UI;
 
 
+
+
 [Flags]
 public enum SizePolicy
 {
@@ -17,10 +19,14 @@ public enum SizePolicy
 }
 
 
+
+
 public interface ISizePoliciable
 {
     FloatRect GetSizePolicyRect(SizePolicy policy);
 }
+
+
 
 
 public static class SizePolicyCalculator

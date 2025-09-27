@@ -9,6 +9,8 @@ using Latte.UI;
 namespace Latte.Debugging.Inspection.Formatting;
 
 
+
+
 public abstract class InspectionObjectFormatter<T>
 {
     public abstract string Format(T @object, int indent = 0);
@@ -31,6 +33,8 @@ public abstract class InspectionObjectFormatter<T>
 }
 
 
+
+
 public static class InspectionObjectFormatter
 {
     public static (string, bool) Format(object? @object, int indent = 0)
@@ -44,6 +48,8 @@ public static class InspectionObjectFormatter
         };
 
 
+
+
     public static string PropertiesToString(object @object, IEnumerable<PropertyInfo> properties, int indent = 0)
     {
         var builder = new StringBuilder();
@@ -54,6 +60,7 @@ public static class InspectionObjectFormatter
         return builder.ToString();
     }
 
+
     public static string PropertyToString(object @object, PropertyInfo property, int indent = 0)
     {
         var (formatResult, isComplexType) = Format(property.GetValue(@object), indent);
@@ -61,6 +68,8 @@ public static class InspectionObjectFormatter
 
         return $"{indentString}{FormatPropertyName(property)}: {(isComplexType ? "\n" : "")}{formatResult}";
     }
+
+
 
 
     public static string FormatPropertyName(PropertyInfo property)

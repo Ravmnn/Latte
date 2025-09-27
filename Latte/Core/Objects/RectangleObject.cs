@@ -7,16 +7,24 @@ using Latte.Sfml;
 namespace Latte.Core.Objects;
 
 
+
+
 public class RectangleObject : ShapeObject
 {
     protected const uint DefaultPointCount = 16;
 
 
+
+
     public new RoundedRectangleShape SfmlShape => (base.SfmlShape as RoundedRectangleShape)!;
 
-    public Vec2f Size { get; set; }
 
+
+
+    public Vec2f Size { get; set; }
     public float Radius { get; set; }
+
+
 
 
     public RectangleObject(Vec2f position, Vec2f size, float radius = 0f)
@@ -29,6 +37,8 @@ public class RectangleObject : ShapeObject
     }
 
 
+
+
     public override void UpdateSfmlProperties()
     {
         base.UpdateSfmlProperties();
@@ -36,6 +46,8 @@ public class RectangleObject : ShapeObject
         SfmlShape.Size = Size;
         SfmlShape.Radius = Radius;
     }
+
+
 
 
     public override FloatRect GetBounds()

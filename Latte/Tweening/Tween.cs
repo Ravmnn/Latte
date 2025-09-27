@@ -5,6 +5,8 @@ using Latte.Application;
 namespace Latte.Tweening;
 
 
+
+
 public static class Tween
 {
     public static FloatsTweenAnimation New(float from, float to, double time, Easing easing = Easing.Linear) =>
@@ -21,6 +23,8 @@ public static class Tween
 
     public static FloatsTweenAnimation New(ColorRGBA from, ColorRGBA to, double time, Easing easing = Easing.Linear) =>
         new FloatsTweenAnimation([from.R, from.G, from.B, from.A], [to.R, to.G, to.B, to.A], time, easing);
+
+
 
 
     public static FloatsTweenAnimation Animate(float from, float to, double time, Easing easing = Easing.Linear)

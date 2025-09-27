@@ -9,15 +9,21 @@ using Latte.Core.Type;
 namespace Latte.UI.Elements;
 
 
+
+
 public class SliderElement : ButtonElement
 {
-    private float _value;
     public SliderHandleElement Handle { get; protected set; }
+
 
     public Orientation Orientation => Handle.Orientation;
 
+
     public float Minimum { get; set; }
     public float Maximum { get; set; }
+
+
+    private float _value;
     public float Value
     {
         get => _value;
@@ -26,7 +32,10 @@ public class SliderElement : ButtonElement
 
     public float NormalizedValue => ProgressBarMath.CalculateNormalizedProgress(Value, Minimum, Maximum);
 
+
     public float StepFactor => CalculateStepFactor();
+
+
 
 
     public SliderElement(Element? parent, Vec2f? position, float min, float max, Orientation orientation = Orientation.Horizontal)
@@ -41,8 +50,12 @@ public class SliderElement : ButtonElement
     }
 
 
+
+
     public override FloatRect GetBounds()
         => Rect.GetBoundsOfRects([base.GetBounds(), Handle.GetBounds()]);
+
+
 
 
     private float CalculateStepFactor()

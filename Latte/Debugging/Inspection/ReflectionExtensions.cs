@@ -7,6 +7,8 @@ using System.Collections.Generic;
 namespace Latte.Debugging.Inspection;
 
 
+
+
 public static class ReflectionExtensions
 {
     public static System.Type? GetTypeWhichDeclaresProperty(this PropertyInfo property)
@@ -28,10 +30,14 @@ public static class ReflectionExtensions
     }
 
 
+
+
     public static IEnumerable<PropertyInfo> GetPropertiesWithNoParameters(this System.Type type)
         => from property in type.GetProperties()
             where property.GetIndexParameters().Length == 0
             select property;
+
+
 
 
     public static IEnumerable<System.Type> GetAllBaseClassesOf(this System.Type type)
@@ -47,6 +53,8 @@ public static class ReflectionExtensions
 
         return baseClasses;
     }
+
+
 
 
     public static void ForeachProperty(this System.Type type, Action<PropertyInfo> action)

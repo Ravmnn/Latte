@@ -4,6 +4,8 @@ using Latte.Core.Objects;
 namespace Latte.UI.Elements.Attributes;
 
 
+
+
 public abstract class ElementAttribute : BaseObjectAttribute
 {
     public sealed override void Process(BaseObject @object)

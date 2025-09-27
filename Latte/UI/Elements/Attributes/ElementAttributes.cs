@@ -6,6 +6,8 @@ using Latte.Exceptions;
 namespace Latte.UI.Elements.Attributes;
 
 
+
+
 [AttributeUsage(AttributeTargets.Class)]
 public class ChildrenTypeAttribute(Type type) : ElementAttribute
 {
@@ -19,6 +21,8 @@ public class ChildrenTypeAttribute(Type type) : ElementAttribute
                 throw new ElementException($"The element \"{element.GetType().Name}\" can only have children of type: \"{Type.Name}\"");
     }
 }
+
+
 
 
 [AttributeUsage(AttributeTargets.Class)]

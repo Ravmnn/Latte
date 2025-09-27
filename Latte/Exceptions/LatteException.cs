@@ -4,6 +4,8 @@ using System;
 namespace Latte.Exceptions;
 
 
+
+
 public class LatteException : Exception
 {
     public LatteException(string message) : base(message)

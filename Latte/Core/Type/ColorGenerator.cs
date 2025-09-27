@@ -1,6 +1,8 @@
 namespace Latte.Core.Type;
 
 
+
+
 public static class ColorGenerator
 {
     public static ColorRGBA FromIndex(uint index, int step = 1)

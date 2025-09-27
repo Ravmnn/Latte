@@ -1,6 +1,8 @@
 namespace Latte.UI;
 
 
+
+
 public class MouseClickState
 {
     public bool IsMouseOver { get; set; }
@@ -22,6 +24,8 @@ public class MouseClickState
     public bool WasMouseDown { get; set; }
     public bool WasPressed { get; set; }
     public bool WasTruePressed { get; set; }
+
+
 
 
     public void SetAllToFalse()

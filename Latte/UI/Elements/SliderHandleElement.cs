@@ -7,17 +7,16 @@ using Latte.Application;
 namespace Latte.UI.Elements;
 
 
+
+
 public class SliderHandleElement : ButtonElement, IDraggable
 {
     public new SliderElement Parent => (base.Parent as SliderElement)!;
 
+
+
+
     public IDraggable ThisDraggable => this;
-
-    // TODO:
-    // decide how to organize this section globally in the project... Separate by interface implementation?
-    // all events in one part?
-
-    public Orientation Orientation { get; }
 
     public bool Dragging { get; protected set; }
     public bool WasDragging { get; protected set; }
@@ -25,6 +24,13 @@ public class SliderHandleElement : ButtonElement, IDraggable
     public event EventHandler? DragBeginEvent;
     public event EventHandler? DragEndEvent;
     public event EventHandler? DraggingEvent;
+
+
+
+
+    public Orientation Orientation { get; }
+
+
 
 
     public SliderHandleElement(SliderElement parent, Orientation orientation)
@@ -35,6 +41,38 @@ public class SliderHandleElement : ButtonElement, IDraggable
         ClipLayerIndexOffset = -1;
         Color = SFML.Graphics.Color.Red;
     }
+
+
+
+
+    public override void OnMouseDown()
+    {
+        Dragging = true;
+        base.OnMouseDown();
+    }
+
+    public override void OnMouseUp()
+    {
+        Dragging = false;
+        base.OnMouseUp();
+    }
+
+
+
+
+    public virtual void OnDragBegin()
+        => DragBeginEvent?.Invoke(this, EventArgs.Empty); // TODO: create extension method object.Trigger(event?)
+
+    public virtual void OnDragEnd()
+        => DragEndEvent?.Invoke(this, EventArgs.Empty);
+
+    public virtual void OnDragging()
+    {
+        ProcessDragging();
+        DraggingEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
 
 
     public override void Update()
@@ -72,31 +110,5 @@ public class SliderHandleElement : ButtonElement, IDraggable
             RelativePosition.X = (Parent.Size.X - Size.X) * Parent.NormalizedValue;
         else
             RelativePosition.Y = (Parent.Size.Y - Size.Y) * Parent.NormalizedValue;
-    }
-
-
-    public override void OnMouseDown()
-    {
-        Dragging = true;
-        base.OnMouseDown();
-    }
-
-    public override void OnMouseUp()
-    {
-        Dragging = false;
-        base.OnMouseUp();
-    }
-
-
-    public virtual void OnDragBegin()
-        => DragBeginEvent?.Invoke(this, EventArgs.Empty); // TODO: create extension method object.Trigger(event?)
-
-    public virtual void OnDragEnd()
-        => DragEndEvent?.Invoke(this, EventArgs.Empty);
-
-    public virtual void OnDragging()
-    {
-        ProcessDragging();
-        DraggingEvent?.Invoke(this, EventArgs.Empty);
     }
 }

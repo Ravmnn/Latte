@@ -9,21 +9,30 @@ using Latte.Communication.Bridge.Exceptions;
 namespace Latte.Communication.Bridge;
 
 
+
+
 public static class BridgeNodesFile
 {
     public const string ProcessesFileName = "BridgeNodes";
 
 
+
+
     public static string ApplicationData => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
 
     public static string BridgePath { get; } = Path.Combine(ApplicationData, "Latte/Bridge");
     public static string ProcessesFilePath { get; } = Path.Combine(BridgePath, ProcessesFileName);
+
+
 
 
     static BridgeNodesFile()
     {
         Directory.CreateDirectory(BridgePath);
     }
+
+
 
 
     public static BridgeNodeData GetBridgeNode(string name)
@@ -63,6 +72,8 @@ public static class BridgeNodesFile
         => ReadAllBridgeNodes().Any(bridgeNode => bridgeNode.Name == name);
 
 
+
+
     public static void WriteBridgeNodes(IEnumerable<BridgeNodeData> bridgeNodes)
     {
         using var writer = new BinaryWriter(File.Open(ProcessesFilePath, FileMode.OpenOrCreate));
@@ -86,6 +97,8 @@ public static class BridgeNodesFile
 
         return bridgeNodes;
     }
+
+
 
 
     private static void WriteBridgeNodeToBinary(BinaryWriter writer, BridgeNodeData bridgeNode)

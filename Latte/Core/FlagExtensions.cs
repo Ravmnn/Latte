@@ -6,6 +6,8 @@ using System.Collections.Generic;
 namespace Latte.Core;
 
 
+
+
 public static class FlagExtensions
 {
     public static bool HasAnyFlag(this Enum source, params IEnumerable<Enum> flags)

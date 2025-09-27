@@ -9,6 +9,8 @@ using Latte.UI;
 namespace Latte.Debugging;
 
 
+
+
 public static class Draw
 {
     public static void Rect(IRenderer renderer, FloatRect rect, Color color)
@@ -18,6 +20,7 @@ public static class Draw
             FillColor = color
         });
 
+
     public static void LineRect(IRenderer renderer, FloatRect rect, Color color, float thickness = 1f)
         => renderer.Render(new RectangleShape(rect.Size)
         {
@@ -26,6 +29,8 @@ public static class Draw
             OutlineColor = color,
             OutlineThickness = thickness
         });
+
+
 
 
     public static void Text(IRenderer renderer, Vec2f position, string text, uint size = 5, Color? color = null, Color? backgroundColor = null)

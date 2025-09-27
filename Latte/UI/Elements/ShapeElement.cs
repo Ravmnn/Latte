@@ -8,17 +8,25 @@ using Latte.Core.Type;
 namespace Latte.UI.Elements;
 
 
+
+
 public abstract class ShapeElement(Element? parent, Shape shape) : Element(parent), IShape
 {
     public override Transformable SfmlTransformable => SfmlShape;
     public override Drawable SfmlDrawable => SfmlShape;
 
+
+
+
+    protected IShape ThisShape => this;
+
     public Shape SfmlShape { get; } = shape;
 
     public float BorderSize { get; set; }
-
     public ColorRGBA Color { get; set; } = SFML.Graphics.Color.White;
     public ColorRGBA BorderColor { get; set; } = SFML.Graphics.Color.White;
+
+
 
 
     public override void UpdateSfmlProperties()
@@ -29,6 +37,8 @@ public abstract class ShapeElement(Element? parent, Shape shape) : Element(paren
         SfmlShape.FillColor = Color;
         SfmlShape.OutlineColor = BorderColor;
     }
+
+
 
 
     public override void BorderLessSimpleDraw(IRenderer renderer)
@@ -44,6 +54,8 @@ public abstract class ShapeElement(Element? parent, Shape shape) : Element(paren
 
     public override FloatRect GetBorderLessRelativeBounds()
         => GetRelativeBounds().ShrinkRect(BorderSize);
+
+
 
 
     public override Vec2f GetAlignmentPosition(Alignment alignment)

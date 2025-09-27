@@ -7,6 +7,8 @@ using Latte.Communication.Bridge.Exceptions;
 namespace Latte.Communication.Bridge;
 
 
+
+
 public enum DataTransferType
 {
     None,
@@ -16,10 +18,14 @@ public enum DataTransferType
 }
 
 
+
+
 public struct DataTransferObject(DataTransferType type, JsonObject? data = null)
 {
     public DataTransferType Type { get; } = type;
     public JsonObject? Data { get; } = data;
+
+
 
 
     public DataTransferObject(string jsonString) : this(DataTransferType.None)
@@ -29,6 +35,8 @@ public struct DataTransferObject(DataTransferType type, JsonObject? data = null)
         Type = data.Type;
         Data = data.Data;
     }
+
+
 
 
     public T DataAs<T>()
@@ -42,6 +50,8 @@ public struct DataTransferObject(DataTransferType type, JsonObject? data = null)
             throw new InvalidDataTransferFormatException(Data);
         }
     }
+
+
 
 
     public string ToJsonString()

@@ -11,6 +11,8 @@ using Latte.Application;
 namespace Latte.Core;
 
 
+
+
 [Flags]
 public enum Corner
 {
@@ -28,6 +30,8 @@ public enum Corner
 }
 
 
+
+
 public record struct FloatRectVertices(Vec2f TopLeft, Vec2f TopRight, Vec2f BottomLeft, Vec2f BottomRight)
 {
     public FloatRectVertices(FloatRect rect) : this(
@@ -42,6 +46,8 @@ public record struct FloatRectVertices(Vec2f TopLeft, Vec2f TopRight, Vec2f Bott
     {}
 
 
+
+
     public static implicit operator FloatRect(FloatRectVertices vertices) => vertices.VerticesToRect();
     public static implicit operator FloatRectVertices(FloatRect rect) => rect.RectToVertices();
 }
@@ -53,6 +59,8 @@ public static class Rect
         new FloatRect(vertices.TopLeft, vertices.BottomRight - vertices.TopLeft);
 
     public static FloatRectVertices RectToVertices(this FloatRect rect) => new FloatRectVertices(rect);
+
+
 
 
     public static IntRect ToWindowCoordinates(this FloatRect rect)
@@ -73,6 +81,8 @@ public static class Rect
     }
 
 
+
+
     public static FloatRect ShrinkRect(this FloatRect rect, Vec2f amount)
     {
         rect.Top += amount.Y;
@@ -87,11 +97,15 @@ public static class Rect
         => ShrinkRect(rect, new Vec2f(amount, amount));
 
 
+
+
     public static FloatRect ExpandRect(this FloatRect rect, Vec2f amount)
         => rect.ShrinkRect(-amount);
 
     public static FloatRect ExpandRect(this FloatRect rect, float amount)
         => ExpandRect(rect, new Vec2f(amount, amount));
+
+
 
 
     public static FloatRect GetBoundsOfRects(this IEnumerable<FloatRect> rects)

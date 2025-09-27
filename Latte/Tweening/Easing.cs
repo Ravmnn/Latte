@@ -4,6 +4,8 @@ using System;
 namespace Latte.Tweening;
 
 
+
+
 /// <summary>
 /// Definition of easing functions.
 /// </summary>
@@ -23,6 +25,8 @@ public enum Easing
 }
 
 
+
+
 /// <summary>
 /// Stores a lot of functions for easing animations, where "t" is the animation progress
 /// from 0 to 1.
@@ -31,6 +35,7 @@ public static class EasingFunctions
 {
     private static float In(float t, int pow) => MathF.Pow(t, pow);
     private static float Out(float t, int pow) => 1 - MathF.Pow(1 - t, pow);
+
 
     private static float InOut(float t, int pow)
     {
@@ -41,6 +46,8 @@ public static class EasingFunctions
 
         return 1 - MathF.Pow(-2 * t + 2, pow) / 2;
     }
+
+
 
 
     public static float Ease(float t, Easing type) => type switch
@@ -86,7 +93,11 @@ public static class EasingFunctions
     };
 
 
+
+
     public static float Linear(float t) => t;
+
+
 
 
     public static float InQuad(float t) => In(t, 2);
@@ -95,16 +106,22 @@ public static class EasingFunctions
     public static float InQuint(float t) => In(t, 5);
 
 
+
+
     public static float OutQuad(float t) => Out(t, 2);
     public static float OutCubic(float t) => Out(t, 3);
     public static float OutQuart(float t) => Out(t, 4);
     public static float OutQuint(float t) => Out(t, 5);
 
 
+
+
     public static float InOutQuad(float t) => InOut(t, 2);
     public static float InOutCubic(float t) => InOut(t, 3);
     public static float InOutQuart(float t) => InOut(t, 4);
     public static float InOutQuint(float t) => InOut(t, 5);
+
+
 
 
     public static float InExpo(float t) => t == 0f ? 0f : MathF.Pow(2f, 10f * t - 10f);
@@ -121,6 +138,8 @@ public static class EasingFunctions
     }
 
 
+
+
     public static float InCirc(float t) => 1f - MathF.Sqrt(1f - MathF.Pow(t, 2f));
     public static float OutCirc(float t) => MathF.Sqrt(1f - MathF.Pow(t - 1f, 2f));
     public static float InOutCirc(float t)
@@ -130,6 +149,8 @@ public static class EasingFunctions
 
         return (MathF.Sqrt(1f - MathF.Pow(-2f * t + 2f, 2f)) + 1f) / 2f;
     }
+
+
 
 
     public static float InElast(float t)
@@ -166,6 +187,8 @@ public static class EasingFunctions
     }
 
 
+
+
     public static float InBack(float t)
     {
         const float C1 = 1.70158f;
@@ -191,6 +214,8 @@ public static class EasingFunctions
             return MathF.Pow(2f * t, 2f) * ((C2 + 1f) * 2f * t - C2) / 2f;
         return (MathF.Pow(2f * t - 2f, 2f) * ((C2 + 1f) * (t * 2f - 2f) + C2) + 2f) / 2f;
     }
+
+
 
 
     public static float InBounce(float t) => 1 - OutBounce(1f - t);
