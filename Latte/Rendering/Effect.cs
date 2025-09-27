@@ -6,11 +6,12 @@ using System.Reflection;
 using SFML.Graphics;
 using SFML.Graphics.Glsl;
 
+using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application;
 
 
-namespace Latte.Core;
+namespace Latte.Rendering;
 
 
 

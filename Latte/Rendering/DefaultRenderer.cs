@@ -1,9 +1,9 @@
 using SFML.Graphics;
 
-using Latte.Core;
+using Latte.Rendering.Exceptions;
 
 
-namespace Latte.Application;
+namespace Latte.Rendering;
 
 
 
@@ -31,5 +31,28 @@ public class DefaultRenderer(RenderTarget renderTarget) : IRenderer
             RenderTarget.Draw(drawable, new RenderStates(drawableEffect));
         else
             RenderTarget.Draw(drawable);
+    }
+
+
+
+
+    public virtual Texture GetContent()
+    {
+        switch (RenderTarget)
+        {
+            case RenderWindow window:
+            {
+                var content = new Texture(RenderTarget.Size.X, RenderTarget.Size.Y);
+                content.Update(window);
+
+                return content;
+            }
+
+            case RenderTexture texture:
+                return texture.Texture;
+
+            default:
+                throw new InvalidRenderTargetException();
+        }
     }
 }

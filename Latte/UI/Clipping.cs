@@ -4,7 +4,7 @@ using OpenTK.Graphics.OpenGL;
 
 using SFML.Graphics;
 
-using Latte.Core;
+using Latte.Rendering;
 using Latte.UI.Elements;
 
 

@@ -1,7 +1,7 @@
 using SFML.Graphics;
 
 
-namespace Latte.Core;
+namespace Latte.Rendering;
 
 
 
@@ -15,4 +15,9 @@ public interface IRenderer
 
 
     void Render(Drawable drawable, Effect? drawableEffect = null);
+
+
+
+
+    Texture GetContent();
 }

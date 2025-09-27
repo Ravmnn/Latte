@@ -1,12 +1,10 @@
 using SFML.Graphics;
 
-using Latte.Application;
-
 
 using SfSprite = SFML.Graphics.Sprite;
 
 
-namespace Latte.Core;
+namespace Latte.Rendering;
 
 
 
@@ -23,4 +21,8 @@ public class TextureRenderer : DefaultRenderer
     {
         RenderTextureSprite = new SfSprite(RenderTexture.Texture);
     }
+
+
+    public override Texture GetContent()
+        => RenderTexture.Texture;
 }

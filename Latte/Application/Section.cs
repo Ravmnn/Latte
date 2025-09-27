@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using Latte.Core;
 using Latte.Core.Objects;
+using Latte.Rendering;
 using Latte.UI;
 using Latte.UI.Elements;
 

@@ -5,6 +5,7 @@ using System.Reflection;
 using SFML.Graphics;
 
 using Latte.Core.Exceptions;
+using Latte.Rendering;
 
 
 namespace Latte.Core;

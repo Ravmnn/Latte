@@ -6,10 +6,10 @@ using SFML.Graphics;
 using Latte.Core;
 using Latte.Core.Objects;
 using Latte.Core.Type;
+using Latte.Rendering;
 using Latte.Application;
 using Latte.UI;
 using Latte.UI.Elements;
-using Latte.UI.Elements.Attributes;
 using Latte.Debugging.Elements;
 
 

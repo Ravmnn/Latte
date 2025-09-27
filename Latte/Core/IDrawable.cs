@@ -1,5 +1,7 @@
 using System;
 
+using Latte.Rendering;
+
 
 namespace Latte.Core;
 
