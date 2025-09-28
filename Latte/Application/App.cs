@@ -257,12 +257,14 @@ public static class App
     {
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
-        // TODO: update shader uniforms here
 
         Section.Draw(renderer);
         DrawObjects(renderer);
 
         Debugger?.Draw(renderer); // draw after elements
+
+
+        renderer.ApplyPostEffect();
     }
 
 

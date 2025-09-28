@@ -44,6 +44,8 @@ public class SliderElement : ButtonElement
         Minimum = min;
         Maximum = max;
 
+        Value = Minimum;
+
         Handle = new SliderHandleElement(this, orientation);
 
         Size = Orientation == Orientation.Horizontal ? new Vec2f(200, 5) : new Vec2f(5, 200);

@@ -12,6 +12,8 @@ public class DefaultRenderer(RenderTarget renderTarget) : IRenderer
 {
     public RenderTarget RenderTarget { get; set; } = renderTarget;
     public Effect? GlobalEffect { get; set; }
+    public Effect? PostEffect { get; set; }
+    public int PostEffectPasses { get; set; } = 1;
 
 
 
@@ -31,6 +33,23 @@ public class DefaultRenderer(RenderTarget renderTarget) : IRenderer
             RenderTarget.Draw(drawable, new RenderStates(drawableEffect));
         else
             RenderTarget.Draw(drawable);
+    }
+
+
+
+
+    public void ApplyPostEffect()
+    {
+        if (PostEffect is null)
+            return;
+
+        for (var i = 0; i < PostEffectPasses; i++)
+        {
+            var content = GetContent();
+            var sprite = new Sprite(content);
+
+            Render(sprite, PostEffect);
+        }
     }
 
 
