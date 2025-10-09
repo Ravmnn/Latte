@@ -67,7 +67,7 @@ public class ProgressBarElement : Element
 
 
 
-    public override void ConstantUpdate()
+    public override void UnconditionalUpdate()
     {
         ClampProgress();
         UpdateSizeBasedOnProgress();
@@ -77,7 +77,7 @@ public class ProgressBarElement : Element
 
         _wasCompleted = Completed;
 
-        base.ConstantUpdate();
+        base.UnconditionalUpdate();
     }
 
 

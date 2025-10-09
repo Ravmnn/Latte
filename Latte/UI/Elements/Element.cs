@@ -156,8 +156,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
 
 
-    // TODO: change name
-    public override void ConstantUpdate()
+    public override void UnconditionalUpdate()
     {
         RemoveNonChildren();
 
@@ -167,7 +166,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         UpdateClipLayerIndex();
         UpdateGeometry();
 
-        base.ConstantUpdate();
+        base.UnconditionalUpdate();
     }
 
 

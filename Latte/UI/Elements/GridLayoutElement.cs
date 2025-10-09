@@ -126,12 +126,12 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
 
 
-    public override void ConstantUpdate()
+    public override void UnconditionalUpdate()
     {
         if (RecreationRequired)
             CreateCells();
 
-        base.ConstantUpdate();
+        base.UnconditionalUpdate();
     }
 
 

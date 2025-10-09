@@ -62,7 +62,7 @@ public class InspectionWindow : DebugWindow
 
 
 
-    public override void ConstantUpdate()
+    public override void UnconditionalUpdate()
     {
         if (LockAtObject is not null)
             ObjectToInspect = LockAtObject;
@@ -72,7 +72,7 @@ public class InspectionWindow : DebugWindow
 
         UpdateInspectionFrames();
 
-        base.ConstantUpdate();
+        base.UnconditionalUpdate();
     }
 
 

@@ -45,11 +45,11 @@ public class SpriteElement : Element
 
 
 
-    public override void ConstantUpdate()
+    public override void UnconditionalUpdate()
     {
         Scale = CalculateScaleBasedOnSize(Size);
 
-        base.ConstantUpdate();
+        base.UnconditionalUpdate();
     }
 
 

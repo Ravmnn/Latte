@@ -80,7 +80,7 @@ public class TextSelectionElement : RectangleElement
 
 
 
-    public override void ConstantUpdate()
+    public override void UnconditionalUpdate()
     {
         if (IsSelecting)
             End = Parent.CharacterAtMousePosition() ?? End;
@@ -90,7 +90,7 @@ public class TextSelectionElement : RectangleElement
         else
             Deselect();
 
-        base.ConstantUpdate();
+        base.UnconditionalUpdate();
     }
 
 

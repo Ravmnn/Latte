@@ -98,7 +98,7 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
 
 
     public event EventHandler? SetupEvent;
-    public event EventHandler? ConstantUpdateEvent;
+    public event EventHandler? UnconditionalUpdateEvent;
 
 
 
@@ -132,9 +132,9 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
 
 
 
-    // called at least one time each frame, independently of visibility. May be called
-    // more than one time a frame
-    public virtual void ConstantUpdate()
+    // called at least once every frame, regardless of visibility or any other factor, therefore unconditional
+    // may be called multiple times a frame.
+    public virtual void UnconditionalUpdate()
     {
         if (!Initialized)
             Setup();
@@ -143,13 +143,13 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
 
         LastPriority = Priority;
 
-        ConstantUpdateEvent?.Invoke(this, EventArgs.Empty);
+        UnconditionalUpdateEvent?.Invoke(this, EventArgs.Empty);
     }
 
 
 
 
-    // called every frame
+    // called once every frame
     public virtual void Update()
         => UpdateEvent?.Invoke(this, EventArgs.Empty);
 

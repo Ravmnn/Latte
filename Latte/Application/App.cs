@@ -8,7 +8,6 @@ using SFML.System;
 using SFML.Graphics;
 using SFML.Window;
 
-using Latte.Core;
 using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.Rendering;
@@ -237,23 +236,23 @@ public static class App
     }
 
 
-    private static void UpdateObjects(bool constantUpdateOnly = false)
+    private static void UpdateObjects(bool unconditionalUpdateOnly = false)
     {
         // use ToArray() to avoid: InvalidOperationException "Collection was modified".
         // don't need to use it with DrawElements(), since it SHOULD not modify the element list
         // and SHOULD be used only for drawing stuff
 
         foreach (var @object in Objects.ToArray())
-            UpdateObject(@object, constantUpdateOnly);
+            UpdateObject(@object, unconditionalUpdateOnly);
     }
 
 
-    public static void UpdateObject(BaseObject @object, bool constantUpdateOnly = false)
+    public static void UpdateObject(BaseObject @object, bool unconditionalUpdateOnly = false)
     {
-        if (@object.CanUpdate && !constantUpdateOnly)
+        if (@object.CanUpdate && !unconditionalUpdateOnly)
             @object.Update();
 
-        @object.ConstantUpdate();
+        @object.UnconditionalUpdate();
     }
 
 
