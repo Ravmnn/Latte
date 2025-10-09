@@ -38,9 +38,6 @@ namespace Latte.Application;
 
 public static class App
 {
-    private static Font? s_defaultFont;
-    private static Window? s_window;
-
     private static bool s_objectWasAddedAndNotUpdated;
 
 
@@ -49,12 +46,15 @@ public static class App
     public static BridgeNode? Bridge { get; set; }
     public static Debugger? Debugger { get; private set; }
 
+
+    private static Window? s_window;
     public static Window Window
     {
         get => s_window ?? throw new AppNotInitializedException();
         private set => s_window = value;
     }
 
+    private static Font? s_defaultFont;
     public static Font DefaultFont
     {
         get => s_defaultFont ?? throw new AppNotInitializedException();
@@ -66,8 +66,28 @@ public static class App
     public static bool HasInitialized { get; private set; }
 
 
-    public static Section Section { get; set; }
+
+
+    private static Section s_section;
+    public static Section Section
+    {
+        get => s_section;
+        set
+        {
+            s_section.Deinitialize();
+            s_section = value;
+            s_section.Initialize();
+
+            SectionChangedEvent?.Invoke(null, EventArgs.Empty);
+        }
+    }
+
     public static IEnumerable<BaseObject> Objects => Section.Objects;
+
+
+    public static event EventHandler? SectionChangedEvent;
+
+
 
 
     public static ColorRGBA BackgroundColor { get; set; }
@@ -85,7 +105,7 @@ public static class App
 
         HasInitialized = false;
 
-        Section = new Section();
+        s_section = new Section();
         Section.ObjectAddedEvent += (_, _) => OnSectionElementAdded();
 
         BackgroundColor = Color.Black;
