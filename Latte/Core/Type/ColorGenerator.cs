@@ -5,12 +5,13 @@ namespace Latte.Core.Type;
 
 public static class ColorGenerator
 {
-    public static ColorRGBA FromIndex(uint index, int step = 1)
+    // TODO: improve this
+    public static ColorRGBA FromIndex(uint index, int step = 1, int[]? startColor = null, uint startChannel = 1, bool startDecreasingPrevious = false, bool ignoreDecreaseChannelAdvance = false)
     {
-        int[] color = [255, 0, 0];
-        uint channelIndex = 1;
+        var color = startColor ?? [255, 0, 0];
+        var channelIndex = startChannel;
 
-        var decreasePrevious = false;
+        var decreasePrevious = startDecreasingPrevious;
 
         for (uint i = 0; i < index; i++)
         {
@@ -28,6 +29,12 @@ public static class ColorGenerator
                 decreasePrevious = false;
                 previousChannel = 0;
                 channelIndex++;
+
+                if (ignoreDecreaseChannelAdvance)
+                {
+                    channelIndex--;
+                    ignoreDecreaseChannelAdvance = false;
+                }
             }
 
             else if (channel.IsChannelMaxed())

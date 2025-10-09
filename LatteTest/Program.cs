@@ -1,7 +1,6 @@
 ﻿using SFML.Window;
 using SFML.Graphics;
 
-using Latte.Core;
 using Latte.Core.Type;
 using Latte.Application;
 using Latte.UI;
@@ -15,7 +14,7 @@ class Program
 {
     private static void Main()
     {
-        App.Init(VideoMode.DesktopMode, "Latte Test", EmbeddedResources.DefaultFont());
+        App.Init(VideoMode.DesktopMode, "Latte Test");
         App.Debugger!.EnableKeyShortcuts = true;
 
 

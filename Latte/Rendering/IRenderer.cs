@@ -5,9 +5,6 @@ namespace Latte.Rendering;
 
 
 
-// TODO:
-// add post-processing support, which will be applied at the end of all drawing operations...
-// consequently, it may be controlled by App
 
 public interface IRenderer
 {

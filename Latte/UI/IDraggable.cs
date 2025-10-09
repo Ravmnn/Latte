@@ -4,7 +4,6 @@ using System;
 namespace Latte.UI;
 
 
-// TODO: try to decrease interface verbosity the max possible
 
 
 public interface IDraggable : IClickable

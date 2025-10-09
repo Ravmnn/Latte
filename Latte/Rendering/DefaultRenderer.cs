@@ -43,6 +43,8 @@ public class DefaultRenderer(RenderTarget renderTarget) : IRenderer
         if (PostEffect is null)
             return;
 
+        PostEffect.UpdateUniforms(this);
+
         for (var i = 0; i < PostEffectPasses; i++)
         {
             var content = GetContent();

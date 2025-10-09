@@ -16,11 +16,6 @@ namespace Latte.Application;
 
 public class Window : RenderWindow, IUpdateable
 {
-    public static ContextSettings DefaultSettings { get; }
-
-
-
-
     public DefaultRenderer Renderer { get; set; }
 
     public Cursor Cursor { get; set; }
@@ -39,22 +34,8 @@ public class Window : RenderWindow, IUpdateable
 
 
 
-    static Window()
-    {
-        DefaultSettings = new ContextSettings
-        {
-            AntialiasingLevel = 2,
-            DepthBits = 24,
-            StencilBits = 8,
-            MinorVersion = 3
-        };
-    }
-
-
-
-
-    public Window(VideoMode mode, string title, Styles style = Styles.Default, ContextSettings? settings = null)
-        : base(mode, title, style, settings ?? DefaultSettings)
+    public Window(VideoMode mode, string title, Styles style, ContextSettings settings)
+        : base(mode, title, style, settings)
     {
         Renderer = new DefaultRenderer(this);
 

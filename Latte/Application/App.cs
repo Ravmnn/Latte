@@ -11,10 +11,12 @@ using SFML.Window;
 using Latte.Core;
 using Latte.Core.Objects;
 using Latte.Core.Type;
+using Latte.Rendering;
 using Latte.UI.Elements;
 using Latte.Application.Exceptions;
 using Latte.Communication.Bridge;
-using Latte.Rendering;
+
+
 using static SFML.Window.Cursor;
 
 
@@ -31,6 +33,8 @@ namespace Latte.Application;
 // TODO: add dropdown
 // TODO: add radial buttons
 // TODO: add effects, which includes blur (a shader maybe), shadow and gradient (shader)
+
+
 
 
 public static class App
@@ -112,11 +116,13 @@ public static class App
     }
 
 
-    // TODO: move font, style and settings to a struct like AppInitializationSettings
-    public static void Init(VideoMode mode, string title, Font? defaultFont = null, Styles style = Styles.Default, ContextSettings? settings = null)
+    public static void Init(VideoMode mode, string title, AppInitializationSettings? settings = null)
     {
-        Init(defaultFont ?? EmbeddedResources.DefaultFont());
-        InitWindow(new Window(mode, title, style, settings));
+        settings ??= AppInitializationSettings.Default;
+
+
+        Init(settings.Value.DefaultFont);
+        InitWindow(new Window(mode, title, settings.Value.WindowStyle, settings.Value.ContextSettings));
     }
 
 
