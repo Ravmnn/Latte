@@ -62,6 +62,14 @@ public static class App
     }
 
 
+    private static IRenderer? s_renderer;
+    public static IRenderer Renderer
+    {
+        get => s_renderer ?? throw new AppNotInitializedException();
+        set => s_renderer = value;
+    }
+
+
     public static bool ShouldQuit { get; private set; }
     public static bool HasInitialized { get; private set; }
 
@@ -94,6 +102,14 @@ public static class App
     public static bool ManualClearDisplayProcess { get; set; }
     public static bool ManualObjectUpdate { get; set; }
     public static bool ManualObjectDraw { get; set; }
+
+
+
+
+    public static event EventHandler? UpdateStartedEvent;
+    public static event EventHandler? UpdateEndedEvent;
+    public static event EventHandler? DrawStartedEvent;
+    public static event EventHandler? DrawEndedEvent;
 
 
 
@@ -148,6 +164,7 @@ public static class App
     public static void InitWindow(Window window)
     {
         Window = window;
+        Renderer = Window.Renderer;
         AddEventListeners(Window);
     }
 
@@ -212,14 +229,14 @@ public static class App
     {
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
+        UpdateStartedEvent?.Invoke(null, EventArgs.Empty);
+
+
         DeltaTime.Update();
 
         Window.Update();
         SetCursorToDefault();
 
-
-        // mouse input needs correct mouse coordinate information, so
-        // it needs to update while using the correct view.
         MouseInput.Update();
         KeyboardInput.Update();
         NavigationManager.Update();
@@ -230,6 +247,9 @@ public static class App
         Debugger?.Update();
 
         UpdateObjectsAndCheckForNewOnes();
+
+
+        UpdateEndedEvent?.Invoke(null, EventArgs.Empty);
     }
 
 
@@ -282,6 +302,8 @@ public static class App
     {
         AppNotInitializedException.ThrowIfAppWasNotInitialized();
 
+        DrawStartedEvent?.Invoke(null, EventArgs.Empty);
+
 
         Section.Draw(renderer);
         DrawObjects(renderer);
@@ -290,6 +312,9 @@ public static class App
 
 
         renderer.ApplyPostEffect();
+
+
+        DrawEndedEvent?.Invoke(null, EventArgs.Empty);
     }
 
 
@@ -300,7 +325,7 @@ public static class App
         if (!ManualClearDisplayProcess)
             Window.Clear(BackgroundColor);
 
-        Draw(Window.Renderer);
+        Draw(Renderer);
 
         if (!ManualClearDisplayProcess)
             Window.Display();
