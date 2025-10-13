@@ -11,7 +11,7 @@ namespace Latte.Core.Objects;
 
 public class RectangleObject : ShapeObject
 {
-    protected const uint DefaultPointCount = 16;
+    protected const uint DefaultPointCount = 8;
 
 
 

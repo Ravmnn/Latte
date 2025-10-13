@@ -293,7 +293,7 @@ public class BridgeConnection : TcpClient
 
     public void Ping()
     {
-
+        // TODO: finish this
     }
 
 

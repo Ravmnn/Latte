@@ -176,9 +176,9 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
 
 
-    public void DeleteFirstElement() => App.RemoveElement(RemoveFirstElement());
-    public void DeleteLastElement() => App.RemoveElement(RemoveLastElement());
-    public void DeleteElementAt(uint row, uint column) => App.RemoveElement(RemoveElementAt(row, column));
+    public void DeleteFirstElement() => App.Section.RemoveElement(RemoveFirstElement());
+    public void DeleteLastElement() => App.Section.RemoveElement(RemoveLastElement());
+    public void DeleteElementAt(uint row, uint column) => App.Section.RemoveElement(RemoveElementAt(row, column));
 
 
     public void Clear()

@@ -59,8 +59,9 @@ public sealed class Debugger : IUpdateable, IDrawable
 
         Options = DebugOption.OnlyVisibleObjects;
 
-        App.AddElement(InspectionWindow);
-        App.AddElement(AppStateWindow);
+        // TODO: debugger inspector is disabled until the new one is finished
+        // App.AddElement(InspectionWindow);
+        // App.AddElement(AppStateWindow);
     }
 
 

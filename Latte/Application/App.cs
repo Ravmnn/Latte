@@ -1,7 +1,5 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-
 using OpenTK.Windowing.Desktop;
 
 using SFML.System;
@@ -11,7 +9,6 @@ using SFML.Window;
 using Latte.Core.Objects;
 using Latte.Core.Type;
 using Latte.Rendering;
-using Latte.UI.Elements;
 using Latte.Application.Exceptions;
 using Latte.Communication.Bridge;
 
@@ -26,6 +23,8 @@ using VideoMode = SFML.Window.VideoMode;
 namespace Latte.Application;
 
 
+
+
 // TODO: add time-based performance analyzer, with FPS calculator
 
 // TODO: add horizontal and vertical layouts
@@ -38,11 +37,6 @@ namespace Latte.Application;
 
 public static class App
 {
-    private static bool s_objectWasAddedAndNotUpdated;
-
-
-
-
     public static BridgeNode? Bridge { get; set; }
     public static Debugger? Debugger { get; private set; }
 
@@ -100,8 +94,6 @@ public static class App
 
     public static ColorRGBA BackgroundColor { get; set; }
     public static bool ManualClearDisplayProcess { get; set; }
-    public static bool ManualObjectUpdate { get; set; }
-    public static bool ManualObjectDraw { get; set; }
 
 
 
@@ -116,13 +108,9 @@ public static class App
 
     static App()
     {
-        s_objectWasAddedAndNotUpdated = false;
-
-
         HasInitialized = false;
 
         s_section = new Section();
-        Section.ObjectAddedEvent += (_, _) => OnSectionElementAdded();
 
         BackgroundColor = Color.Black;
         ManualClearDisplayProcess = false;
@@ -246,8 +234,6 @@ public static class App
         Section.Update();
         Debugger?.Update();
 
-        UpdateObjectsAndCheckForNewOnes();
-
 
         UpdateEndedEvent?.Invoke(null, EventArgs.Empty);
     }
@@ -255,45 +241,6 @@ public static class App
 
     private static void SetCursorToDefault()
         => Window.Cursor.Type = CursorType.Arrow;
-
-
-    private static void UpdateObjectsAndCheckForNewOnes()
-    {
-        if (ManualObjectUpdate)
-            return;
-
-        UpdateObjects();
-
-        // if an element is added inside an Element.Update method, it won't be updated.
-        // to avoid bugs due to it, whenever an element is added inside an Element.Update method,
-        // another Update call will be made to update new added elements.
-
-        while (s_objectWasAddedAndNotUpdated)
-        {
-            s_objectWasAddedAndNotUpdated = false;
-            UpdateObjects(true);
-        }
-    }
-
-
-    private static void UpdateObjects(bool unconditionalUpdateOnly = false)
-    {
-        // use ToArray() to avoid: InvalidOperationException "Collection was modified".
-        // don't need to use it with DrawElements(), since it SHOULD not modify the element list
-        // and SHOULD be used only for drawing stuff
-
-        foreach (var @object in Objects.ToArray())
-            UpdateObject(@object, unconditionalUpdateOnly);
-    }
-
-
-    public static void UpdateObject(BaseObject @object, bool unconditionalUpdateOnly = false)
-    {
-        if (@object.CanUpdate && !unconditionalUpdateOnly)
-            @object.Update();
-
-        @object.UnconditionalUpdate();
-    }
 
 
 
@@ -306,8 +253,6 @@ public static class App
 
 
         Section.Draw(renderer);
-        DrawObjects(renderer);
-
         Debugger?.Draw(renderer); // draw after elements
 
 
@@ -332,37 +277,6 @@ public static class App
     }
 
 
-    private static void DrawObjects(IRenderer renderer)
-    {
-        if (ManualObjectDraw)
-            return;
-
-        foreach (var @object in Objects)
-            DrawObject(renderer, @object);
-    }
-
-
-    public static void DrawObject(IRenderer renderer, BaseObject @object)
-    {
-        if (@object.CanDraw)
-            @object.Draw(renderer);
-    }
-
-
-
-
-    public static void AddObjects(params IEnumerable<BaseObject> objects) => Section.AddObjects(objects);
-    public static void AddObject(BaseObject @object) => Section.AddObject(@object);
-    public static void RemoveObjects(params IEnumerable<BaseObject> objects) => Section.RemoveObjects(objects);
-    public static bool RemoveObject(BaseObject @object) => Section.RemoveObject(@object);
-    public static bool HasObject(BaseObject @object) => Section.HasObject(@object);
-
-    public static void AddElements(params IEnumerable<Element> elements) => Section.AddElements(elements);
-    public static void AddElement(Element element) => Section.AddElement(element);
-    public static void RemoveElements(params IEnumerable<Element> elements) => Section.RemoveElements(elements);
-    public static bool RemoveElement(Element element) => Section.RemoveElement(element);
-
-
 
 
     private static void OnWindowClose(object? _, EventArgs __)
@@ -380,13 +294,5 @@ public static class App
         newView.Size = newSize;
 
         Window.SetView(newView);
-    }
-
-
-
-
-    private static void OnSectionElementAdded()
-    {
-        s_objectWasAddedAndNotUpdated = true;
     }
 }

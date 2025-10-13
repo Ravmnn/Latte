@@ -14,11 +14,11 @@ namespace Latte.Application;
 
 
 
-// TODO: improve this... make this really useful
 public class Section : IUpdateable, IDrawable
 {
     // Elements are ordered based on their priority
     private List<BaseObject> _objects;
+    private bool _objectWasAddedAndNotUpdated;
 
 
 
@@ -43,8 +43,8 @@ public class Section : IUpdateable, IDrawable
     {
         _objects = [];
 
-        ObjectAddedEvent += (_, args) => ObjectListModifiedEvent?.Invoke(this, args);
-        ObjectRemovedEvent += (_, args) => ObjectListModifiedEvent?.Invoke(this, args);
+        ObjectAddedEvent += OnObjectAdded;
+        ObjectRemovedEvent += OnObjectRemoved;
     }
 
 
@@ -59,6 +59,7 @@ public class Section : IUpdateable, IDrawable
     public virtual void Update()
     {
         SortObjectListByPriority();
+        UpdateObjectsAndCheckForNewOnes();
 
         UpdateEvent?.Invoke(this, EventArgs.Empty);
     }
@@ -68,10 +69,47 @@ public class Section : IUpdateable, IDrawable
         => _objects = _objects.OrderBy(@object => @object.Priority).ToList();
 
 
+    protected void UpdateObjectsAndCheckForNewOnes()
+    {
+        UpdateObjects();
+
+        // if an element is added inside an Element.Update method, it won't be updated.
+        // to avoid bugs due to it, whenever an element is added inside an Element.Update method,
+        // another Update call will be made to update new added elements.
+
+        while (_objectWasAddedAndNotUpdated)
+        {
+            _objectWasAddedAndNotUpdated = false;
+            UpdateObjects(true);
+        }
+    }
+
+
+    protected void UpdateObjects(bool unconditionalUpdateOnly = false)
+    {
+        // use ToArray() to avoid: InvalidOperationException "Collection was modified".
+        // don't need to use it with DrawElements(), since it SHOULD not modify the element list
+        // and SHOULD be used only for drawing stuff
+
+        foreach (var @object in Objects.ToArray())
+            @object.UpdateObject(unconditionalUpdateOnly);
+    }
+
+
 
 
     public virtual void Draw(IRenderer renderer)
-        => DrawEvent?.Invoke(this, EventArgs.Empty);
+    {
+        DrawObjects(renderer);
+        DrawEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    protected void DrawObjects(IRenderer renderer)
+    {
+        foreach (var @object in Objects)
+            @object.DrawObject(renderer);
+    }
 
 
 
@@ -218,4 +256,17 @@ public class Section : IUpdateable, IDrawable
         if (e.Element is not null)
             AddObject(e.Element);
     }
+
+
+
+
+    private void OnObjectAdded(object? sender, BaseObjectEventArgs args)
+    {
+        _objectWasAddedAndNotUpdated = true;
+        ObjectListModifiedEvent?.Invoke(sender, args);
+    }
+
+
+    private void OnObjectRemoved(object? sender, BaseObjectEventArgs args)
+        => ObjectListModifiedEvent?.Invoke(sender, args);
 }
