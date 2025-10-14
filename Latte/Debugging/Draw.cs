@@ -14,6 +14,9 @@ namespace Latte.Debugging;
 
 public static class Draw
 {
+    // do not use a BaseObject as debugging draw annotation, since
+    // they need to update once before being able to draw
+
     public static void Rect(IRenderer renderer, FloatRect rect, Color color)
         => renderer.Render(new RectangleShape(rect.Size)
         {

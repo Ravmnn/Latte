@@ -21,11 +21,20 @@ public class Section : IUpdateable, IDrawable
     private bool _objectWasAddedAndNotUpdated;
 
 
-
-
     public IEnumerable<BaseObject> Objects => _objects;
 
 
+
+
+    public static IObjectHandler GlobalObjectHandler { get; set; }
+
+
+    private IObjectHandler? _objectHandler;
+    public IObjectHandler ObjectHandler
+    {
+        get => _objectHandler ?? GlobalObjectHandler;
+        set => _objectHandler = value;
+    }
 
 
     public event EventHandler<BaseObjectEventArgs>? ObjectAddedEvent;
@@ -35,6 +44,14 @@ public class Section : IUpdateable, IDrawable
 
     public event EventHandler? UpdateEvent;
     public event EventHandler? DrawEvent;
+
+
+
+
+    static Section()
+    {
+        GlobalObjectHandler = new DefaultObjectHandler();
+    }
 
 
 
@@ -80,19 +97,19 @@ public class Section : IUpdateable, IDrawable
         while (_objectWasAddedAndNotUpdated)
         {
             _objectWasAddedAndNotUpdated = false;
-            UpdateObjects(true);
+            UpdateObjects(false);
         }
     }
 
 
-    protected void UpdateObjects(bool unconditionalUpdateOnly = false)
+    protected void UpdateObjects(bool mainUpdate = true)
     {
         // use ToArray() to avoid: InvalidOperationException "Collection was modified".
         // don't need to use it with DrawElements(), since it SHOULD not modify the element list
         // and SHOULD be used only for drawing stuff
 
         foreach (var @object in Objects.ToArray())
-            @object.UpdateObject(unconditionalUpdateOnly);
+            ObjectHandler.Update(@object, mainUpdate);
     }
 
 
@@ -108,7 +125,7 @@ public class Section : IUpdateable, IDrawable
     protected void DrawObjects(IRenderer renderer)
     {
         foreach (var @object in Objects)
-            @object.DrawObject(renderer);
+            ObjectHandler.Draw(@object, renderer);
     }
 
 
