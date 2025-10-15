@@ -1,11 +1,11 @@
 using SFML.Graphics;
 
 
-namespace Latte.UI;
+namespace Latte.Core;
 
 
 
-// TODO: move to Latte.Core
+
 public interface IBounds
 {
     FloatRect GetBounds();
