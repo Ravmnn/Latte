@@ -16,7 +16,7 @@ public interface IRenderer
 
 
 
-    void Render(Drawable drawable, Effect? drawableEffect = null);
+    void Render(Drawable drawable, Effect? drawableEffect = null, Texture? texture = null);
 
 
 

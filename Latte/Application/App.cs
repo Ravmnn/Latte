@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 using OpenTK.Windowing.Desktop;
 
 using SFML.System;
@@ -231,7 +232,7 @@ public static class App
         FocusManager.Update();
         AnimationManager.Update();
 
-        Section.Update();
+        UpdateSection();
         Debugger?.Update();
 
 
@@ -241,6 +242,18 @@ public static class App
 
     private static void SetCursorToDefault()
         => Window.Cursor.Type = CursorType.Arrow;
+
+
+    private static void UpdateSection()
+    {
+        // ensure Section is updated
+
+        var oldSection = Section;
+        Section.Update();
+
+        if (oldSection != Section)
+            Update();
+    }
 
 
 

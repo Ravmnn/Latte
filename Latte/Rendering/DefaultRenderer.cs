@@ -18,21 +18,28 @@ public class DefaultRenderer(RenderTarget renderTarget) : IRenderer
 
 
 
-    public virtual void Render(Drawable drawable, Effect? drawableEffect = null)
+    public virtual void Render(Drawable drawable, Effect? drawableEffect = null, Texture? texture = null)
     {
         GlobalEffect?.UpdateUniforms(this);
         drawableEffect?.UpdateUniforms(this);
 
-        RenderWithEffect(drawable, drawableEffect ?? GlobalEffect);
+        RenderWithStates(drawable, drawableEffect ?? GlobalEffect, texture);
     }
 
 
-    protected void RenderWithEffect(Drawable drawable, Effect? drawableEffect = null)
+    protected void RenderWithStates(Drawable drawable, Effect? drawableEffect = null, Texture? texture = null)
     {
-        if (drawableEffect is not null)
-            RenderTarget.Draw(drawable, new RenderStates(drawableEffect));
-        else
+        if (drawableEffect is null && texture is null)
+        {
             RenderTarget.Draw(drawable);
+            return;
+        }
+
+        var states = RenderStates.Default;
+        states.Shader = drawableEffect ?? RenderStates.Default.Shader;
+        states.Texture = texture ?? RenderStates.Default.Texture;
+
+        RenderTarget.Draw(drawable, states);
     }
 
 
