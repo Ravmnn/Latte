@@ -37,6 +37,41 @@ public static class Draw
 
 
 
+    public static void Line(IRenderer renderer, Vec2f from, Vec2f to, Color? color = null)
+    {
+        color ??= Color.White;
+
+        var vertices = new VertexArray(PrimitiveType.Lines, 2);
+        vertices.Append(new Vertex(from, color.Value));
+        vertices.Append(new Vertex(to, color.Value));
+
+        renderer.Render(vertices);
+    }
+
+
+
+
+    public static void Circle(IRenderer renderer, Vec2f position, float radius, Color? color = null)
+    {
+        color ??= Color.White;
+
+        var circle = new CircleShape(radius)
+        {
+            Origin = new Vec2f(radius, radius),
+            Position = position,
+            FillColor = color.Value
+        };
+
+        renderer.Render(circle);
+    }
+
+
+    public static void Point(IRenderer renderer, Vec2f position, Color? color = null)
+        => Circle(renderer, position, 4f, color);
+
+
+
+
     public static void Text(IRenderer renderer, Vec2f position, string text, uint size = 5, Color? color = null, Color? backgroundColor = null)
     {
         var textObject = new Text(text, App.DefaultFont, size)

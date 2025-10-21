@@ -77,7 +77,7 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
 
 
     private int _priority;
-    public int Priority
+    public int Priority // TODO: it's probably a good idea to make this exclusively feature of Element
     {
         get => _priority;
         set
