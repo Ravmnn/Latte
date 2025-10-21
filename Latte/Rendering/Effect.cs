@@ -77,7 +77,15 @@ public class Effect : Shader
 
         switch (property.GetValue(this))
         {
+            case int value:
+                SetUniform(name, value);
+                break;
+
             case float value:
+                SetUniform(name, value);
+                break;
+
+            case bool value:
                 SetUniform(name, value);
                 break;
 

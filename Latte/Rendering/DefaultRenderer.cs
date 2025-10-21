@@ -53,12 +53,16 @@ public class DefaultRenderer(RenderTarget renderTarget) : IRenderer
         PostEffect.UpdateUniforms(this);
 
         for (var i = 0; i < PostEffectPasses; i++)
-        {
-            var content = GetContent();
-            var sprite = new Sprite(content);
+            ApplyEffect(PostEffect);
+    }
 
-            Render(sprite, PostEffect);
-        }
+
+    public void ApplyEffect(Effect effect)
+    {
+        var content = GetContent();
+        var sprite = new Sprite(content);
+
+        Render(sprite, effect);
     }
 
 

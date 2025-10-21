@@ -8,10 +8,10 @@ namespace Latte.Rendering;
 
 public interface IRenderer
 {
-    RenderTarget RenderTarget { get; }
-    Effect? GlobalEffect { get; }
-    Effect? PostEffect { get; }
-    int PostEffectPasses { get; }
+    RenderTarget RenderTarget { get; set; }
+    Effect? GlobalEffect { get; set; }
+    Effect? PostEffect { get; set; }
+    int PostEffectPasses { get; set; }
 
 
 
@@ -22,6 +22,7 @@ public interface IRenderer
 
 
     void ApplyPostEffect();
+    void ApplyEffect(Effect effect);
 
 
 
