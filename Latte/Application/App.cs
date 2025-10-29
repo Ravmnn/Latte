@@ -26,6 +26,8 @@ namespace Latte.Application;
 
 
 
+// TODO: implement UBOs to send more data to shaders
+
 // TODO: add time-based performance analyzer, with FPS calculator
 
 // TODO: add horizontal and vertical layouts

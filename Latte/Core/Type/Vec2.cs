@@ -11,6 +11,8 @@ namespace Latte.Core.Type;
 
 
 
+// TODO: remove this base class (vec2's should not have inheritance, more verbose though)
+// TODO: make all struct
 public class Vec2<T>(T x, T y) : ICloneable, IFloatArrayModifiable where T :
     IAdditionOperators<T, T, T>,
     ISubtractionOperators<T, T, T>,
