@@ -342,7 +342,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         if (position is null)
             Alignment = Alignment.Center;
         else
-            RelativePosition = position;
+            RelativePosition = position.Value;
     }
 
 

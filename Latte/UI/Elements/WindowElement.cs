@@ -192,19 +192,17 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
         ResizeCornersBy(left, top, right, bottom);
 
         if (ShouldResizeCornersToMinSize())
-            ResizeCornersToSizeLimit(MinSize! - Size, left != 0f, top != 0f, right != 0f, bottom != 0f);
+            ResizeCornersToSizeLimit(MinSize!.Value - Size, left != 0f, top != 0f, right != 0f, bottom != 0f);
 
         if (ShouldResizeCornersToMaxSize())
-            ResizeCornersToSizeLimit(MaxSize! - Size, left != 0f, top != 0f, right != 0f, bottom != 0f);
+            ResizeCornersToSizeLimit(MaxSize!.Value - Size, left != 0f, top != 0f, right != 0f, bottom != 0f);
     }
 
 
     private void ResizeCornersBy(float left = 0f, float top = 0f, float right = 0f, float bottom = 0f)
     {
-        RelativePosition.X += left;
-        RelativePosition.Y += top;
-        Size.X += right;
-        Size.Y += bottom;
+        RelativePosition = RelativePosition with { X = RelativePosition.X + left, Y = RelativePosition.Y + top };
+        Size = Size with { X = Size.X + right, Y = Size.Y + bottom };
     }
 
 
@@ -213,11 +211,11 @@ public class WindowElement : RectangleElement, IDraggable, IResizable
 
 
     private bool ShouldResizeCornersToMinSize()
-        => MinSize is not null && (Size.X < MinSize.X || Size.Y < MinSize.Y);
+        => MinSize is not null && (Size.X < MinSize.Value.X || Size.Y < MinSize.Value.Y);
 
 
     private bool ShouldResizeCornersToMaxSize()
-        => MaxSize is not null && (Size.X > MaxSize.X || Size.Y > MaxSize.Y);
+        => MaxSize is not null && (Size.X > MaxSize.Value.X || Size.Y > MaxSize.Value.Y);
 
 
 

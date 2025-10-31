@@ -98,17 +98,17 @@ public class SliderHandleElement : ButtonElement, IDraggable
     protected void ClampPosition()
     {
         if (Orientation == Orientation.Horizontal)
-            RelativePosition.X = Math.Clamp(RelativePosition.X, 0, Parent.Size.X - Size.X);
+            RelativePosition = RelativePosition with { X = Math.Clamp(RelativePosition.X, 0, Parent.Size.X - Size.X) };
         else
-            RelativePosition.Y = Math.Clamp(RelativePosition.Y, 0, Parent.Size.Y - Size.Y);
+            RelativePosition = RelativePosition with { Y = Math.Clamp(RelativePosition.Y, 0, Parent.Size.Y - Size.Y) };
     }
 
 
     protected void UpdatePositionBasedOnNormalizedValue()
     {
         if (Orientation == Orientation.Horizontal)
-            RelativePosition.X = (Parent.Size.X - Size.X) * Parent.NormalizedValue;
+            RelativePosition = RelativePosition with { X = (Parent.Size.X - Size.X) * Parent.NormalizedValue };
         else
-            RelativePosition.Y = (Parent.Size.Y - Size.Y) * Parent.NormalizedValue;
+            RelativePosition = RelativePosition with { Y = (Parent.Size.Y - Size.Y) * Parent.NormalizedValue };
     }
 }

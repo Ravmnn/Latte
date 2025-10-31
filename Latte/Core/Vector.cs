@@ -10,18 +10,39 @@ namespace Latte.Core;
 
 public static class Vector
 {
-    public static float Length(this Vec2f vec)
-        => MathF.Sqrt(vec.Dot(vec));
+    public static double Length(Vec2f vec)
+        => Math.Sqrt(Dot(vec, vec));
 
 
-    public static Vec2f Normalized(this Vec2f vec)
-        => vec * (1f / vec.Length());
+    public static Vec2f Normalized(Vec2f vec)
+        => vec * (float)(1f / Length(vec));
 
 
-    public static float Dot(this Vec2f a, Vec2f b)
+    public static double Dot(Vec2f a, Vec2f b)
         => a.X * b.X + a.Y * b.Y;
 
 
-    public static float Cross(this Vec2f a, Vec2f b)
+    public static double Cross(Vec2f a, Vec2f b)
+        => a.X * b.Y - a.Y * b.X;
+}
+
+
+
+
+public static class VectorF
+{
+    public static float Length(Vec2f vec)
+        => MathF.Sqrt(Dot(vec, vec));
+
+
+    public static Vec2f Normalized(Vec2f vec)
+        => vec * (1f / Length(vec));
+
+
+    public static float Dot(Vec2f a, Vec2f b)
+        => a.X * b.X + a.Y * b.Y;
+
+
+    public static float Cross(Vec2f a, Vec2f b)
         => a.X * b.Y - a.Y * b.X;
 }

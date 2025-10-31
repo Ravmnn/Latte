@@ -66,7 +66,7 @@ public static class Rect
     public static IntRect ToWindowCoordinates(this FloatRect rect)
     {
         Vec2i transformedPosition = App.Window.MapCoordsToPixel(rect.Position);
-        Vec2i transformedSize = App.Window.MapCoordsToPixel(rect.Position + rect.Size) - transformedPosition;
+        Vec2i transformedSize = (Vec2i)App.Window.MapCoordsToPixel(rect.Position + rect.Size) - transformedPosition;
 
         return new IntRect(transformedPosition, transformedSize);
     }
@@ -75,7 +75,7 @@ public static class Rect
     public static FloatRect ToWorldCoordinates(this IntRect rect)
     {
         Vec2f transformedPosition = App.Window.MapPixelToCoords(rect.Position);
-        Vec2f transformedSize = App.Window.MapPixelToCoords(rect.Position + rect.Size) - transformedPosition;
+        Vec2f transformedSize = (Vec2f)App.Window.MapPixelToCoords(rect.Position + rect.Size) - transformedPosition;
 
         return new FloatRect(transformedPosition, transformedSize);
     }

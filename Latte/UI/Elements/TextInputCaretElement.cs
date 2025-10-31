@@ -41,7 +41,7 @@ public class TextInputCaretElement : RectangleElement
         Color = new ColorRGBA(0, 0, 0, 200);
         Alignment = Alignment.VerticalCenter;
 
-        Size.X = 2f;
+        Size = Size with { X = 2f };
 
         Visible = false;
 

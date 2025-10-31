@@ -74,7 +74,7 @@ public class ScrollAreaElement : ButtonElement
         ClampScrollOffset();
         MouseWheelScroll();
 
-        LastScrollOffset = ScrollOffset.Copy();
+        LastScrollOffset = ScrollOffset;
 
         base.Update();
     }
@@ -99,11 +99,11 @@ public class ScrollAreaElement : ButtonElement
         switch (Orientation)
         {
             case Orientation.Vertical:
-                ScrollOffset.Y += step;
+                ScrollOffset = ScrollOffset with { Y = ScrollOffset.Y + step };
                 break;
 
             case Orientation.Horizontal:
-                ScrollOffset.X += step;
+                ScrollOffset = ScrollOffset with { X = ScrollOffset.X + step };
                 break;
         }
 
@@ -127,10 +127,12 @@ public class ScrollAreaElement : ButtonElement
         Vec2f progress = ScrollOffset / ((Vec2f)childrenBounds.Size - Size);
 
         if (VerticalScrollHandle is not null)
-            VerticalScrollHandle.RelativePosition.Y = (Size.Y - VerticalScrollHandle.Size.Y) * progress.Y;
+            VerticalScrollHandle.RelativePosition = VerticalScrollHandle.RelativePosition
+                with { Y = (Size.Y - VerticalScrollHandle.Size.Y) * progress.Y };
 
         if (HorizontalScrollHandle is not null)
-            HorizontalScrollHandle.RelativePosition.X = (Size.X - HorizontalScrollHandle.Size.X) * progress.X;
+            HorizontalScrollHandle.RelativePosition = HorizontalScrollHandle.RelativePosition
+                with { X = (Size.X - HorizontalScrollHandle.Size.X) * progress.X };
     }
 
 
@@ -138,8 +140,8 @@ public class ScrollAreaElement : ButtonElement
     {
         var bounds = GetClampedChildrenBounds();
 
-        ScrollOffset.X = Math.Clamp(ScrollOffset.X, 0, bounds.Width - Size.X);
-        ScrollOffset.Y = Math.Clamp(ScrollOffset.Y, 0, bounds.Height - Size.Y);
+        ScrollOffset = ScrollOffset with { X = Math.Clamp(ScrollOffset.X, 0, bounds.Width - Size.X) };
+        ScrollOffset = ScrollOffset with { Y = Math.Clamp(ScrollOffset.Y, 0, bounds.Height - Size.Y) };
     }
 
 

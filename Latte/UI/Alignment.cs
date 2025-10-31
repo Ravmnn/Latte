@@ -119,17 +119,17 @@ public static class AlignmentCalculator
     // https://learnsfml.com/basics/graphics/how-to-center-text/#set-a-string
 
     public static Vec2f GetTextAlignedPositionOfChild(Text text, FloatRect parent, Alignment alignment)
-        => GetAlignedPositionOfChild(text.GetGlobalBounds(), parent, alignment) - text.GetLocalBounds().Position;
+        => GetAlignedPositionOfChild(text.GetGlobalBounds(), parent, alignment) - (Vec2f)text.GetLocalBounds().Position;
 
     public static Vec2f GetTextAlignedRelativePositionOfChild(Text text, FloatRect parent, Alignment alignment)
-        => GetAlignedRelativePositionOfChild(text.GetGlobalBounds(), parent, alignment) - text.GetLocalBounds().Position;
+        => GetAlignedRelativePositionOfChild(text.GetGlobalBounds(), parent, alignment) - (Vec2f)text.GetLocalBounds().Position;
 
 
 
 
     public static Vec2f ApplyBorderOffset(Vec2f position, float borderSize, Alignment alignment)
     {
-        var newPosition = position.Copy();
+        var newPosition = position;
         var ignoreCenter = false;
 
         if (alignment.HasAnyFlag(Alignment.Top, Alignment.Bottom))

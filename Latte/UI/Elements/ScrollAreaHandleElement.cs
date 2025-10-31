@@ -59,12 +59,12 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
         {
             case Orientation.Vertical:
                 Alignment = Alignment.Right;
-                Size.X = 10;
+                Size = Size with { X = 10 };
                 break;
 
             case Orientation.Horizontal:
                 Alignment = Alignment.Bottom;
-                Size.Y = 10;
+                Size = Size with { Y = 10 };
                 break;
         }
     }
@@ -96,9 +96,9 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
         var size = parentSize * sizeRatio;
 
         if (Orientation == Orientation.Vertical)
-            Size.Y = size.Y;
+            Size = Size with { Y = size.Y };
         else
-            Size.X = size.X;
+            Size = Size with { X = size.X };
     }
 
 
@@ -107,18 +107,18 @@ public class ScrollAreaHandleElement : ButtonElement, IDraggable
         Vec2f scrollOffset = ((Vec2f)Parent.GetClampedChildrenBounds().Size - Parent.Size) * GetProgress();
 
         if (Orientation == Orientation.Vertical)
-            Parent.ScrollOffset.Y = scrollOffset.Y;
+            Parent.ScrollOffset = Parent.ScrollOffset with { Y = scrollOffset.Y };
         else
-            Parent.ScrollOffset.X = scrollOffset.X;
+            Parent.ScrollOffset = Parent.ScrollOffset with { X = scrollOffset.X };
     }
 
 
     protected void ClampPosition()
     {
         if (Orientation == Orientation.Vertical)
-            RelativePosition.Y = Math.Clamp(RelativePosition.Y, 0, Parent.Size.Y - Size.Y);
+            RelativePosition = RelativePosition with { Y = Math.Clamp(RelativePosition.Y, 0, Parent.Size.Y - Size.Y) };
         else
-            RelativePosition.X = Math.Clamp(RelativePosition.X, 0, Parent.Size.X - Size.X);
+            RelativePosition = RelativePosition with { X = Math.Clamp(RelativePosition.X, 0, Parent.Size.X - Size.X) };
     }
 
 
