@@ -188,10 +188,13 @@ public sealed class Debugger : IUpdateable, IDrawable
 
     public static void DrawObjectPriority(IRenderer renderer, BaseObject @object)
     {
-        var absolutePriority = (uint)Math.Abs(@object.Priority);
+        if (@object is not Element element)
+            return;
+
+        var absolutePriority = (uint)Math.Abs(element.Priority);
 
         Debugging.Draw.Rect(renderer, @object.GetBounds(), ColorGenerator.FromIndex(absolutePriority, 50));
-        Debugging.Draw.Text(renderer, @object.GetBounds(), Alignment.Center, @object.Priority.ToString(), backgroundColor: Color.White);
+        Debugging.Draw.Text(renderer, @object.GetBounds(), Alignment.Center, element.Priority.ToString(), backgroundColor: Color.White);
     }
 
     public static void DrawFocusIndicator(IRenderer renderer, BaseObject @object)

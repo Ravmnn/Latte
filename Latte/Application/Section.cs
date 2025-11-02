@@ -83,7 +83,7 @@ public class Section : IUpdateable, IDrawable
 
 
     private void SortObjectListByPriority()
-        => _objects = _objects.OrderBy(@object => @object.Priority).ToList();
+        => _objects = _objects.OrderBy(@object => (@object as Element)?.Priority ?? 0).ToList();
 
 
     protected void UpdateObjectsAndCheckForNewOnes()

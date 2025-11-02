@@ -76,27 +76,6 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
 
 
 
-    private int _priority;
-    public int Priority // TODO: it's probably a good idea to make this exclusively feature of Element
-    {
-        get => _priority;
-        set
-        {
-            if (_priority == value)
-                return;
-
-            _priority = value;
-            OnPriorityChange();
-        }
-    }
-
-    protected int LastPriority { get; private set; }
-
-    public event EventHandler? PriorityChangedEvent;
-
-
-
-
     public event EventHandler? SetupEvent;
     public event EventHandler? UnconditionalUpdateEvent;
 
@@ -140,8 +119,6 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
             Setup();
 
         UpdateSfmlProperties();
-
-        LastPriority = Priority;
 
         UnconditionalUpdateEvent?.Invoke(this, EventArgs.Empty);
     }
@@ -198,16 +175,6 @@ public abstract class BaseObject : IUpdateable, IDrawable, ISfmlObject
 
 
 
-    public void Raise(uint amount = 1) => Priority += (int)amount;
-    public void Lower(uint amount = 1) => Priority -= (int)amount;
-
-
-
-
     protected virtual void OnVisibilityChange()
         => VisibilityChangedEvent?.Invoke(this, EventArgs.Empty);
-
-
-    protected virtual void OnPriorityChange()
-        => PriorityChangedEvent?.Invoke(this, EventArgs.Empty);
 }

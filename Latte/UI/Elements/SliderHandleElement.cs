@@ -61,7 +61,7 @@ public class SliderHandleElement : ButtonElement, IDraggable
 
 
     public virtual void OnDragBegin()
-        => DragBeginEvent?.Invoke(this, EventArgs.Empty); // TODO: create extension method object.Trigger(event?)
+        => DragBeginEvent?.Invoke(this, EventArgs.Empty);
 
     public virtual void OnDragEnd()
         => DragEndEvent?.Invoke(this, EventArgs.Empty);

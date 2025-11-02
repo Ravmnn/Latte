@@ -49,4 +49,14 @@ public sealed class MainSection : Section
     {
         layout.Push(new RectangleElement(layout, null, size) { Color = color ?? Color.White });
     }
+
+
+    public override void Update()
+    {
+        foreach (var @object in App.Objects)
+            if (@object.Position == new Vec2f())
+                Console.WriteLine(@object);
+
+        base.Update();
+    }
 }

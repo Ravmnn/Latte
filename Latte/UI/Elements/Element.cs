@@ -99,6 +99,25 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     public int ClipLayerIndexOffset { get; set; }
 
 
+    private int _priority;
+    public int Priority
+    {
+        get => _priority;
+        set
+        {
+            if (_priority == value)
+                return;
+
+            _priority = value;
+            OnPriorityChange();
+        }
+    }
+
+    protected int LastPriority { get; private set; }
+
+    public event EventHandler? PriorityChangedEvent;
+
+
     public PrioritySnap PrioritySnap { get; set; }
     public int PrioritySnapOffset { get; set; }
 
@@ -165,6 +184,8 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         UpdatePriority();
         UpdateClipLayerIndex();
         UpdateGeometry();
+
+        LastPriority = Priority;
 
         base.UnconditionalUpdate();
     }
@@ -394,6 +415,10 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
 
 
+    public void Raise(uint amount = 1) => Priority += (int)amount;
+    public void Lower(uint amount = 1) => Priority -= (int)amount;
+
+
     public void RaiseToTop()
     {
         var elements = App.Section.GetObjectsOfType<Element>();
@@ -451,6 +476,10 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
     }
 
 
+
+
+    protected virtual void OnPriorityChange()
+        => PriorityChangedEvent?.Invoke(this, EventArgs.Empty);
 
 
     protected virtual void OnParentChange()
