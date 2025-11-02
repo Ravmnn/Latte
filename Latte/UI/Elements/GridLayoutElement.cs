@@ -1,11 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using Latte.Core.Type;
-using Latte.Application;
-using Latte.UI.Elements.Attributes;
-using Latte.UI.Elements.Exceptions;
 
 
 namespace Latte.UI.Elements;
@@ -13,114 +9,29 @@ namespace Latte.UI.Elements;
 
 
 
-// TODO: rebuild grid system from scratch... maybe use something like Horizontal and VerticalLayout
-
-public enum GridLayoutGrowDirection
+public class GridLayoutElement : VerticalLayoutElement
 {
-    Horizontal,
-    Vertical
-}
+    public List<Element> Rows => Elements;
 
 
-
-
-[ChildrenType(typeof(GridLayoutCellElement))]
-public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
-{
-    public GridLayoutCellElement[,] Cells { get; private set; }
-
-
-
-
-    private uint _rows;
-    public uint Rows
+    public uint MaxWidth { get; set; }
+    public uint? MaxHeight
     {
-        get => _rows;
-        set
-        {
-            if (MaxRows is not null)
-                ArgumentOutOfRangeException.ThrowIfGreaterThan(value, MaxRows.Value, nameof(value));
-
-            if (MinRows is not null)
-                ArgumentOutOfRangeException.ThrowIfLessThan(value, MinRows.Value, nameof(value));
-
-            _rows = value;
-            RecreationRequired = true;
-        }
+        get => MaxElementCount;
+        set => MaxElementCount = value;
     }
 
 
-    private uint _columns;
-    public uint Columns
+    public new Vec2f Margin { get; set; }
+
+
+
+
+    public GridLayoutElement(Element? parent, Vec2f? position, uint rowWidth) : base(parent, position)
     {
-        get => _columns;
-        set
-        {
-            if (MaxColumns is not null)
-                ArgumentOutOfRangeException.ThrowIfGreaterThan(value, MaxColumns.Value, nameof(value));
+        MaxWidth = rowWidth;
 
-            if (MinColumns is not null)
-                ArgumentOutOfRangeException.ThrowIfLessThan(value, MinColumns.Value, nameof(value));
-
-            _columns = value;
-            RecreationRequired = true;
-        }
-    }
-
-    public uint? MaxRows { get; set; }
-    public uint? MaxColumns { get; set; }
-
-    public uint? MinRows { get; set; }
-    public uint? MinColumns { get; set; }
-
-
-    private float _cellWidth;
-    public float CellWidth
-    {
-        get => _cellWidth;
-        set
-        {
-            _cellWidth = value;
-            RecreationRequired = true;
-        }
-    }
-
-
-    private float _cellHeight;
-    public float CellHeight
-    {
-        get => _cellHeight;
-        set
-        {
-            _cellHeight = value;
-            RecreationRequired = true;
-        }
-    }
-
-
-    public GridLayoutGrowDirection GrowDirection { get; set; }
-    public bool Fixed { get; set; }
-
-    public bool RecreationRequired { get; set; }
-
-
-
-
-    public GridLayoutElement(Element? parent, Vec2f? position, uint rows, uint columns, float cellWidth, float cellHeight)
-        : base(parent, position, new Vec2f())
-    {
-        _rows = rows;
-        _columns = columns;
-
-        _cellWidth = cellWidth;
-        _cellHeight = cellHeight;
-
-        GrowDirection = GridLayoutGrowDirection.Horizontal;
-
-        Color = SFML.Graphics.Color.Transparent;
-
-        Cells = new GridLayoutCellElement[0, 0];
-        CreateCells();
+        AddNewRow();
     }
 
 
@@ -128,184 +39,57 @@ public class GridLayoutElement : RectangleElement, IEnumerable<Element?>
 
     public override void UnconditionalUpdate()
     {
-        if (RecreationRequired)
-            CreateCells();
+        UpdateMargins();
+        RemoveEmptyRows();
 
         base.UnconditionalUpdate();
     }
 
 
-
-
-    public void AddElementAtEnd(Element element)
-        => FindAvailableCell().Element = element;
-
-
-
-
-    public Element RemoveFirstElement()
+    private void UpdateMargins()
     {
-        var element = FindFirstElement() ?? throw new EmptyGridException();
-        element.Parent = null;
+        base.Margin = Margin.Y;
 
-        return element;
-    }
-
-    public Element RemoveLastElement()
-    {
-        var element = FindLastElement() ?? throw new EmptyGridException();
-        element.Parent = null;
-
-        return element;
+        foreach (var row in Rows.Cast<HorizontalLayoutElement>())
+            row.Margin = Margin.X;
     }
 
 
-    public Element RemoveElementAt(uint row, uint column)
+    private void RemoveEmptyRows()
     {
-        var cell = Cells[row, column];
-
-        if (cell.Element is null)
-            throw new IndexOutOfRangeException();
-
-        var element = cell.Element;
-        cell.Element = null;
-
-        return element;
+        foreach (var row in Rows.Cast<HorizontalLayoutElement>())
+            if (row.Elements.Count == 0)
+                Elements.Remove(row);
     }
 
 
 
 
-    public void DeleteFirstElement() => App.Section.RemoveElement(RemoveFirstElement());
-    public void DeleteLastElement() => App.Section.RemoveElement(RemoveLastElement());
-    public void DeleteElementAt(uint row, uint column) => App.Section.RemoveElement(RemoveElementAt(row, column));
-
-
-    public void Clear()
+    public override void Push(Element element)
     {
-        for (uint row = 0; row < Rows; row++)
-            for (uint col = 0; col < Columns; col++)
-                DeleteElementAt(row, col);
+        var lastRow = (Elements.Last() as HorizontalLayoutElement)!;
 
-        Rows = MinRows ?? 0;
-        Columns = MinColumns ?? 0;
-
-        CreateCells();
-    }
-
-
-
-
-    public Element? GetElementAt(uint row, uint col) => Cells[row, col].Element;
-
-    public Element? this[uint row, uint col] => GetElementAt(row, col);
-
-
-
-
-    public Element? FindFirstElement()
-    {
-        for (var row = 0; row < Cells.GetLength(0) - 1; row++)
-        for (var col = 0; col < Cells.GetLength(1); col++)
-            if (Cells[row, col].Element is { } element)
-                return element;
-
-        return null;
-    }
-
-
-    public Element? FindLastElement()
-    {
-        for (var row = Cells.GetLength(0) - 1; row >= 0; row--)
-        for (var col = Cells.GetLength(1) - 1; col >= 0; col--)
-            if (Cells[row, col].Element is { } element)
-                return element;
-
-        return null;
-    }
-
-
-
-
-    public IEnumerator<Element?> GetEnumerator() => new GridLayoutEnumerator(this);
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-
-
-
-    protected GridLayoutCellElement FindAvailableCell()
-    {
-        foreach (var cell in Cells)
-            if (cell.Element is null)
-                return cell;
-
-        GrowLayout();
-
-        return FindAvailableCell();
-    }
-
-
-
-
-    protected void GrowLayout()
-    {
-        if (Fixed)
-            return;
-
-        switch (GrowDirection)
-        {
-            case GridLayoutGrowDirection.Horizontal:
-                Columns++;
-                break;
-
-            case GridLayoutGrowDirection.Vertical:
-                Rows++;
-                break;
-        }
-
-        CreateCells();
-    }
-
-
-
-
-    protected void CreateCells()
-    {
-        var oldCells = Cells;
-
-        Cells = new GridLayoutCellElement[Rows, Columns];
-
-        for (uint row = 0; row < Rows; row++)
-        for (uint col = 0; col < Columns; col++)
-        {
-            InitializeCellBasedOnOldCellMatrix(oldCells, row, col);
-            UpdateCellGeometry(row, col);
-        }
-
-        Size = new Vec2f(Columns * CellWidth, Rows * CellHeight);
-
-        RecreationRequired = false;
-    }
-
-
-    private void InitializeCellBasedOnOldCellMatrix(GridLayoutCellElement[,] oldCells, uint row, uint col)
-    {
-        if (AreIndicesInsideMatrixBounds(oldCells, row, col))
-            Cells[row, col] = oldCells[row, col];
+        if (lastRow.Elements.Count + 1 <= MaxWidth)
+            lastRow.Elements.Add(element);
         else
-            Cells[row, col] = new GridLayoutCellElement(this, new Vec2f(), new Vec2f());
+        {
+            AddNewRow();
+            Push(element);
+        }
     }
 
 
-    private void UpdateCellGeometry(uint row, uint col)
+    public override Element Pop()
     {
-        Cells[row, col].RelativePosition = new Vec2f(col * CellWidth, row * CellHeight);
-        Cells[row, col].Size = new Vec2f(CellWidth, CellHeight);
+        var lastRow = (Elements.Last() as HorizontalLayoutElement)!;
+        var element = lastRow.Elements.Last();
+
+        lastRow.Elements.RemoveAt(lastRow.Elements.Count - 1);
+
+        return element;
     }
 
 
-
-
-    private static bool AreIndicesInsideMatrixBounds<T>(T[,] matrix, uint row, uint col)
-        => row < matrix.GetLength(0) && col < matrix.GetLength(1);
+    private void AddNewRow()
+        => Elements.Add(new HorizontalLayoutElement(this, null));
 }

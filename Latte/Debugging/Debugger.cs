@@ -10,7 +10,6 @@ using Latte.Rendering;
 using Latte.Application;
 using Latte.UI;
 using Latte.UI.Elements;
-using Latte.Debugging.Elements;
 
 
 namespace Latte.Debugging;
@@ -42,9 +41,6 @@ public enum DebugOption
 
 public sealed class Debugger : IUpdateable, IDrawable
 {
-    public InspectionWindow InspectionWindow { get; }
-    public AppStateWindow AppStateWindow { get; }
-
     public DebugOption Options { get; set; }
     public bool EnableKeyShortcuts { get; set; }
 
@@ -54,9 +50,6 @@ public sealed class Debugger : IUpdateable, IDrawable
 
     public Debugger()
     {
-        InspectionWindow = new InspectionWindow { Visible = false };
-        AppStateWindow = new AppStateWindow { Visible = false };
-
         Options = DebugOption.OnlyVisibleObjects;
 
         // TODO: debugger inspector is disabled until the new one is finished
@@ -113,16 +106,6 @@ public sealed class Debugger : IUpdateable, IDrawable
             case Keyboard.Scancode.F7:
                 ToggleDebugOption(DebugOption.ShowFocus);
                 break;
-
-            case Keyboard.Scancode.F9:
-                InspectionWindow.LockAtObject = InspectionWindow.LockAtObject is null
-                    ? MouseInput.TrueClickableWhichCaughtMouseInput : null;
-
-                break;
-
-            case Keyboard.Scancode.F10:
-                ToggleDebugWindowsVisibility();
-                break;
         }
     }
 
@@ -132,13 +115,6 @@ public sealed class Debugger : IUpdateable, IDrawable
             Options &= ~option;
         else
             Options |= option;
-    }
-
-
-    private void ToggleDebugWindowsVisibility()
-    {
-        InspectionWindow.Visible = !InspectionWindow.Visible;
-        AppStateWindow.Visible = !AppStateWindow.Visible;
     }
 
 
