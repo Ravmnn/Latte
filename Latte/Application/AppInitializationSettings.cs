@@ -22,7 +22,7 @@ public readonly struct AppInitializationSettings
 
     public static AppInitializationSettings Default => new AppInitializationSettings
     {
-        DefaultFont = EmbeddedResources.DefaultFont(),
+        DefaultFont = LatteEmbeddedResources.DefaultFont(),
         WindowStyle = Styles.Default,
         ContextSettings = DefaultContextSettings
     };

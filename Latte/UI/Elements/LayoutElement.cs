@@ -23,6 +23,7 @@ public abstract class LayoutElement : RectangleElement
     public LayoutElement(Element? parent, Vec2f? position) : base(parent, position, new Vec2f())
     {
         Elements = [];
+        ClipChildren = false;
 
         Color = SFML.Graphics.Color.Transparent;
     }

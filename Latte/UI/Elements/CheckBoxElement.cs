@@ -41,7 +41,8 @@ internal class CheckBoxSelectedIndicatorElement : RectangleElement
 
 public class CheckBoxElement : ButtonElement
 {
-    protected RectangleElement SelectedIndicator { get; set; }
+    protected Element SelectedIndicator { get; set; }
+
 
 
 
@@ -50,7 +51,8 @@ public class CheckBoxElement : ButtonElement
 
 
 
-    public CheckBoxElement(Element? parent, Vec2f? position, bool selected = false) : base(parent, position, new Vec2f(20, 20), null)
+    public CheckBoxElement(Element? parent, Vec2f? position, bool selected = false)
+        : base(parent, position, new Vec2f(20, 20), null)
     {
         SelectedIndicator = new CheckBoxSelectedIndicatorElement(this);
 
@@ -65,7 +67,7 @@ public class CheckBoxElement : ButtonElement
 
     public override void OnMouseClick()
     {
-        base.OnMouseClick();
         Selected = !Selected;
+        base.OnMouseClick();
     }
 }

@@ -4,7 +4,6 @@ using System.Reflection;
 
 using SFML.Graphics;
 
-using Latte.Core.Exceptions;
 using Latte.Rendering;
 
 
@@ -15,39 +14,32 @@ namespace Latte.Core;
 
 public static class EmbeddedResourceLoader
 {
-    private static string? s_resourcesPath;
-    public static string ResourcesPath
-    {
-        get => s_resourcesPath ?? throw new EmbeddedResourcesPathNotSet();
-        set => s_resourcesPath = value;
-    }
-
-
-
-
-    public static Assembly SourceAssembly { get; set; }
+    public static Assembly DefaultSourceAssembly { get; set; }
+    public static string DefaultResourcesPath { get; set; }
 
 
 
 
     static EmbeddedResourceLoader()
     {
-        ResourcesPath = "Latte.Resources";
-        SourceAssembly = typeof(EmbeddedResourceLoader).Assembly;
+        DefaultSourceAssembly = typeof(EmbeddedResourceLoader).Assembly;
+        DefaultResourcesPath = "Latte.Resources";
     }
 
 
 
 
     private static string Prefix(this string resourceName)
-        => $"{ResourcesPath}.{resourceName}";
+        => $"{DefaultResourcesPath}.{resourceName}";
 
 
 
 
     public static byte[] Load(string resourceName, Assembly? sourceAssembly = null)
     {
-        var stream = (sourceAssembly ?? SourceAssembly).GetManifestResourceStream(resourceName.Prefix());
+        resourceName = sourceAssembly is not null ? resourceName : resourceName.Prefix();
+
+        var stream = (sourceAssembly ?? DefaultSourceAssembly).GetManifestResourceStream(resourceName);
         var bytes = new byte[stream!.Length];
         stream.ReadExactly(bytes, 0, bytes.Length);
 

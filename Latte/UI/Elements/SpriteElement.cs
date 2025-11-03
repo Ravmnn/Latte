@@ -30,9 +30,9 @@ public class SpriteElement : Element
 
 
 
-    public SpriteElement(Element? parent, string imagePath, Vec2f? position, Vec2f size) : base(parent)
+    public SpriteElement(Element? parent, Texture texture, Vec2f? position, Vec2f size) : base(parent)
     {
-        SfmlSprite = new Sprite(new Texture(imagePath));
+        SfmlSprite = new Sprite(texture);
 
         Texture = SfmlTexture;
         Smooth = true;
@@ -68,14 +68,15 @@ public class SpriteElement : Element
 
 
     private Vec2f CalculateScaleBasedOnSize(Vec2f targetSize)
-        => Scale * targetSize / (Vec2f)GetBounds().Size;
+    {
+        var oldScale = SfmlSprite.Scale;
 
-    // currentScale = currentSize
-    // targetScale = targetSize
+        SfmlSprite.Scale = new Vec2f(1, 1);
+        var bounds = GetBounds();
+        SfmlSprite.Scale = oldScale;
 
-    // currentScale * targetSize = targetScale * currentSize
-
-    // targetScale = (currentScale * targetSize) / currentSize
+        return targetSize / bounds.Size;
+    }
 
 
 
@@ -86,10 +87,10 @@ public class SpriteElement : Element
 
 
     public override FloatRect GetBounds()
-        => new FloatRect(AbsolutePosition, Size);
+        => SfmlSprite.GetGlobalBounds();
 
     public override FloatRect GetRelativeBounds()
-        => new FloatRect(RelativePosition, Size);
+        => GetBounds() with { Left = RelativePosition.X, Top = RelativePosition.Y };
 
 
 

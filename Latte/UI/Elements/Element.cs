@@ -95,6 +95,11 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
 
     public bool Clip { get; set; }
+    public bool ClipChildren { get; set; }
+
+    protected bool CanClipChildren => ClipChildren && (Parent?.CanClipChildren ?? true);
+    protected bool CanClipThis => Clip && (Parent?.CanClipChildren ?? true);
+
     public int ClipLayerIndex { get; protected set; }
     public int ClipLayerIndexOffset { get; set; }
 
@@ -154,6 +159,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
         Parent = parent;
 
         Clip = true;
+        ClipChildren = true;
 
         PrioritySnap = PrioritySnap.None;
         PrioritySnapOffset = 1;
@@ -255,7 +261,7 @@ public abstract class Element : BaseObject, IAlignable, ISizePoliciable, IMouseI
 
     protected virtual void BeginDraw(IRenderer renderer)
     {
-        if (!Clip)
+        if (!CanClipThis)
             return;
 
         Clipping.ClipEnable();
