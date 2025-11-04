@@ -1,3 +1,4 @@
+using System;
 using Latte.Core.Type;
 
 
@@ -44,9 +45,19 @@ public class CheckBoxElement : ButtonElement
     protected Element SelectedIndicator { get; set; }
 
 
+    private bool _selected;
+    public bool Selected
+    {
+        get => _selected;
+        set
+        {
+            _selected = value;
+            OnSelectedChanged();
+        }
+    }
 
 
-    public bool Selected { get; set; }
+    public event EventHandler? SelectedChangedEvent;
 
 
 
@@ -70,4 +81,10 @@ public class CheckBoxElement : ButtonElement
         Selected = !Selected;
         base.OnMouseClick();
     }
+
+
+
+
+    protected virtual void OnSelectedChanged()
+        => SelectedChangedEvent?.Invoke(this, EventArgs.Empty);
 }
